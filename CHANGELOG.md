@@ -2,7 +2,9 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [1.0.1] – 2026-11-18
+
+Security and supply-chain hardening of the repository. The app works exactly as in 1.0.0.
 
 ### Security
 - **Security policy** (`SECURITY.md`): how to report a vulnerability privately through GitHub, supported versions, and what is in and out of scope.

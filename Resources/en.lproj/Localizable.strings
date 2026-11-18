@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "Choose an image to see the watermark here.";
 "Watermark preview" = "Watermark preview";
 "Drag the watermark in the preview, or choose a position." = "Drag the watermark in the preview, or choose a position.";
+
+/* Language menu */
+"Language" = "Language";
+"Same as System" = "Same as System";
+"Restart Kapture SCR to change the language?" = "Restart Kapture SCR to change the language?";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected.";
+"Restart Now" = "Restart Now";
+"Later" = "Later";
+"The new language will be used the next time Kapture SCR opens." = "The new language will be used the next time Kapture SCR opens.";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Couldn’t restart Kapture SCR. Quit and open it again to change the language.";

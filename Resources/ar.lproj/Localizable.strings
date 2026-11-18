@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "اختر صورة لترى العلامة المائية هنا.";
 "Watermark preview" = "معاينة العلامة المائية";
 "Drag the watermark in the preview, or choose a position." = "اسحب العلامة المائية في المعاينة، أو اختر موضعًا.";
+
+/* Language menu */
+"Language" = "اللغة";
+"Same as System" = "مثل النظام";
+"Restart Kapture SCR to change the language?" = "هل تريد إعادة تشغيل Kapture SCR لتغيير اللغة؟";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "تُحفظ اللقطات والصور المستوردة في السجل الأخير في الذاكرة فقط وستُفقد. لن تتأثر الملفات المحفوظة.";
+"Restart Now" = "إعادة التشغيل الآن";
+"Later" = "لاحقًا";
+"The new language will be used the next time Kapture SCR opens." = "ستُستخدم اللغة الجديدة في المرة القادمة التي تفتح فيها Kapture SCR.";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "تعذّرت إعادة تشغيل Kapture SCR. أغلقه وافتحه مرة أخرى لتغيير اللغة.";

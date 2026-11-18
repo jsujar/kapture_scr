@@ -3,7 +3,7 @@
 <plist version="1.0"><dict>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
-<key>CFBundleLocalizations</key><array><string>en</string><string>es</string><string>fr</string><string>pt-BR</string><string>ru</string><string>zh-Hans</string><string>hi</string><string>bn</string><string>ar</string><string>ur</string></array>
+<key>CFBundleLocalizations</key><array><string>en</string><string>es</string><string>fr</string><string>pt-BR</string><string>ru</string><string>zh-Hans</string><string>zh-Hant</string><string>de</string><string>nb</string><string>sv</string><string>hu</string><string>hi</string><string>bn</string><string>ar</string><string>ur</string></array>
 <key>CFBundleIdentifier</key><string>local.kapture.app</string>
 <key>CFBundleName</key><string>Kapture SCR</string>
 <key>CFBundleDisplayName</key><string>Kapture SCR</string>

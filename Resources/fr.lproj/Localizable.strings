@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "Choisissez une image pour voir le filigrane ici.";
 "Watermark preview" = "Aperçu du filigrane";
 "Drag the watermark in the preview, or choose a position." = "Faites glisser le filigrane dans l’aperçu ou choisissez une position.";
+
+/* Language menu */
+"Language" = "Langue";
+"Same as System" = "Comme le système";
+"Restart Kapture SCR to change the language?" = "Redémarrer Kapture SCR pour changer de langue ?";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "Les captures et les images importées de l’historique récent ne sont conservées qu’en mémoire et seront perdues. Les fichiers enregistrés ne sont pas concernés.";
+"Restart Now" = "Redémarrer maintenant";
+"Later" = "Plus tard";
+"The new language will be used the next time Kapture SCR opens." = "La nouvelle langue sera utilisée à la prochaine ouverture de Kapture SCR.";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Impossible de redémarrer Kapture SCR. Quittez-le et rouvrez-le pour changer de langue.";

@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "Выберите изображение, чтобы увидеть здесь водяной знак.";
 "Watermark preview" = "Предпросмотр водяного знака";
 "Drag the watermark in the preview, or choose a position." = "Перетащите водяной знак в окне предпросмотра или выберите положение.";
+
+/* Language menu */
+"Language" = "Язык";
+"Same as System" = "Как в системе";
+"Restart Kapture SCR to change the language?" = "Перезапустить Kapture SCR, чтобы сменить язык?";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "Снимки и импортированные изображения из недавней истории хранятся только в памяти и будут потеряны. Сохранённые файлы не затрагиваются.";
+"Restart Now" = "Перезапустить";
+"Later" = "Позже";
+"The new language will be used the next time Kapture SCR opens." = "Новый язык будет использоваться при следующем запуске Kapture SCR.";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Не удалось перезапустить Kapture SCR. Закройте и снова откройте его, чтобы сменить язык.";

@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/macOS-14%2B-36383D?logo=apple&logoColor=white" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Swift-SwiftUI%20%2B%20AppKit-36383D?logo=swift&logoColor=white" alt="Swift, SwiftUI and AppKit">
   <img src="https://img.shields.io/badge/network-none-36383D" alt="No network access">
-  <a href="#languages"><img src="https://img.shields.io/badge/languages-10-36383D" alt="10 languages"></a>
+  <a href="#languages"><img src="https://img.shields.io/badge/languages-15-36383D" alt="15 languages"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-36383D" alt="MIT License"></a>
 </p>
 
@@ -33,7 +33,7 @@
 
 - **Private by design.** No networking code and no network entitlement. Captures stay on your Mac, in memory or in the folder you choose.
 - **Native and light.** Written in Swift with AppKit and SwiftUI. No dependencies, and no background polling while idle.
-- **Made for macOS.** Liquid Glass surfaces in light and dark, menu bar first, and 10 languages including right-to-left layouts.
+- **Made for macOS.** Liquid Glass surfaces in light and dark, menu bar first, and 15 languages including right-to-left layouts.
 
 ## Install
 
@@ -105,20 +105,27 @@ Open *Options › Watermark Settings…* to add your logo or signature to every 
 - **Liquid Glass.** The guide, options panel, countdown, recent captures panel and editor use Liquid Glass on macOS 26 and later (`glassEffect`, `GlassEffectContainer`), with a translucent fallback on macOS 14–15.
 - **Light and dark.** Every surface has both versions and follows the system appearance.
 - **Accessibility.** Surfaces respect *Reduce motion* and *Reduce transparency*.
-- **10 languages.** The whole interface is translated, including right-to-left layouts. See [Languages](#languages).
+- **15 languages.** The whole interface is translated, including right-to-left layouts. See [Languages](#languages).
 
 ## Languages
 
-Kapture SCR follows the language set in **System Settings › General › Language & Region**. To use a different language for this app only, add it under **Applications** in the same pane. If your language is not listed, the app uses English.
+**Automatic.** Kapture SCR follows the language set in **System Settings › General › Language & Region**. It uses the first language in your list that it has, so with *Catalan, Spanish* it uses Spanish. Regional variants map to the closest translation, for example Portuguese (Portugal) uses Portuguese (Brazil). If none of your languages is available, the app uses English.
+
+**Choose one yourself.** Use *Options › Language* in the menu bar menu, or *Same as System* to go back. Kapture SCR restarts to apply it everywhere, including system dialogs and right-to-left layouts. The recent history lives only in memory, so if it holds screenshots or imported images, Kapture SCR warns you first and lets you restart later. Saved files are never affected. This is the same setting as *Applications* in System Settings › General › Language & Region.
 
 | Language | Native name | Code | Direction |
 | --- | --- | --- | --- |
 | English | English | `en` | Left to right |
+| German | Deutsch | `de` | Left to right |
 | Spanish | Español | `es` | Left to right |
 | French | Français | `fr` | Left to right |
+| Hungarian | Magyar | `hu` | Left to right |
+| Norwegian (Bokmål) | Norsk bokmål | `nb` | Left to right |
 | Portuguese (Brazil) | Português (Brasil) | `pt-BR` | Left to right |
+| Swedish | Svenska | `sv` | Left to right |
 | Russian | Русский | `ru` | Left to right |
 | Chinese (Simplified) | 简体中文 | `zh-Hans` | Left to right |
+| Chinese (Traditional) | 繁體中文 | `zh-Hant` | Left to right |
 | Hindi | हिन्दी | `hi` | Left to right |
 | Bengali | বাংলা | `bn` | Left to right |
 | Arabic | العربية | `ar` | Right to left |
@@ -203,7 +210,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
 - **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
 - **Files.** Saving never overwrites an existing file, and file names are the same in every language.
 - **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.
-- **Languages.** All 10 translations are complete, keep their placeholders and match `Info.plist`.
+- **Languages.** All 15 translations are complete, keep their placeholders and match `Info.plist` and the *Language* menu, and macOS picks the expected one for regional settings (for example Portuguese (Portugal) → Portuguese (Brazil)).
 
 **Coverage.** `./scripts/coverage.sh` runs the tests with code coverage. The tests target the logic: about three quarters of the history, editing, file and shortcut code runs under test. Most of the source is user interface, so the overall figure is low.
 
@@ -267,7 +274,7 @@ It lists missing or unused keys for each language.
 
 ```
 Sources/Kapture/main.swift    App, capture flow, overlay, editor and panels
-Resources/                    Icons, logo and Localizable.strings for 10 languages
+Resources/                    Icons, logo and Localizable.strings for 15 languages
 Tests/KaptureTests/           Unit tests
 scripts/                      Build, disk image, coverage, load test and translation check scripts
 .github/workflows/ci.yml      Continuous integration

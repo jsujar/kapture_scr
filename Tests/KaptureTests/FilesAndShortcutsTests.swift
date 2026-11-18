@@ -100,3 +100,28 @@ final class ShortcutTests: XCTestCase {
         XCTAssertEqual(back, original)
     }
 }
+
+final class LanguageSettingTests: XCTestCase {
+    func testLanguageChoiceIsStoredAsAppleLanguagesInTheAppsOwnDomain() {
+        let suite = "KaptureTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = Settings(defaults: defaults, domain: suite)
+        XCTAssertNil(settings.language, "follows the system by default")
+        settings.language = "zh-Hant"
+        XCTAssertEqual(defaults.persistentDomain(forName: suite)?["AppleLanguages"] as? [String], ["zh-Hant"])
+        XCTAssertEqual(settings.language, "zh-Hant")
+        settings.language = nil
+        XCTAssertNil(defaults.persistentDomain(forName: suite)?["AppleLanguages"])
+        XCTAssertNil(settings.language)
+    }
+
+    func testPerAppLanguageFromSystemSettingsIsRecognised() {
+        // System Settings › Language & Region › Applications writes a regional code such as "pt-PT".
+        let suite = "KaptureTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.set(["pt-PT"], forKey: "AppleLanguages")
+        XCTAssertEqual(Settings(defaults: defaults, domain: suite).language, "pt-BR")
+    }
+}

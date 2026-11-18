@@ -98,6 +98,9 @@ final class NoNetworkTests: XCTestCase {
         let code = try source
         let calls = code.components(separatedBy: "NSWorkspace.shared.open(").dropFirst().map { String($0.prefix(while: { $0 != ")" })) }
         XCTAssertEqual(calls, ["folder"])
+        // Restarting to change the language opens only this same app.
+        let apps = code.components(separatedBy: "openApplication(at: ").dropFirst().map { String($0.prefix(while: { $0 != "," })) }
+        XCTAssertEqual(apps, ["Bundle.main.bundleURL"])
     }
 
     // MARK: 3. Binary

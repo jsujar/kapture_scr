@@ -15,6 +15,19 @@ struct Capture: Identifiable {
 /// Looks up a user-facing string in Localizable.strings (English keys; see Resources/*.lproj).
 func L(_ value: String.LocalizationValue) -> String { String(localized: value) }
 
+/// Languages the app is translated into, each with its own name, as listed in Options › Language.
+/// Computed rather than a global constant: globals in main.swift are only set when the app starts, not in tests.
+var appLanguages: [(code: String, name: String)] { [
+    ("en", "English"), ("de", "Deutsch"), ("es", "Español"), ("fr", "Français"), ("hu", "Magyar"),
+    ("nb", "Norsk bokmål"), ("pt-BR", "Português (Brasil)"), ("sv", "Svenska"), ("ru", "Русский"),
+    ("zh-Hans", "简体中文"), ("zh-Hant", "繁體中文"), ("hi", "हिन्दी"), ("bn", "বাংলা"), ("ar", "العربية"), ("ur", "اردو"),
+] }
+
+/// The app language macOS picks for a list of preferred languages (for example ["pt-PT"] → "pt-BR").
+func appLanguage(for preferences: [String]) -> String {
+    Bundle.preferredLocalizations(from: appLanguages.map(\.code), forPreferences: preferences).first ?? "en"
+}
+
 enum EditTool: CaseIterable {
     case crop, arrow, text, redact
     var title: String { switch self { case .crop: L("Crop"); case .arrow: L("Arrow"); case .text: L("Text"); case .redact: L("Redact") } }
@@ -42,7 +55,16 @@ enum ImageFormat: String, CaseIterable {
 /// Persistent capture preferences (UserDefaults inside the sandbox container).
 final class Settings {
     private let d: UserDefaults
-    init(defaults: UserDefaults = .standard) { d = defaults }
+    /// Name of the preferences domain behind `d`, to tell the app's own values from global ones.
+    private let domain: String?
+    init(defaults: UserDefaults = .standard, domain: String? = Bundle.main.bundleIdentifier) { d = defaults; self.domain = domain }
+
+    /// Language chosen in Options › Language; nil follows the system. Stored as AppleLanguages in the app's own
+    /// preferences, the same key System Settings writes for per-app languages, so it applies from the next launch.
+    var language: String? {
+        get { (domain.flatMap { d.persistentDomain(forName: $0) }?["AppleLanguages"] as? [String])?.first.map { appLanguage(for: [$0]) } }
+        set { if let newValue { d.set([newValue], forKey: "AppleLanguages") } else { d.removeObject(forKey: "AppleLanguages") } }
+    }
     var mode: CaptureMode {
         get { CaptureMode(rawValue: d.string(forKey: "mode") ?? "") ?? .selection }
         set { d.set(newValue.rawValue, forKey: "mode") }
@@ -385,7 +407,7 @@ enum FolderAccess {
 // MARK: - Capture HUD: hint, options and countdown (Liquid Glass on macOS 26+, material before)
 
 /// Timer choices offered in capture mode, in seconds (0 = none).
-let captureDelays = [0, 3, 5, 15]
+var captureDelays: [Int] { [0, 3, 5, 15] }
 func delayTitle(_ d: Int) -> String { d == 0 ? L("Off") : L("\(d) s") }
 
 extension View {
@@ -1526,6 +1548,7 @@ final class WatermarkModel: ObservableObject {
 
 struct WatermarkView: View {
     @ObservedObject var model: WatermarkModel
+    @Environment(\.layoutDirection) private var direction
     /// Corners and edges keep a small margin; bottom right matches the default position.
     private let presets: [(x: Double, y: Double, label: String)] = [
         (0.03, 0.05, L("Top Left")), (0.5, 0.05, L("Top")), (0.97, 0.05, L("Top Right")),
@@ -1547,10 +1570,12 @@ struct WatermarkView: View {
             HStack(alignment: .top, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L("Position")).font(.system(size: 13, weight: .semibold))
-                    presetGrid
+                    // Positions are physical places in the image, which is never mirrored, so the grid is not mirrored either.
+                    presetGrid.environment(\.layoutDirection, .leftToRight)
                 }
-                VStack(spacing: 8) {
-                    slider(L("Horizontal"), value: $model.options.x, in: 0...1)
+                // A grid sizes the label column to the longest label in the current language.
+                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 8) {
+                    slider(L("Horizontal"), value: $model.options.x, in: 0...1, physical: true)
                     slider(L("Vertical"), value: $model.options.y, in: 0...1)
                     slider(L("Size"), value: $model.options.size, in: Watermark.sizeRange)
                     slider(L("Opacity"), value: $model.options.opacity, in: Watermark.opacityRange)
@@ -1600,6 +1625,7 @@ struct WatermarkView: View {
                 })
             }
             .aspectRatio(1440.0 / 900.0, contentMode: .fit)
+            .environment(\.layoutDirection, .leftToRight) // drag coordinates match the unmirrored image
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
             .accessibilityLabel(L("Watermark preview"))
@@ -1628,10 +1654,11 @@ struct WatermarkView: View {
         }
     }
 
-    private func slider(_ title: String, value: Binding<Double>, in range: ClosedRange<Double>) -> some View {
-        HStack(spacing: 10) {
-            Text(title).font(.system(size: 12)).frame(width: 84, alignment: .leading)
-            Slider(value: value, in: range)
+    /// `physical`: the value is a left-to-right place in the image, so the slider keeps that direction in Arabic and Urdu.
+    private func slider(_ title: String, value: Binding<Double>, in range: ClosedRange<Double>, physical: Bool = false) -> some View {
+        GridRow {
+            Text(title).font(.system(size: 12)).fixedSize()
+            Slider(value: value, in: range).environment(\.layoutDirection, physical ? .leftToRight : direction)
             Text(value.wrappedValue.formatted(.percent.precision(.fractionLength(0)))).font(.system(size: 12)).monospacedDigit()
                 .frame(width: 44, alignment: .trailing)
         }
@@ -2404,6 +2431,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         options.addItem(.separator())
         options.addItem(item(L("Add Watermark"), #selector(toggleWatermark), on: store.watermarkActive))
         options.addItem(item(L("Watermark Settings…"), #selector(showWatermarkSettings)))
+        options.addItem(.separator())
+        let languages = NSMenu()
+        let chosen = settings.language
+        languages.addItem(item(L("Same as System"), #selector(setLanguage(_:)), tag: -1, on: chosen == nil))
+        languages.addItem(.separator())
+        for (n, language) in appLanguages.enumerated() {
+            languages.addItem(item(language.name, #selector(setLanguage(_:)), tag: n, on: chosen == language.code))
+        }
+        let languageItem = NSMenuItem(title: L("Language"), action: nil, keyEquivalent: "")
+        languageItem.submenu = languages
+        options.addItem(languageItem)
         let optionsItem = NSMenuItem(title: L("Options"), action: nil, keyEquivalent: "")
         optionsItem.submenu = options
         menu.addItem(optionsItem)
@@ -2436,6 +2474,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         settings.watermarkEnabled.toggle()
         watermarkModel?.enabled = settings.watermarkEnabled
     }
+    /// Saves the language and restarts so every window, panel and system dialog uses it (and the right layout direction).
+    /// The history lives only in memory, so the user is asked first when it holds anything.
+    @objc func setLanguage(_ sender: NSMenuItem) {
+        let code = sender.tag >= 0 ? appLanguages[sender.tag].code : nil
+        guard code != settings.language else { return }
+        settings.language = code
+        let system = UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["AppleLanguages"] as? [String] ?? ["en"]
+        guard (code ?? appLanguage(for: system)) != Bundle.main.preferredLocalizations.first else { return } // already shown
+        if store.captures.isEmpty { relaunch(); return }
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = L("Restart Kapture SCR to change the language?")
+        alert.informativeText = L("Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected.")
+        alert.addButton(withTitle: L("Restart Now"))
+        alert.addButton(withTitle: L("Later"))
+        if alert.runModal() == .alertFirstButtonReturn { relaunch() }
+        else { store.message = L("The new language will be used the next time Kapture SCR opens.") }
+    }
+
+    /// Opens a new instance of this app, then quits; the new one waits for this one before taking the global shortcuts.
+    func relaunch() {
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { [weak self] _, error in
+            DispatchQueue.main.async {
+                if error == nil { NSApp.terminate(nil) }
+                else { self?.store.message = L("Couldn’t restart Kapture SCR. Quit and open it again to change the language."); self?.show() }
+            }
+        }
+    }
+
+    /// After a restart the previous instance may still be quitting and holding the global shortcuts: wait for it (up to 5 s).
+    func setupHotKeysAfterPreviousInstance() {
+        let previous = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+            .filter { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }
+        let deadline = Date().addingTimeInterval(5)
+        func attempt() {
+            if previous.allSatisfy(\.isTerminated) || Date() > deadline { setupHotKeys(); return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: attempt)
+        }
+        attempt()
+    }
+
     @objc func showWatermarkSettings() {
         if watermarkWindow == nil {
             let model = WatermarkModel(store: store)
@@ -2488,7 +2569,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Do not change the selected capture while the user edits it.
         store.canPoll = { [weak self] in self?.window.isVisible == false }
         thumbnail.onOpen = { [weak self] id in self?.openInEditor(id) }
-        setupHotKeys()
+        setupHotKeysAfterPreviousInstance()
         show()
     }
     @objc func show() { recentPanel?.orderOut(nil); overRecentPanel = false; thumbnail.hide(); NSApp.activate(ignoringOtherApps:true); window.makeKeyAndOrderFront(nil) }
@@ -2505,6 +2586,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 }
 let app = NSApplication.shared
+// macOS takes the layout direction from the system language. Follow the app's own language instead, so Arabic or
+// Urdu chosen for Kapture SCR alone is right-to-left, and another language on an Arabic or Urdu Mac is left-to-right.
+UserDefaults.standard.set(["ar", "ur"].contains(Bundle.main.preferredLocalizations.first ?? ""), forKey: "AppleTextDirection")
 let delegate = AppDelegate()
 app.delegate = delegate
 app.run()

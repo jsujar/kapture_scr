@@ -5,10 +5,15 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 
 ### Added
+- **Language menu** (*Options › Language*): choose any of the 15 languages, or *Same as System*. The choice is stored as the app's own `AppleLanguages`, the same setting as System Settings › Language & Region › Applications. Kapture SCR restarts to apply it; when the in-memory history holds screenshots or imported images it warns that they will be lost and offers *Later*.
+- **Five new languages:** German, Norwegian (Bokmål), Swedish, Hungarian and Traditional Chinese (Taiwan vocabulary), for 15 in total.
+
+### Fixed
+- **Right-to-left layout** for Arabic and Urdu chosen for the app only: macOS takes the layout direction from the system language, so Kapture SCR now sets it from its own language at launch (and keeps other languages left-to-right on an Arabic or Urdu Mac). In the watermark settings, the preview, the nine positions and the horizontal slider stay left-to-right because they match places in the image.
 - **Automatic watermark** (*Options › Watermark Settings…*, off by default): adds an image of your choice to every capture and imported image, in files, the clipboard and the editor. Live preview on a sample screenshot where the mark can be dragged, nine quick positions, horizontal and vertical position in percent (the mark always stays inside), size as a share of the capture's width, opacity, and *Repeat as a pattern*. The image (PNG, JPEG, HEIC or TIFF up to 4096 px) is copied into the sandbox container. *Options › Add Watermark* turns it on and off. JPEG files with a watermark are flattened onto white. Translated into all 10 languages.
 
 ### Development
-- **Unit tests** (`swift test`, 76 tests): image limits, history, edits and undo, watermark, file saving, shortcuts and the 10 translations, plus a three-layer check that the app cannot reach the network (entitlements, source and compiled binary).
+- **Unit tests** (`swift test`, 76 tests): image limits, history, edits and undo, watermark, file saving, shortcuts and the 15 translations, plus a three-layer check that the app cannot reach the network (entitlements, source and compiled binary).
 - **Continuous integration** on GitHub Actions: tests, code coverage, translation check and a signed build whose entitlements are checked for the sandbox and the absence of network access.
 - **Load test** (`scripts/loadtest/run.sh`) and **coverage report** (`scripts/coverage.sh`).
 - `CaptureStore.expire(now:)` takes the current time as a parameter so expiry can be tested.

@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "选择图像后即可在此预览水印。";
 "Watermark preview" = "水印预览";
 "Drag the watermark in the preview, or choose a position." = "在预览中拖动水印，或选择一个位置。";
+
+/* Language menu */
+"Language" = "语言";
+"Same as System" = "跟随系统";
+"Restart Kapture SCR to change the language?" = "要重新启动 Kapture SCR 以更改语言吗？";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "最近历史记录中的截屏和导入的图像仅保存在内存中，将会丢失。已存储的文件不受影响。";
+"Restart Now" = "立即重新启动";
+"Later" = "稍后";
+"The new language will be used the next time Kapture SCR opens." = "下次打开 Kapture SCR 时将使用新语言。";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "无法重新启动 Kapture SCR。请退出后重新打开以更改语言。";

@@ -1,8 +1,9 @@
 import XCTest
+@testable import Kapture
 
-/// The 10 languages promised in the README: every table exists, parses, is complete and keeps placeholders intact.
+/// The 15 languages promised in the README: every table exists, parses, is complete and keeps placeholders intact.
 final class LocalizationTests: XCTestCase {
-    private let expected = ["en", "es", "fr", "pt-BR", "ru", "zh-Hans", "hi", "bn", "ar", "ur"]
+    private let expected = ["en", "de", "es", "fr", "hu", "nb", "pt-BR", "sv", "ru", "zh-Hans", "zh-Hant", "hi", "bn", "ar", "ur"]
 
     private func table(_ lang: String) throws -> [String: String] {
         let url = repoRoot.appendingPathComponent("Resources/\(lang).lproj/Localizable.strings")
@@ -14,6 +15,20 @@ final class LocalizationTests: XCTestCase {
         let found = try FileManager.default.contentsOfDirectory(atPath: repoRoot.appendingPathComponent("Resources").path)
             .filter { $0.hasSuffix(".lproj") }.map { String($0.dropLast(6)) }
         XCTAssertEqual(Set(found), Set(expected))
+    }
+
+    func testLanguageMenuListsEveryLanguageOnce() {
+        XCTAssertEqual(appLanguages.map(\.code), expected, "Options › Language follows the same list and order")
+        XCTAssertEqual(Set(appLanguages.map(\.name)).count, appLanguages.count)
+    }
+
+    func testMacOSPicksTheExpectedLanguage() {
+        let cases: [([String], String)] = [
+            (["es-MX"], "es"), (["pt-PT"], "pt-BR"), (["zh-Hant-TW"], "zh-Hant"), (["zh-HK"], "zh-Hant"), (["zh-Hans-CN"], "zh-Hans"),
+            (["de-AT"], "de"), (["nb-NO"], "nb"), (["no-NO"], "nb"), (["nn-NO"], "nb"), (["sv-FI"], "sv"), (["hu-HU"], "hu"),
+            (["ja-JP", "sv-SE"], "sv"), (["ja-JP"], "en"), (["fr-CA"], "fr"), (["ar-EG"], "ar"),
+        ]
+        for (preferences, language) in cases { XCTAssertEqual(appLanguage(for: preferences), language, "\(preferences)") }
     }
 
     func testInfoPlistDeclaresTheSameLanguages() throws {

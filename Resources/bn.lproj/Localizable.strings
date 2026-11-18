@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "এখানে ওয়াটারমার্ক দেখতে একটি ছবি বেছে নিন।";
 "Watermark preview" = "ওয়াটারমার্কের প্রিভিউ";
 "Drag the watermark in the preview, or choose a position." = "প্রিভিউতে ওয়াটারমার্ক টেনে আনুন, বা একটি অবস্থান বেছে নিন।";
+
+/* Language menu */
+"Language" = "ভাষা";
+"Same as System" = "সিস্টেমের মতো";
+"Restart Kapture SCR to change the language?" = "ভাষা পরিবর্তন করতে Kapture SCR আবার চালু করবেন?";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "সাম্প্রতিক ইতিহাসের স্ক্রিনশট ও ইমপোর্ট করা ছবি শুধু মেমরিতে থাকে এবং হারিয়ে যাবে। সংরক্ষিত ফাইলে কোনো প্রভাব পড়বে না।";
+"Restart Now" = "এখনই আবার চালু করুন";
+"Later" = "পরে";
+"The new language will be used the next time Kapture SCR opens." = "পরের বার Kapture SCR খুললে নতুন ভাষা ব্যবহার হবে।";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Kapture SCR আবার চালু করা যায়নি। ভাষা পরিবর্তন করতে এটি বন্ধ করে আবার খুলুন।";

@@ -146,3 +146,13 @@
 "Choose an image to see the watermark here." = "Elige una imagen para ver aquí la marca de agua.";
 "Watermark preview" = "Vista previa de la marca de agua";
 "Drag the watermark in the preview, or choose a position." = "Arrastra la marca de agua en la vista previa o elige una posición.";
+
+/* Language menu */
+"Language" = "Idioma";
+"Same as System" = "Igual que el sistema";
+"Restart Kapture SCR to change the language?" = "¿Reiniciar Kapture SCR para cambiar el idioma?";
+"Screenshots and imported images in the recent history are kept only in memory and will be lost. Saved files are not affected." = "Las capturas y las imágenes importadas del historial reciente solo se guardan en memoria y se perderán. Los archivos guardados no se ven afectados.";
+"Restart Now" = "Reiniciar ahora";
+"Later" = "Más tarde";
+"The new language will be used the next time Kapture SCR opens." = "El nuevo idioma se usará la próxima vez que abras Kapture SCR.";
+"Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "No se pudo reiniciar Kapture SCR. Ciérralo y vuelve a abrirlo para cambiar el idioma.";

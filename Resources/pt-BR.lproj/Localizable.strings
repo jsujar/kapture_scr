@@ -115,3 +115,34 @@
 "Import Shortcut" = "Atalho de importação";
 "Import shortcut: %@" = "Atalho de importação: %@";
 "Adjust Capture Area" = "Ajustar área de captura";
+
+/* Watermark */
+"Watermark not applied." = "Marca d’água não aplicada.";
+"Add Watermark" = "Adicionar marca d’água";
+"Watermark Settings…" = "Ajustes da marca d’água…";
+"Watermark" = "Marca d’água";
+"PNG with transparency works best." = "Um PNG com transparência dá o melhor resultado.";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "Não foi possível usar essa imagem. Escolha um PNG, JPEG, HEIC ou TIFF de até 4096 px.";
+"Top Left" = "Superior esquerdo";
+"Top" = "Superior";
+"Top Right" = "Superior direito";
+"Left" = "Esquerda";
+"Center" = "Centro";
+"Right" = "Direita";
+"Bottom Left" = "Inferior esquerdo";
+"Bottom" = "Inferior";
+"Bottom Right" = "Inferior direito";
+"Add the watermark to every capture and imported image" = "Adicionar a marca d’água a cada captura e imagem importada";
+"Position" = "Posição";
+"Horizontal" = "Horizontal";
+"Vertical" = "Vertical";
+"Size" = "Tamanho";
+"Opacity" = "Opacidade";
+"Repeat as a pattern" = "Repetir como padrão";
+"No image chosen" = "Nenhuma imagem escolhida";
+"Watermark Image" = "Imagem da marca d’água";
+"Choose Image…" = "Escolher imagem…";
+"Remove" = "Remover";
+"Choose an image to see the watermark here." = "Escolha uma imagem para ver a marca d’água aqui.";
+"Watermark preview" = "Pré-visualização da marca d’água";
+"Drag the watermark in the preview, or choose a position." = "Arraste a marca d’água na pré-visualização ou escolha uma posição.";

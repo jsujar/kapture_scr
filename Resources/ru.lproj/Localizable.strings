@@ -115,3 +115,34 @@
 "Import Shortcut" = "Сочетание для импорта";
 "Import shortcut: %@" = "Сочетание для импорта: %@";
 "Adjust Capture Area" = "Изменять область снимка";
+
+/* Watermark */
+"Watermark not applied." = "Водяной знак не добавлен.";
+"Add Watermark" = "Добавлять водяной знак";
+"Watermark Settings…" = "Настройки водяного знака…";
+"Watermark" = "Водяной знак";
+"PNG with transparency works best." = "Лучше всего подходит PNG с прозрачностью.";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "Не удалось использовать это изображение. Выберите PNG, JPEG, HEIC или TIFF размером до 4096 пикс.";
+"Top Left" = "Слева вверху";
+"Top" = "Вверху";
+"Top Right" = "Справа вверху";
+"Left" = "Слева";
+"Center" = "По центру";
+"Right" = "Справа";
+"Bottom Left" = "Слева внизу";
+"Bottom" = "Внизу";
+"Bottom Right" = "Справа внизу";
+"Add the watermark to every capture and imported image" = "Добавлять водяной знак на каждый снимок и импортированное изображение";
+"Position" = "Положение";
+"Horizontal" = "По горизонтали";
+"Vertical" = "По вертикали";
+"Size" = "Размер";
+"Opacity" = "Непрозрачность";
+"Repeat as a pattern" = "Повторять узором";
+"No image chosen" = "Изображение не выбрано";
+"Watermark Image" = "Изображение водяного знака";
+"Choose Image…" = "Выбрать изображение…";
+"Remove" = "Удалить";
+"Choose an image to see the watermark here." = "Выберите изображение, чтобы увидеть здесь водяной знак.";
+"Watermark preview" = "Предпросмотр водяного знака";
+"Drag the watermark in the preview, or choose a position." = "Перетащите водяной знак в окне предпросмотра или выберите положение.";

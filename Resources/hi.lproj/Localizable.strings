@@ -115,3 +115,34 @@
 "Import Shortcut" = "इम्पोर्ट शॉर्टकट";
 "Import shortcut: %@" = "इम्पोर्ट शॉर्टकट: %@";
 "Adjust Capture Area" = "कैप्चर क्षेत्र बदलें";
+
+/* Watermark */
+"Watermark not applied." = "वॉटरमार्क नहीं लगाया गया।";
+"Add Watermark" = "वॉटरमार्क जोड़ें";
+"Watermark Settings…" = "वॉटरमार्क सेटिंग्स…";
+"Watermark" = "वॉटरमार्क";
+"PNG with transparency works best." = "पारदर्शिता वाला PNG सबसे अच्छा रहता है।";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "यह इमेज इस्तेमाल नहीं की जा सकी। 4096 px तक की PNG, JPEG, HEIC या TIFF चुनें।";
+"Top Left" = "ऊपर बाएँ";
+"Top" = "ऊपर";
+"Top Right" = "ऊपर दाएँ";
+"Left" = "बाएँ";
+"Center" = "बीच में";
+"Right" = "दाएँ";
+"Bottom Left" = "नीचे बाएँ";
+"Bottom" = "नीचे";
+"Bottom Right" = "नीचे दाएँ";
+"Add the watermark to every capture and imported image" = "हर स्क्रीनशॉट और इम्पोर्ट की गई इमेज पर वॉटरमार्क जोड़ें";
+"Position" = "स्थिति";
+"Horizontal" = "क्षैतिज";
+"Vertical" = "लंबवत";
+"Size" = "आकार";
+"Opacity" = "अपारदर्शिता";
+"Repeat as a pattern" = "पैटर्न की तरह दोहराएँ";
+"No image chosen" = "कोई इमेज नहीं चुनी गई";
+"Watermark Image" = "वॉटरमार्क इमेज";
+"Choose Image…" = "इमेज चुनें…";
+"Remove" = "हटाएँ";
+"Choose an image to see the watermark here." = "वॉटरमार्क यहाँ देखने के लिए एक इमेज चुनें।";
+"Watermark preview" = "वॉटरमार्क पूर्वावलोकन";
+"Drag the watermark in the preview, or choose a position." = "पूर्वावलोकन में वॉटरमार्क खींचें, या कोई स्थिति चुनें।";

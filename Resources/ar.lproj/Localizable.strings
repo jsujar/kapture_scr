@@ -115,3 +115,34 @@
 "Import Shortcut" = "اختصار الاستيراد";
 "Import shortcut: %@" = "اختصار الاستيراد: %@";
 "Adjust Capture Area" = "تعديل منطقة الالتقاط";
+
+/* Watermark */
+"Watermark not applied." = "لم تُضَف العلامة المائية.";
+"Add Watermark" = "إضافة علامة مائية";
+"Watermark Settings…" = "إعدادات العلامة المائية…";
+"Watermark" = "العلامة المائية";
+"PNG with transparency works best." = "تعطي صورة PNG بخلفية شفافة أفضل نتيجة.";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "تعذّر استخدام هذه الصورة. اختر صورة PNG أو JPEG أو HEIC أو TIFF بحجم 4096 بكسل كحد أقصى.";
+"Top Left" = "أعلى اليسار";
+"Top" = "أعلى";
+"Top Right" = "أعلى اليمين";
+"Left" = "يسار";
+"Center" = "الوسط";
+"Right" = "يمين";
+"Bottom Left" = "أسفل اليسار";
+"Bottom" = "أسفل";
+"Bottom Right" = "أسفل اليمين";
+"Add the watermark to every capture and imported image" = "إضافة العلامة المائية إلى كل لقطة وكل صورة مستوردة";
+"Position" = "الموضع";
+"Horizontal" = "أفقي";
+"Vertical" = "عمودي";
+"Size" = "الحجم";
+"Opacity" = "العتامة";
+"Repeat as a pattern" = "تكرار كنمط";
+"No image chosen" = "لم يتم اختيار صورة";
+"Watermark Image" = "صورة العلامة المائية";
+"Choose Image…" = "اختيار صورة…";
+"Remove" = "إزالة";
+"Choose an image to see the watermark here." = "اختر صورة لترى العلامة المائية هنا.";
+"Watermark preview" = "معاينة العلامة المائية";
+"Drag the watermark in the preview, or choose a position." = "اسحب العلامة المائية في المعاينة، أو اختر موضعًا.";

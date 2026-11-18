@@ -41,7 +41,8 @@ enum ImageFormat: String, CaseIterable {
 
 /// Persistent capture preferences (UserDefaults inside the sandbox container).
 final class Settings {
-    private let d = UserDefaults.standard
+    private let d: UserDefaults
+    init(defaults: UserDefaults = .standard) { d = defaults }
     var mode: CaptureMode {
         get { CaptureMode(rawValue: d.string(forKey: "mode") ?? "") ?? .selection }
         set { d.set(newValue.rawValue, forKey: "mode") }
@@ -70,6 +71,25 @@ final class Settings {
     var destination: Destination {
         get { Destination(rawValue: d.string(forKey: "destination") ?? "") ?? .clipboard }
         set { d.set(newValue.rawValue, forKey: "destination") }
+    }
+    /// Automatic watermark, off by default. The image is a copy kept in the container (see Watermark.imageURL).
+    var watermarkEnabled: Bool {
+        get { d.bool(forKey: "watermarkEnabled") }
+        set { d.set(newValue, forKey: "watermarkEnabled") }
+    }
+    var watermark: WatermarkOptions {
+        get {
+            let fallback = WatermarkOptions()
+            func value(_ key: String, _ standard: Double) -> Double { d.object(forKey: key) as? Double ?? standard }
+            return WatermarkOptions(x: value("watermarkX", fallback.x), y: value("watermarkY", fallback.y),
+                                    size: value("watermarkSize", fallback.size), opacity: value("watermarkOpacity", fallback.opacity),
+                                    tiled: d.bool(forKey: "watermarkTiled"))
+        }
+        set {
+            d.set(newValue.x, forKey: "watermarkX"); d.set(newValue.y, forKey: "watermarkY")
+            d.set(newValue.size, forKey: "watermarkSize"); d.set(newValue.opacity, forKey: "watermarkOpacity")
+            d.set(newValue.tiled, forKey: "watermarkTiled")
+        }
     }
     /// Global shortcut chosen for an action; defaults are not stored.
     func shortcut(for action: ShortcutAction) -> Shortcut {
@@ -338,6 +358,20 @@ enum FolderAccess {
         f.locale = Locale(identifier: "en_US_POSIX") // same file names in every language
         f.dateFormat = "yyyy-MM-dd HH.mm.ss"
         return "Kapture SCR \(f.string(from: date))"
+    }
+
+    /// Encodes in the chosen file format. JPEG has no transparency, so it is flattened onto white first.
+    static func encode(_ image: CGImage, as format: ImageFormat) -> Data? {
+        guard format == .jpg else { return pngData(image) }
+        guard let color = CGColorSpace(name: CGColorSpace.sRGB),
+              let ctx = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: 0, space: color, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else { return nil }
+        ctx.setFillColor(CGColor(gray: 1, alpha: 1)); ctx.fill(CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        guard let flat = ctx.makeImage() else { return nil }
+        let data = NSMutableData()
+        guard let dest = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(dest, flat, [kCGImageDestinationLossyCompressionQuality: 0.9] as CFDictionary)
+        return CGImageDestinationFinalize(dest) ? data as Data : nil
     }
 
     static func pngData(_ image: CGImage) -> Data? {
@@ -1171,9 +1205,19 @@ final class CaptureStore: ObservableObject {
         return raster(decoded)
     }
 
+    /// Watermark image, loaded from the container on first use; nil when none has been chosen.
+    lazy var watermarkImage: CGImage? = Watermark.loadStored()
+    /// True when new captures and imports get the watermark.
+    var watermarkActive: Bool { settings.watermarkEnabled && watermarkImage != nil }
+    /// The image with the watermark when it is on; otherwise unchanged.
+    func watermarked(_ image: CGImage) -> CGImage {
+        guard settings.watermarkEnabled, let mark = watermarkImage else { return image }
+        return Watermark.apply(mark, to: image, options: settings.watermark) ?? image
+    }
+
     @discardableResult
     private func insert(_ image: CGImage, baseName: String) -> Capture {
-        let capture = Capture(image: image, baseName: baseName)
+        let capture = Capture(image: watermarked(image), baseName: baseName)
         captures.insert(capture, at: 0); if captures.count > 10 { captures.removeLast() }
         // Limit total resident raster data, in addition to number of images.
         while captures.count > 1 && captures.reduce(0, { $0 + $1.image.bytesPerRow * $1.image.height }) > 128 * 1024 * 1024 { captures.removeLast() }
@@ -1302,6 +1346,295 @@ final class CaptureStore: ObservableObject {
             }
         }) else { return }
         replace(result)
+    }
+}
+
+// MARK: - Watermark
+
+/// Where and how the watermark is drawn. Values are fractions so they mean the same on every display.
+struct WatermarkOptions: Equatable {
+    /// 0 = left edge, 0.5 = centred, 1 = right edge. A single mark always stays fully inside the capture.
+    var x = 0.97
+    /// 0 = top edge, 0.5 = centred, 1 = bottom edge.
+    var y = 0.95
+    /// Width of the mark as a fraction of the capture's width.
+    var size = 0.18
+    var opacity = 0.6
+    /// Repeats the mark as a pattern over the whole capture; x and y then shift the pattern.
+    var tiled = false
+}
+
+enum Watermark {
+    static let sizeRange = 0.03...0.6
+    static let opacityRange = 0.05...1.0
+    /// Limits for the chosen image (it is drawn on every capture, so it stays small).
+    static let maxBytes = 32 * 1024 * 1024, maxSide = 4096, maxPixels = 16_000_000
+
+    /// Size of the mark in pixels: a fraction of the capture's width, keeping its proportions and fitting inside.
+    static func markSize(_ mark: CGImage, canvas: CGSize, size: Double) -> CGSize {
+        let aspect = CGFloat(mark.height) / CGFloat(max(1, mark.width))
+        var w = canvas.width * CGFloat(min(max(size, sizeRange.lowerBound), sizeRange.upperBound))
+        var h = w * aspect
+        if h > canvas.height { h = canvas.height; w = h / aspect }
+        return CGSize(width: max(1, w.rounded()), height: max(1, h.rounded()))
+    }
+
+    /// Rectangles where the mark is drawn, in Core Graphics coordinates (origin at the bottom-left).
+    static func rects(mark: CGImage, canvas: CGSize, options: WatermarkOptions) -> [CGRect] {
+        let s = markSize(mark, canvas: canvas, size: options.size)
+        let x = CGFloat(min(max(options.x, 0), 1)), y = CGFloat(min(max(options.y, 0), 1))
+        guard options.tiled else {
+            return [CGRect(x: ((canvas.width - s.width) * x).rounded(), y: ((canvas.height - s.height) * (1 - y)).rounded(), width: s.width, height: s.height)]
+        }
+        // Brick pattern with a gap of one mark between marks; at most about 50 rows and columns.
+        let stepX = max(s.width * 2, canvas.width / 50), stepY = max(s.height * 2.5, canvas.height / 50)
+        var out: [CGRect] = []
+        var row = 0
+        var top = stepY * y - stepY // y measured from the top
+        while top < canvas.height {
+            var left = stepX * x - stepX * (row % 2 == 0 ? 1 : 1.5)
+            while left < canvas.width {
+                let r = CGRect(x: left, y: canvas.height - top - s.height, width: s.width, height: s.height)
+                if r.intersects(CGRect(origin: .zero, size: canvas)) { out.append(r) }
+                left += stepX
+            }
+            top += stepY; row += 1
+        }
+        return out
+    }
+
+    static func apply(_ mark: CGImage, to image: CGImage, options: WatermarkOptions) -> CGImage? {
+        let canvas = CGSize(width: image.width, height: image.height)
+        let rects = rects(mark: mark, canvas: canvas, options: options)
+        return CaptureStore.raster(image) { ctx in
+            ctx.setAlpha(CGFloat(min(max(options.opacity, opacityRange.lowerBound), opacityRange.upperBound)))
+            ctx.interpolationQuality = .high
+            for r in rects { ctx.draw(mark, in: r) }
+        }
+    }
+
+    /// The copy of the chosen image, inside the app's sandbox container.
+    static var imageURL: URL {
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return support.appendingPathComponent("Kapture SCR", isDirectory: true).appendingPathComponent("watermark.png")
+    }
+
+    static func loadStored(from url: URL = imageURL) -> CGImage? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return CaptureStore.decode(data, maxBytes: maxBytes, maxSide: maxSide, maxPixels: maxPixels)
+    }
+
+    /// Validates the chosen image and keeps a PNG copy, so the original file can move or disappear.
+    static func store(_ data: Data, at url: URL = imageURL) -> CGImage? {
+        guard let image = CaptureStore.decode(data, maxBytes: maxBytes, maxSide: maxSide, maxPixels: maxPixels),
+              let png = FolderAccess.pngData(image) else { return nil }
+        do {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try png.write(to: url, options: .atomic)
+        } catch { return nil }
+        return image
+    }
+
+    static func removeStored(at url: URL = imageURL) { try? FileManager.default.removeItem(at: url) }
+
+    /// A neutral, screenshot-like picture for the settings preview: desktop, a window with text lines and a photo.
+    static func sampleScreenshot(width: Int = 1440, height: Int = 900) -> CGImage? {
+        guard let color = CGColorSpace(name: CGColorSpace.sRGB),
+              let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: color, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+        let w = CGFloat(width), h = CGFloat(height)
+        let colors = [CGColor(red: 0.20, green: 0.36, blue: 0.55, alpha: 1), CGColor(red: 0.55, green: 0.42, blue: 0.62, alpha: 1)] as CFArray
+        if let gradient = CGGradient(colorsSpace: color, colors: colors, locations: [0, 1]) {
+            ctx.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: w, y: h), options: [])
+        }
+        let window = CGRect(x: w * 0.12, y: h * 0.12, width: w * 0.76, height: h * 0.72)
+        ctx.setFillColor(CGColor(gray: 0.98, alpha: 1)); ctx.addPath(CGPath(roundedRect: window, cornerWidth: 18, cornerHeight: 18, transform: nil)); ctx.fillPath()
+        ctx.setFillColor(CGColor(gray: 0.90, alpha: 1)); ctx.fill(CGRect(x: window.minX, y: window.maxY - 56, width: window.width, height: 38))
+        for (i, c) in [(1.0, 0.37, 0.34), (1.0, 0.74, 0.18), (0.16, 0.79, 0.25)].enumerated() {
+            ctx.setFillColor(CGColor(red: c.0, green: c.1, blue: c.2, alpha: 1))
+            ctx.fillEllipse(in: CGRect(x: window.minX + 22 + CGFloat(i) * 26, y: window.maxY - 34, width: 14, height: 14))
+        }
+        ctx.setFillColor(CGColor(gray: 0.78, alpha: 1))
+        var line = window.maxY - 110
+        var n = 0
+        while line > window.minY + 40 {
+            let len = window.width * (n % 3 == 2 ? 0.25 : 0.42)
+            ctx.fill(CGRect(x: window.minX + 40, y: line, width: len, height: 12)); line -= 30; n += 1
+        }
+        ctx.setFillColor(CGColor(red: 0.62, green: 0.76, blue: 0.86, alpha: 1))
+        ctx.fill(CGRect(x: window.midX + 20, y: window.minY + 40, width: window.width * 0.42, height: window.height * 0.62))
+        return ctx.makeImage()
+    }
+}
+
+final class WatermarkModel: ObservableObject {
+    let store: CaptureStore
+    @Published var enabled: Bool { didSet { store.settings.watermarkEnabled = enabled } }
+    @Published var options: WatermarkOptions { didSet { store.settings.watermark = options; render() } }
+    @Published private(set) var preview: CGImage?
+    @Published var error: String?
+    private let sample = Watermark.sampleScreenshot()
+
+    init(store: CaptureStore) {
+        self.store = store
+        enabled = store.settings.watermarkEnabled
+        options = store.settings.watermark
+        render()
+    }
+
+    var mark: CGImage? { store.watermarkImage }
+
+    func render() {
+        guard let sample else { preview = nil; return }
+        preview = mark.flatMap { Watermark.apply($0, to: sample, options: options) } ?? sample
+    }
+
+    /// Places a single mark centred under a point of the preview (fractions of its width and height).
+    func move(to p: CGPoint) {
+        guard let sample, let mark else { return }
+        if options.tiled { options.x = min(max(p.x, 0), 1); options.y = min(max(p.y, 0), 1); return }
+        let s = Watermark.markSize(mark, canvas: CGSize(width: sample.width, height: sample.height), size: options.size)
+        let mw = s.width / CGFloat(sample.width), mh = s.height / CGFloat(sample.height)
+        options.x = mw < 1 ? min(max((p.x - mw / 2) / (1 - mw), 0), 1) : 0.5
+        options.y = mh < 1 ? min(max((p.y - mh / 2) / (1 - mh), 0), 1) : 0.5
+    }
+
+    func chooseImage() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.png, .jpeg, .tiff, .heic, .gif, .bmp]
+        panel.allowsMultipleSelection = false; panel.canChooseDirectories = false
+        panel.prompt = L("Choose"); panel.message = L("PNG with transparency works best.")
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        guard let data = try? Data(contentsOf: url), let image = Watermark.store(data) else {
+            error = L("Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px."); return
+        }
+        error = nil
+        objectWillChange.send()
+        store.watermarkImage = image
+        enabled = true
+        render()
+    }
+
+    func removeImage() {
+        Watermark.removeStored()
+        objectWillChange.send()
+        store.watermarkImage = nil
+        enabled = false
+        render()
+    }
+}
+
+struct WatermarkView: View {
+    @ObservedObject var model: WatermarkModel
+    /// Corners and edges keep a small margin; bottom right matches the default position.
+    private let presets: [(x: Double, y: Double, label: String)] = [
+        (0.03, 0.05, L("Top Left")), (0.5, 0.05, L("Top")), (0.97, 0.05, L("Top Right")),
+        (0.03, 0.5, L("Left")), (0.5, 0.5, L("Center")), (0.97, 0.5, L("Right")),
+        (0.03, 0.95, L("Bottom Left")), (0.5, 0.95, L("Bottom")), (0.97, 0.95, L("Bottom Right")),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            imageRow
+            HStack {
+                Text(L("Add the watermark to every capture and imported image"))
+                Spacer()
+                Toggle(L("Add the watermark to every capture and imported image"), isOn: $model.enabled)
+                    .toggleStyle(.switch).labelsHidden()
+            }
+            .disabled(model.mark == nil)
+            preview
+            HStack(alignment: .top, spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L("Position")).font(.system(size: 13, weight: .semibold))
+                    presetGrid
+                }
+                VStack(spacing: 8) {
+                    slider(L("Horizontal"), value: $model.options.x, in: 0...1)
+                    slider(L("Vertical"), value: $model.options.y, in: 0...1)
+                    slider(L("Size"), value: $model.options.size, in: Watermark.sizeRange)
+                    slider(L("Opacity"), value: $model.options.opacity, in: Watermark.opacityRange)
+                }
+            }
+            .disabled(model.mark == nil)
+            Toggle(L("Repeat as a pattern"), isOn: $model.options.tiled).disabled(model.mark == nil)
+        }
+        .padding(20)
+        .frame(width: 600)
+    }
+
+    private var imageRow: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.08))
+                if let mark = model.mark { Image(decorative: mark, scale: 1).resizable().scaledToFit().padding(4) }
+                else { Image(systemName: "photo").foregroundStyle(.secondary) }
+            }
+            .frame(width: 52, height: 52)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.mark == nil ? L("No image chosen") : L("Watermark Image")).font(.system(size: 13, weight: .semibold))
+                Text(model.error ?? L("PNG with transparency works best.")).font(.system(size: 12))
+                    .foregroundStyle(model.error == nil ? Color.secondary : Color.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+            Button(L("Choose Image…")) { model.chooseImage() }
+            Button(L("Remove")) { model.removeImage() }.disabled(model.mark == nil)
+        }
+    }
+
+    private var preview: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            GeometryReader { geo in
+                ZStack {
+                    if let image = model.preview { Image(decorative: image, scale: 1).resizable() }
+                    if model.mark == nil {
+                        Text(L("Choose an image to see the watermark here."))
+                            .font(.system(size: 13, weight: .medium)).padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(.regularMaterial, in: Capsule())
+                    }
+                }
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0).onChanged { v in
+                    model.move(to: CGPoint(x: v.location.x / geo.size.width, y: v.location.y / geo.size.height))
+                })
+            }
+            .aspectRatio(1440.0 / 900.0, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
+            .accessibilityLabel(L("Watermark preview"))
+            Text(L("Drag the watermark in the preview, or choose a position.")).font(.system(size: 12)).foregroundStyle(.secondary)
+        }
+    }
+
+    private var presetGrid: some View {
+        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+            ForEach(0..<3, id: \.self) { row in
+                GridRow {
+                    ForEach(0..<3, id: \.self) { col in
+                        let p = presets[row * 3 + col]
+                        let on = abs(model.options.x - p.x) < 0.005 && abs(model.options.y - p.y) < 0.005
+                        Button { model.options.x = p.x; model.options.y = p.y } label: {
+                            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                .fill(on ? Color.accentColor : Color.primary.opacity(0.10))
+                                .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).strokeBorder(Color.primary.opacity(0.2), lineWidth: 0.5))
+                                .frame(width: 30, height: 20)
+                        }
+                        .buttonStyle(.plain).help(p.label).accessibilityLabel(p.label)
+                        .accessibilityAddTraits(on ? .isSelected : [])
+                    }
+                }
+            }
+        }
+    }
+
+    private func slider(_ title: String, value: Binding<Double>, in range: ClosedRange<Double>) -> some View {
+        HStack(spacing: 10) {
+            Text(title).font(.system(size: 12)).frame(width: 84, alignment: .leading)
+            Slider(value: value, in: range)
+            Text(value.wrappedValue.formatted(.percent.precision(.fractionLength(0)))).font(.system(size: 12)).monospacedDigit()
+                .frame(width: 44, alignment: .trailing)
+        }
     }
 }
 
@@ -1852,6 +2185,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var recentPanelFade: DispatchWorkItem?
     var actionHotKeys: [ShortcutAction: EventHotKeyRef] = [:]
     let recorder = ShortcutRecorder()
+    var watermarkWindow: NSWindow?
+    var watermarkModel: WatermarkModel?
     var eventHandler: EventHandlerRef?
     var hoverSuppressed = false
 
@@ -1953,20 +2288,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let data = try? Data(contentsOf: tmp) else { store.message = L("Couldn’t read the screenshot."); return }
         let base = FolderAccess.baseName()
         let capture = store.addOwnCapture(data, baseName: base)
+        // With a watermark, the file and the clipboard get the watermarked pixels instead of the raw screenshot.
+        let marked = store.watermarkActive ? capture : nil
         var notes: [String] = []
 
         if settings.destination.usesFolder {
             if let folder = settings.folder {
-                do { let name = try FolderAccess.write(data, base: base, ext: settings.format.rawValue, in: folder).lastPathComponent; notes.append(L("Saved as \(name)")) }
+                let fileData = marked.flatMap { FolderAccess.encode($0.image, as: settings.format) } ?? data
+                do { let name = try FolderAccess.write(fileData, base: base, ext: settings.format.rawValue, in: folder).lastPathComponent; notes.append(L("Saved as \(name)")) }
                 catch { notes.append(L("Couldn’t save to the folder: \(error.localizedDescription)")) }
             } else { notes.append(L("No destination folder.")) }
         }
         if settings.destination.usesClipboard {
             // Clipboard always gets lossless PNG; the file keeps the chosen format.
-            let png = settings.format == .png ? data : capture.flatMap { FolderAccess.pngData($0.image) }
+            let png = marked == nil && settings.format == .png ? data : capture.flatMap { FolderAccess.pngData($0.image) }
             notes.append(png.map { store.writeToPasteboard($0) } == true ? L("Copied to clipboard.") : L("Couldn’t copy to the clipboard."))
         }
-        if capture == nil { notes.append(L("Too large for the editor.")) }
+        if capture == nil {
+            notes.append(L("Too large for the editor."))
+            if store.watermarkActive { notes.append(L("Watermark not applied.")) }
+        }
         store.message = notes.joined(separator: " ")
         if let capture { thumbnail.show(capture) }
     }
@@ -2060,6 +2401,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         options.addItem(item(L("Change Capture Shortcut…"), #selector(changeShortcut)))
         options.addItem(item(L("Change Window Shortcut…"), #selector(changeWindowShortcut)))
         options.addItem(item(L("Change Import Shortcut…"), #selector(changeImportShortcut)))
+        options.addItem(.separator())
+        options.addItem(item(L("Add Watermark"), #selector(toggleWatermark), on: store.watermarkActive))
+        options.addItem(item(L("Watermark Settings…"), #selector(showWatermarkSettings)))
         let optionsItem = NSMenuItem(title: L("Options"), action: nil, keyEquivalent: "")
         optionsItem.submenu = options
         menu.addItem(optionsItem)
@@ -2086,6 +2430,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func toggleCursor() { settings.showCursor.toggle() }
     @objc func toggleShadow() { settings.windowShadow.toggle() }
     @objc func toggleAdjust() { settings.adjustSelection.toggle() }
+    /// Without a watermark image there is nothing to turn on, so the settings open instead.
+    @objc func toggleWatermark() {
+        guard store.watermarkImage != nil else { showWatermarkSettings(); return }
+        settings.watermarkEnabled.toggle()
+        watermarkModel?.enabled = settings.watermarkEnabled
+    }
+    @objc func showWatermarkSettings() {
+        if watermarkWindow == nil {
+            let model = WatermarkModel(store: store)
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 700), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            w.title = L("Watermark"); w.isReleasedWhenClosed = false
+            let host = NSHostingController(rootView: WatermarkView(model: model))
+            host.sizingOptions = [.preferredContentSize]
+            w.contentViewController = host
+            w.center()
+            watermarkWindow = w; watermarkModel = model
+        }
+        watermarkModel?.enabled = settings.watermarkEnabled
+        NSApp.activate(ignoringOtherApps: true)
+        watermarkWindow?.makeKeyAndOrderFront(nil)
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)

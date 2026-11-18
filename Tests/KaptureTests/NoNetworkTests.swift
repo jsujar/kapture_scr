@@ -7,7 +7,15 @@ import XCTest
 /// 3. Binary: the compiled executable links no networking framework and imports no socket or URL-loading symbol.
 /// These tests fail if any layer is weakened.
 final class NoNetworkTests: XCTestCase {
-    private var source: String { get throws { try String(contentsOf: repoRoot.appendingPathComponent("Sources/Kapture/main.swift"), encoding: .utf8) } }
+    /// All app source files joined, so code added in new files is checked too.
+    private var source: String {
+        get throws {
+            let dir = repoRoot.appendingPathComponent("Sources")
+            let files = FileManager.default.enumerator(at: dir, includingPropertiesForKeys: nil)!.compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" }
+            XCTAssertFalse(files.isEmpty)
+            return try files.map { try String(contentsOf: $0, encoding: .utf8) }.joined(separator: "\n")
+        }
+    }
 
     /// True if the code calls a free C function such as `socket(`; methods like `.system(` (SwiftUI fonts) don't count.
     private func callsCFunction(_ name: String, in code: String) -> Bool {
@@ -56,9 +64,9 @@ final class NoNetworkTests: XCTestCase {
             "NSUbiquitousKeyValueStore", "NSSharingService", "MetricKit", "MXMetricManager", "os_signpost",
             "Data(contentsOf: URL(string", "String(contentsOf: URL(string",
         ]
-        for token in forbidden { XCTAssertFalse(code.contains(token), "Sources/Kapture/main.swift uses \(token)") }
+        for token in forbidden { XCTAssertFalse(code.contains(token), "Sources/ uses \(token)") }
         for function in ["socket", "connect", "bind", "listen", "sendto", "sendmsg"] {
-            XCTAssertFalse(callsCFunction(function, in: code), "Sources/Kapture/main.swift calls \(function)()")
+            XCTAssertFalse(callsCFunction(function, in: code), "Sources/ calls \(function)()")
         }
     }
 

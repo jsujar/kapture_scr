@@ -115,3 +115,34 @@
 "Import Shortcut" = "امپورٹ شارٹ کٹ";
 "Import shortcut: %@" = "امپورٹ شارٹ کٹ: %@";
 "Adjust Capture Area" = "کیپچر کا حصہ تبدیل کریں";
+
+/* Watermark */
+"Watermark not applied." = "واٹر مارک نہیں لگایا گیا۔";
+"Add Watermark" = "واٹر مارک شامل کریں";
+"Watermark Settings…" = "واٹر مارک کی ترتیبات…";
+"Watermark" = "واٹر مارک";
+"PNG with transparency works best." = "شفافیت والی PNG بہترین رہتی ہے۔";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "یہ تصویر استعمال نہیں ہو سکی۔ 4096 px تک کی PNG، JPEG، HEIC یا TIFF منتخب کریں۔";
+"Top Left" = "اوپر بائیں";
+"Top" = "اوپر";
+"Top Right" = "اوپر دائیں";
+"Left" = "بائیں";
+"Center" = "درمیان";
+"Right" = "دائیں";
+"Bottom Left" = "نیچے بائیں";
+"Bottom" = "نیچے";
+"Bottom Right" = "نیچے دائیں";
+"Add the watermark to every capture and imported image" = "ہر اسکرین شاٹ اور درآمد شدہ تصویر پر واٹر مارک شامل کریں";
+"Position" = "مقام";
+"Horizontal" = "افقی";
+"Vertical" = "عمودی";
+"Size" = "سائز";
+"Opacity" = "غیر شفافیت";
+"Repeat as a pattern" = "پیٹرن کی طرح دہرائیں";
+"No image chosen" = "کوئی تصویر منتخب نہیں کی گئی";
+"Watermark Image" = "واٹر مارک کی تصویر";
+"Choose Image…" = "تصویر منتخب کریں…";
+"Remove" = "ہٹائیں";
+"Choose an image to see the watermark here." = "واٹر مارک یہاں دیکھنے کے لیے ایک تصویر منتخب کریں۔";
+"Watermark preview" = "واٹر مارک کا پیش منظر";
+"Drag the watermark in the preview, or choose a position." = "پیش منظر میں واٹر مارک کو گھسیٹیں، یا کوئی مقام منتخب کریں۔";

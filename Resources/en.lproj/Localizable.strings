@@ -115,3 +115,34 @@
 "Import Shortcut" = "Import Shortcut";
 "Import shortcut: %@" = "Import shortcut: %@";
 "Adjust Capture Area" = "Adjust Capture Area";
+
+/* Watermark */
+"Watermark not applied." = "Watermark not applied.";
+"Add Watermark" = "Add Watermark";
+"Watermark Settings…" = "Watermark Settings…";
+"Watermark" = "Watermark";
+"PNG with transparency works best." = "PNG with transparency works best.";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px.";
+"Top Left" = "Top Left";
+"Top" = "Top";
+"Top Right" = "Top Right";
+"Left" = "Left";
+"Center" = "Center";
+"Right" = "Right";
+"Bottom Left" = "Bottom Left";
+"Bottom" = "Bottom";
+"Bottom Right" = "Bottom Right";
+"Add the watermark to every capture and imported image" = "Add the watermark to every capture and imported image";
+"Position" = "Position";
+"Horizontal" = "Horizontal";
+"Vertical" = "Vertical";
+"Size" = "Size";
+"Opacity" = "Opacity";
+"Repeat as a pattern" = "Repeat as a pattern";
+"No image chosen" = "No image chosen";
+"Watermark Image" = "Watermark Image";
+"Choose Image…" = "Choose Image…";
+"Remove" = "Remove";
+"Choose an image to see the watermark here." = "Choose an image to see the watermark here.";
+"Watermark preview" = "Watermark preview";
+"Drag the watermark in the preview, or choose a position." = "Drag the watermark in the preview, or choose a position.";

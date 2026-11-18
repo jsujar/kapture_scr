@@ -83,6 +83,16 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
 - **Save Copy** (<kbd>⌘</kbd> <kbd>S</kbd>) writes a new `… (edited).png` next to your captures. The original file is never touched.
 - **Copy** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>C</kbd>) puts the edited PNG on the clipboard.
 
+### Watermark
+
+Open *Options › Watermark Settings…* to add your logo or signature to every capture and imported image.
+
+- **Your image.** PNG, JPEG, HEIC or TIFF up to 4096 px. PNG with transparency works best. Kapture SCR keeps a copy in its sandbox container, so the original file can move.
+- **Live preview.** The mark is drawn on a sample screenshot exactly as it will appear on your captures. Drag it to place it, or pick one of nine positions.
+- **Position, size and opacity.** Horizontal and vertical position go from 0 % (left or top) to 100 % (right or bottom), and the mark always stays inside the capture. Size is a share of the capture's width, so it looks the same on every display.
+- **Pattern.** *Repeat as a pattern* tiles the mark over the whole capture; the position then shifts the pattern.
+- **Where it goes.** Files, the clipboard and the editor all get the watermarked image. Edits never add it twice. Turn it on or off from *Options › Add Watermark*.
+
 ### Menu bar
 
 - **Recent captures panel.** Hover over the menu bar icon to see your recent captures in a smoked-glass panel. Click one to edit it, or drag it into another app.
@@ -141,7 +151,7 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 - **No network.** No networking code, OCR, auto-updates or telemetry, and no network entitlement. The App Sandbox therefore blocks every connection, and [automated tests](#tests) check this on every change.
 - **Files only where you allow.**
   - Captures and edited copies go to the folder you choose.
-  - Preferences live in the app's sandbox container.
+  - Preferences, and the copy of your watermark image, live in the app's sandbox container.
   - Each capture passes through a temporary file inside the container, deleted once read.
 - **Ephemeral history.** Up to 10 images, kept in memory for 30 minutes, within 128 MiB of raster data.
 - **Clean exports.** Exported PNGs contain only the current pixels: no layers and no undo states. Undo keeps the previous image in memory temporarily, and this is not secure memory erasure.
@@ -189,6 +199,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
   - Binary: the compiled app links no networking framework and imports no socket or URL-loading function.
 - **Image limits.** Oversized, truncated or invalid images are rejected, as are images over the pixel and byte limits.
 - **History.** Up to 10 images and 128 MiB, expiry after 30 minutes, and selection after removal.
+- **Watermark.** Position, size, opacity, transparency and pattern, and that captures, imports and saved files get it exactly once.
 - **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
 - **Files.** Saving never overwrites an existing file, and file names are the same in every language.
 - **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.

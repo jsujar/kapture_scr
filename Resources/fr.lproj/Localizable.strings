@@ -115,3 +115,34 @@
 "Import Shortcut" = "Raccourci d’importation";
 "Import shortcut: %@" = "Raccourci d’importation : %@";
 "Adjust Capture Area" = "Ajuster la zone de capture";
+
+/* Watermark */
+"Watermark not applied." = "Filigrane non appliqué.";
+"Add Watermark" = "Ajouter un filigrane";
+"Watermark Settings…" = "Réglages du filigrane…";
+"Watermark" = "Filigrane";
+"PNG with transparency works best." = "Un PNG avec transparence donne le meilleur résultat.";
+"Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "Impossible d’utiliser cette image. Choisissez un PNG, JPEG, HEIC ou TIFF de 4096 px maximum.";
+"Top Left" = "En haut à gauche";
+"Top" = "En haut";
+"Top Right" = "En haut à droite";
+"Left" = "À gauche";
+"Center" = "Centre";
+"Right" = "À droite";
+"Bottom Left" = "En bas à gauche";
+"Bottom" = "En bas";
+"Bottom Right" = "En bas à droite";
+"Add the watermark to every capture and imported image" = "Ajouter le filigrane à chaque capture et image importée";
+"Position" = "Position";
+"Horizontal" = "Horizontal";
+"Vertical" = "Vertical";
+"Size" = "Taille";
+"Opacity" = "Opacité";
+"Repeat as a pattern" = "Répéter en motif";
+"No image chosen" = "Aucune image choisie";
+"Watermark Image" = "Image du filigrane";
+"Choose Image…" = "Choisir une image…";
+"Remove" = "Retirer";
+"Choose an image to see the watermark here." = "Choisissez une image pour voir le filigrane ici.";
+"Watermark preview" = "Aperçu du filigrane";
+"Drag the watermark in the preview, or choose a position." = "Faites glisser le filigrane dans l’aperçu ou choisissez une position.";

@@ -56,7 +56,6 @@
 "Import from Clipboard" = "کلپ بورڈ سے درآمد کریں";
 "Screenshot" = "اسکرین شاٹ";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "عارضی ہسٹری میموری میں رہتی ہے: 30 منٹ کے لیے زیادہ سے زیادہ 10 تصاویر۔ «کاپی محفوظ کریں» نیا PNG بناتا ہے اور کبھی اوور رائٹ نہیں کرتا۔";
-"Recent:" = "حالیہ:";
 "Import" = "درآمد";
 "Import Image from Clipboard" = "کلپ بورڈ سے تصویر درآمد کریں";
 "Open the screenshots folder" = "اسکرین شاٹس کا فولڈر کھولیں";
@@ -235,3 +234,9 @@
 "Zoom" = "زوم";
 "Reset Zoom" = "زوم ری سیٹ کریں";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "ایڈیٹر میں کسی تفصیل کو دیکھنے کے لیے ٹریک پیڈ پر پنچ کریں اور اِدھر اُدھر جانے کے لیے دو انگلیوں سے سوائپ کریں۔ پوری تصویر دوبارہ دیکھنے کے لیے دو انگلیوں سے دو بار ٹیپ کریں یا ⌘0 دبائیں۔ زوم کرنے سے تصویر کبھی نہیں بدلتی۔";
+
+/* Editor rulers */
+"Rulers" = "رولر";
+"Show Rulers" = "رولر دکھائیں";
+"Hide Rulers" = "رولر چھپائیں";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "ایڈیٹر کیپچر کے اصل پکسلز میں رولر دکھاتا ہے۔ یہ زوم کے ساتھ چلتے ہیں اور پوائنٹر کو نشان زد کرتے ہیں؛ تصویر کا سائز اور پوائنٹر کی جگہ نیچے نظر آتی ہے، اور گھسیٹنے پر حصے کا سائز دکھائی دیتا ہے۔ انہیں دکھانے یا چھپانے کے لیے ⌘R دبائیں۔";

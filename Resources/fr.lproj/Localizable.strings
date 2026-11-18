@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Importer du presse-papiers";
 "Screenshot" = "Capture";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Historique temporaire en mémoire : jusqu’à 10 images pendant 30 minutes. Enregistrer une copie crée un nouveau PNG et n’écrase jamais rien.";
-"Recent:" = "Récentes :";
 "Import" = "Importer";
 "Import Image from Clipboard" = "Importer l’image du presse-papiers";
 "Open the screenshots folder" = "Ouvrir le dossier des captures";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Réinitialiser le zoom";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "Dans l’éditeur, pincez le trackpad pour examiner un détail et balayez avec deux doigts pour vous déplacer. Touchez deux fois avec deux doigts ou appuyez sur ⌘0 pour revoir l’image entière. Le zoom ne modifie jamais l’image.";
+
+/* Editor rulers */
+"Rulers" = "Règles";
+"Show Rulers" = "Afficher les règles";
+"Hide Rulers" = "Masquer les règles";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "L’éditeur affiche des règles graduées dans les pixels réels de la capture. Elles suivent le zoom et indiquent le pointeur ; la taille de l’image et la position du pointeur apparaissent en bas, et un glisser montre la taille de la zone. Appuyez sur ⌘R pour les afficher ou les masquer.";

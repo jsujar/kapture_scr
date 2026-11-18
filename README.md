@@ -86,6 +86,7 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
 - **Canvas.** A dark canvas with a floating glass toolbar and a filmstrip of recent captures.
 - **Tools.** Crop, arrow, text, opaque redaction and highlighter (<kbd>⌘</kbd> <kbd>1</kbd>–<kbd>5</kbd>).
 - **Highlighter.** Draw freehand; the stroke is smoothed into one even line. It blends like a marker on paper, so text under it stays readable. Six colours plus a custom one, and three widths. The choice is remembered.
+- **Pixel rulers.** Rulers along the top and left edges are numbered in the capture's own pixels (on Retina displays, twice the points you see). They follow the zoom, a line marks the pointer, the image size and pointer position show at the bottom, and dragging shows the size of the area (or the arrow's length). <kbd>⌘</kbd> <kbd>R</kbd> or *… › Hide Rulers* turns them off.
 - **Zoom to look at a detail.** Pinch the trackpad over the image, swipe with two fingers to move around, and double-tap with two fingers or press <kbd>⌘</kbd> <kbd>0</kbd> to see the whole image again. It only magnifies the view: the image never changes, and every tool still works while zoomed.
 - **Undo and redo.** Up to five steps within 64 MiB.
 - **Save Copy** (<kbd>⌘</kbd> <kbd>S</kbd>) writes a new `… (edited).png` next to your captures. The original file is never touched.
@@ -164,6 +165,7 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 | Cancel | <kbd>Esc</kbd> |
 | Editor tools | <kbd>⌘</kbd> <kbd>1</kbd>–<kbd>5</kbd> |
 | Editor zoom | Pinch, two-finger swipe; <kbd>⌘</kbd> <kbd>0</kbd> resets |
+| Show or hide rulers | <kbd>⌘</kbd> <kbd>R</kbd> |
 | Undo / Redo | <kbd>⌘</kbd> <kbd>Z</kbd> / <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>Z</kbd> |
 | Save Copy · Copy edited image | <kbd>⌘</kbd> <kbd>S</kbd> · <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>C</kbd> |
 

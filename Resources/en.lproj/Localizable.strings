@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Import from Clipboard";
 "Screenshot" = "Screenshot";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites.";
-"Recent:" = "Recent:";
 "Import" = "Import";
 "Import Image from Clipboard" = "Import Image from Clipboard";
 "Open the screenshots folder" = "Open the screenshots folder";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Reset Zoom";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image.";
+
+/* Editor rulers */
+"Rulers" = "Rulers";
+"Show Rulers" = "Show Rulers";
+"Hide Rulers" = "Hide Rulers";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them.";

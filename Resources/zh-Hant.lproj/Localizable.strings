@@ -56,7 +56,6 @@
 "Import from Clipboard" = "從剪貼簿匯入";
 "Screenshot" = "截圖";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "暫時歷史紀錄保存在記憶體中：最多 10 張影像，保留 30 分鐘。「儲存副本」會建立新的 PNG，絕不覆蓋。";
-"Recent:" = "最近：";
 "Import" = "匯入";
 "Import Image from Clipboard" = "從剪貼簿匯入影像";
 "Open the screenshots folder" = "打開截圖資料夾";
@@ -235,3 +234,9 @@
 "Zoom" = "縮放";
 "Reset Zoom" = "重置縮放";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "在編輯器中，在觸控式軌跡板上以雙指撐開或捏合來查看細節，以雙指滑動來移動。以雙指點兩下或按下 ⌘0 可再次查看整張影像。縮放絕不會更改影像。";
+
+/* Editor rulers */
+"Rulers" = "尺標";
+"Show Rulers" = "顯示尺標";
+"Hide Rulers" = "隱藏尺標";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "編輯器會以截圖的實際像素顯示尺標。尺標會跟隨縮放並標示指標位置；影像尺寸和指標座標會顯示在底部，拖移時會顯示區域大小。按下 ⌘R 可顯示或隱藏尺標。";

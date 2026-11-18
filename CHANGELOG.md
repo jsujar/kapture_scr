@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented here.
 
+## [1.1.0] – 2026-11-18
+
+Pixel rulers in the editor and a cleaner recent captures panel.
+
+### Added
+- **Pixel rulers** in the editor, numbered in the capture's own pixels: round steps that follow the zoom, a line that marks the pointer, the image size and pointer position at the bottom, and the size of the area being dragged (or the arrow's length). On by default; ⌘R or *… › Hide Rulers* turns them off, and the choice is remembered.
+
+### Changed
+- The recent captures panel shows the logo in the top-left corner instead of the capture count, so the empty state only holds the message and the shortcuts.
+
 ## [1.0.1] – 2026-11-18
 
 Security and supply-chain hardening of the repository. The app works exactly as in 1.0.0.

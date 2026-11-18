@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Importar del portapapeles";
 "Screenshot" = "Captura";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Historial temporal en memoria: hasta 10 imágenes durante 30 minutos. Guardar copia crea un PNG nuevo y nunca sobrescribe.";
-"Recent:" = "Recientes:";
 "Import" = "Importar";
 "Import Image from Clipboard" = "Importar imagen del portapapeles";
 "Open the screenshots folder" = "Abrir la carpeta de capturas";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Restablecer zoom";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "En el editor, pellizca el trackpad para ver un detalle y desliza dos dedos para moverte. Toca dos veces con dos dedos o pulsa ⌘0 para volver a ver la imagen entera. El zoom nunca cambia la imagen.";
+
+/* Editor rulers */
+"Rulers" = "Reglas";
+"Show Rulers" = "Mostrar reglas";
+"Hide Rulers" = "Ocultar reglas";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "El editor muestra reglas en los píxeles reales de la captura. Siguen el zoom y marcan el puntero; abajo aparecen el tamaño de la imagen y la posición del puntero, y al arrastrar se ve el tamaño de la zona. Pulsa ⌘R para mostrarlas u ocultarlas.";

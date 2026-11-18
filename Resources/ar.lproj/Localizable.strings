@@ -56,7 +56,6 @@
 "Import from Clipboard" = "استيراد من الحافظة";
 "Screenshot" = "لقطة شاشة";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "سجل مؤقت في الذاكرة: حتى 10 صور لمدة 30 دقيقة. يُنشئ «حفظ نسخة» ملف PNG جديدًا ولا يستبدل أي ملف.";
-"Recent:" = "الأخيرة:";
 "Import" = "استيراد";
 "Import Image from Clipboard" = "استيراد صورة من الحافظة";
 "Open the screenshots folder" = "فتح مجلد لقطات الشاشة";
@@ -235,3 +234,9 @@
 "Zoom" = "التكبير";
 "Reset Zoom" = "إعادة تعيين التكبير";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "في المحرر، باعد أو قرّب إصبعيك على لوحة التعقب لرؤية التفاصيل، واسحب بإصبعين للتنقل. اضغط مرتين بإصبعين أو اضغط ⌘0 لرؤية الصورة كاملة من جديد. التكبير لا يغيّر الصورة أبدًا.";
+
+/* Editor rulers */
+"Rulers" = "المساطر";
+"Show Rulers" = "إظهار المساطر";
+"Hide Rulers" = "إخفاء المساطر";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "يعرض المحرر مساطر بوحدات البكسل الفعلية للقطة. تتبع المساطر التكبير وتحدد موضع المؤشر؛ ويظهر حجم الصورة وموضع المؤشر في الأسفل، وعند السحب يظهر حجم المنطقة. اضغط ⌘R لإظهارها أو إخفائها.";

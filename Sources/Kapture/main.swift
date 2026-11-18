@@ -178,6 +178,11 @@ final class Settings {
             d.set(newValue.opacity, forKey: "numberOpacity"); d.set(newValue.font, forKey: "numberFont"); d.set(newValue.color.stored, forKey: "numberColor")
         }
     }
+    /// Pixel rulers around the image in the editor, on by default.
+    var showRulers: Bool {
+        get { d.object(forKey: "showRulers") as? Bool ?? true }
+        set { d.set(newValue, forKey: "showRulers") }
+    }
     var highlightColor: RGB {
         get { RGB(stored: d.object(forKey: "highlightColor")) ?? RGB.highlighterPresets[0].0 }
         set { d.set(newValue.stored, forKey: "highlightColor") }
@@ -1317,6 +1322,7 @@ final class CaptureStore: ObservableObject {
     @Published var autoImport = false
     @Published var highlightColor: RGB { didSet { settings.highlightColor = highlightColor } }
     @Published var highlightSize: HighlightSize { didSet { settings.highlightSize = highlightSize } }
+    @Published var showRulers: Bool { didSet { settings.showRulers = showRulers } }
     let settings: Settings
     private var lastChange = NSPasteboard.general.changeCount
     private var undoImages: [CGImage] = []
@@ -1364,6 +1370,7 @@ final class CaptureStore: ObservableObject {
         self.settings = settings
         highlightColor = settings.highlightColor
         highlightSize = settings.highlightSize
+        showRulers = settings.showRulers
         captureShortcut = settings.captureShortcut
         windowShortcut = settings.shortcut(for: .captureWindow)
         repeatShortcut = settings.shortcut(for: .repeatCapture)
@@ -2181,6 +2188,8 @@ struct HelpView: View {
                   shortcut: store.repeatShortcut),
             Topic(id: L("Editor"), symbol: "pencil.tip.crop.circle",
                   text: L("Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original.")),
+            Topic(id: L("Rulers"), symbol: "ruler",
+                  text: L("The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them.")),
             Topic(id: L("Zoom"), symbol: "plus.magnifyingglass",
                   text: L("In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image.")),
             Topic(id: L("Watermark and Number"), symbol: "seal",
@@ -2272,6 +2281,92 @@ extension View {
     }
 }
 
+/// Tick spacing for the editor rulers, in image pixels. Numbered ticks use round steps (1, 2, 5 × 10ⁿ) at least
+/// `labelSpacing` points apart; small ticks divide them when there is room. Follows the zoom.
+enum RulerScale {
+    static func steps(pointsPerPixel ppp: CGFloat, labelSpacing: CGFloat = 56, minorSpacing: CGFloat = 5) -> (major: Int, minor: Int) {
+        guard ppp > 0, ppp.isFinite else { return (1, 1) }
+        var major = 1, magnitude = 1
+        search: while true {
+            for m in [1, 2, 5] {
+                major = m * magnitude
+                if CGFloat(major) * ppp >= labelSpacing { break search }
+            }
+            if magnitude > 100_000_000 { break }
+            magnitude *= 10
+        }
+        for divisor in [10, 5, 2] where major % divisor == 0 && CGFloat(major / divisor) * ppp >= minorSpacing {
+            return (major, major / divisor)
+        }
+        return (major, major)
+    }
+}
+
+/// A ruler along the top or left edge of the editor canvas, numbered in the capture's own pixels.
+/// `origin` is where the image's first pixel is, and `shown` how long the whole image is on screen, both in points.
+struct RulerView: View {
+    enum Axis { case horizontal, vertical }
+    static let thickness: CGFloat = 20
+    let axis: Axis
+    let pixels: Int
+    let origin: CGFloat
+    let shown: CGFloat
+    /// The pointer, in image pixels.
+    let cursor: CGFloat?
+
+    var body: some View {
+        Canvas { ctx, size in
+            let horizontal = axis == .horizontal
+            let length = horizontal ? size.width : size.height
+            let depth = horizontal ? size.height : size.width
+            guard pixels > 0, shown > 0 else { return }
+            let ppp = shown / CGFloat(pixels)
+            func line(_ pos: CGFloat, _ tick: CGFloat) -> Path {
+                Path { p in
+                    if horizontal { p.move(to: CGPoint(x: pos, y: depth)); p.addLine(to: CGPoint(x: pos, y: depth - tick)) }
+                    else { p.move(to: CGPoint(x: depth, y: pos)); p.addLine(to: CGPoint(x: depth - tick, y: pos)) }
+                }
+            }
+            // The image's extent, slightly lighter than the area around it.
+            let start = max(0, origin), end = min(length, origin + shown)
+            if end > start {
+                let r = horizontal ? CGRect(x: start, y: 0, width: end - start, height: depth) : CGRect(x: 0, y: start, width: depth, height: end - start)
+                ctx.fill(Path(r), with: .color(.white.opacity(0.06)))
+            }
+            let step = RulerScale.steps(pointsPerPixel: ppp)
+            let first = max(0, Int(floor(-origin / ppp)))
+            let last = min(pixels, Int(ceil((length - origin) / ppp)))
+            var px = first / step.minor * step.minor
+            while px <= last {
+                let pos = (origin + CGFloat(px) * ppp).rounded() + 0.5
+                let major = px % step.major == 0
+                ctx.stroke(line(pos, major ? depth * 0.5 : depth * 0.22), with: .color(.white.opacity(major ? 0.55 : 0.3)), lineWidth: 1)
+                if major {
+                    let label = Text("\(px)").font(.system(size: 9, weight: .medium).monospacedDigit()).foregroundStyle(.white.opacity(0.65))
+                    if horizontal {
+                        ctx.draw(label, at: CGPoint(x: pos + 3, y: 2), anchor: .topLeading)
+                    } else {
+                        var layer = ctx
+                        layer.translateBy(x: 2, y: pos - 3)
+                        layer.rotate(by: .degrees(-90))
+                        layer.draw(label, at: .zero, anchor: .topLeading)
+                    }
+                }
+                px += step.minor
+            }
+            if let cursor {
+                let pos = (origin + cursor * ppp).rounded() + 0.5
+                ctx.stroke(line(pos, depth), with: .color(.accentColor), lineWidth: 1)
+            }
+            // Edge next to the image.
+            let edge = horizontal ? Path(CGRect(x: 0, y: depth - 0.5, width: length, height: 0.5)) : Path(CGRect(x: depth - 0.5, y: 0, width: 0.5, height: length))
+            ctx.fill(edge, with: .color(.white.opacity(0.18)))
+        }
+        .background(Color.black.opacity(0.28))
+        .accessibilityHidden(true)
+    }
+}
+
 /// View-only zoom of the editor canvas: it magnifies what you see, never the image itself.
 /// Positions are relative to the centre of the canvas area, in points.
 struct ZoomState: Equatable {
@@ -2310,8 +2405,8 @@ struct ZoomState: Equatable {
 final class CanvasZoom: ObservableObject {
     @Published var state = ZoomState()
     /// The canvas area and the image size at 1×, in the window's SwiftUI coordinates.
-    var frame: CGRect = .zero
-    var content: CGSize = .zero
+    @Published var frame: CGRect = .zero
+    @Published var content: CGSize = .zero
     weak var window: NSWindow?
     private var monitor: Any?
 
@@ -2369,6 +2464,8 @@ struct EditorView: View {
     @State private var stroke: [CGPoint] = []
     @State private var toastVisible = false
     @StateObject private var zoom = CanvasZoom()
+    /// The pointer over the image, in image pixels.
+    @State private var hover: CGPoint?
     @Namespace private var toolSelection
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -2444,7 +2541,13 @@ struct EditorView: View {
                         .keyboardShortcut("s", modifiers: .command).disabled(store.current == nil)
                     BareIconButton(symbol: "doc.on.clipboard", label: L("Import image from clipboard (⌘I)")) { store.importImage() }
                         .keyboardShortcut("i", modifiers: .command)
+                    // ⌘R toggles the rulers from anywhere in the editor.
+                    Button(L("Show Rulers")) { store.showRulers.toggle() }
+                        .keyboardShortcut("r", modifiers: .command)
+                        .frame(width: 0, height: 0).opacity(0).accessibilityHidden(true)
                     Menu {
+                        Button(store.showRulers ? L("Hide Rulers") : L("Show Rulers"), systemImage: "ruler") { store.showRulers.toggle() }
+                        Divider()
                         Button(L("Delete This Screenshot"), systemImage: "trash") { store.remove() }.disabled(store.current == nil)
                         Button(L("Clear History"), systemImage: "xmark.bin") { store.clear() }.disabled(store.captures.isEmpty)
                     } label: {
@@ -2539,6 +2642,72 @@ struct EditorView: View {
 
     @ViewBuilder private var canvas: some View {
         if let capture = store.current {
+            if store.showRulers {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        Color.black.opacity(0.28).frame(width: RulerView.thickness, height: RulerView.thickness)
+                        ruler(.horizontal, capture).frame(height: RulerView.thickness)
+                    }
+                    HStack(spacing: 0) {
+                        ruler(.vertical, capture).frame(width: RulerView.thickness)
+                        imageArea(capture)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(alignment: .bottomLeading) { measureBadge(capture) }
+                // Positions are physical places in the image, which is never mirrored.
+                .environment(\.layoutDirection, .leftToRight)
+            } else {
+                imageArea(capture)
+            }
+        }
+    }
+
+    private func ruler(_ axis: RulerView.Axis, _ capture: Capture) -> some View {
+        let horizontal = axis == .horizontal
+        let area = horizontal ? zoom.frame.width : zoom.frame.height
+        let shown = (horizontal ? zoom.content.width : zoom.content.height) * zoom.state.zoom
+        let pan = horizontal ? zoom.state.pan.width : zoom.state.pan.height
+        return RulerView(axis: axis, pixels: horizontal ? capture.image.width : capture.image.height,
+                         origin: area / 2 + pan - shown / 2, shown: shown,
+                         cursor: hover.map { horizontal ? $0.x : $0.y })
+    }
+
+    /// Size of the area being dragged (or the arrow's length), in image pixels, next to the pointer.
+    /// Counter-scaled so it stays readable at any zoom.
+    private func selectionSize(_ a: CGPoint, _ b: CGPoint, in size: CGSize, image: CGImage) -> some View {
+        let sx = CGFloat(image.width) / size.width, sy = CGFloat(image.height) / size.height
+        let w = abs(b.x - a.x) * sx, h = abs(b.y - a.y) * sy
+        let text = tool == .arrow ? "\(Int(hypot(w, h).rounded())) px" : "\(Int(w.rounded())) × \(Int(h.rounded())) px"
+        let k = 1 / zoom.state.zoom
+        return Text(text)
+            .font(.system(size: 11, weight: .semibold).monospacedDigit())
+            .foregroundStyle(.white)
+            .padding(.horizontal, 7).padding(.vertical, 3)
+            .background(Capsule().fill(.black.opacity(0.72)))
+            .fixedSize()
+            .scaleEffect(k)
+            .position(x: min(max(b.x + 44 * k, 44 * k), size.width - 44 * k), y: min(max(b.y + 18 * k, 12 * k), size.height - 12 * k))
+            .allowsHitTesting(false)
+    }
+
+    /// The image size, and the pointer's position in pixels while it is over the image.
+    private func measureBadge(_ capture: Capture) -> some View {
+        HStack(spacing: 8) {
+            Text("\(capture.image.width) × \(capture.image.height) px")
+            if let hover {
+                Text("x \(Int(hover.x)) · y \(Int(hover.y))").foregroundStyle(.secondary)
+            }
+        }
+        .font(.system(size: 11, weight: .medium).monospacedDigit())
+        .padding(.horizontal, 10).frame(height: 24)
+        .glassSurface(Capsule(), tint: Smoke.panelTint)
+        .overlay(Capsule().strokeBorder(Smoke.rim, lineWidth: 0.5))
+        .padding(.leading, RulerView.thickness + 10).padding(.bottom, 10)
+        .allowsHitTesting(false)
+    }
+
+    private func imageArea(_ capture: Capture) -> some View {
             GeometryReader { geo in
                 let ratio = min(geo.size.width / CGFloat(capture.image.width), geo.size.height / CGFloat(capture.image.height), 1)
                 let size = CGSize(width: CGFloat(capture.image.width) * ratio, height: CGFloat(capture.image.height) * ratio)
@@ -2558,6 +2727,7 @@ struct EditorView: View {
                             else { p.addRect(CGRect(x: min(a.x, b.x), y: min(a.y, b.y), width: abs(a.x - b.x), height: abs(a.y - b.y))) }
                         }
                         .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                        if store.showRulers { selectionSize(a, b, in: size, image: capture.image) }
                     }
                 }
                 .frame(width: size.width, height: size.height)
@@ -2565,6 +2735,12 @@ struct EditorView: View {
                 .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(.white.opacity(0.1), lineWidth: 0.5))
                 .shadow(color: .black.opacity(0.45), radius: 24, y: 10)
                 .contentShape(Rectangle())
+                .onContinuousHover { phase in
+                    if case .active(let p) = phase, size.width > 0, size.height > 0 {
+                        hover = CGPoint(x: min(max(p.x / size.width, 0), 1) * CGFloat(capture.image.width - 1),
+                                        y: min(max(p.y / size.height, 0), 1) * CGFloat(capture.image.height - 1))
+                    } else { hover = nil }
+                }
                 .gesture(DragGesture(minimumDistance: 0)
                     .onChanged { v in
                         guard tool == .highlight else { start = v.startLocation; end = v.location; return }
@@ -2599,7 +2775,6 @@ struct EditorView: View {
                 .onChange(of: size) { _, new in zoom.content = new; zoom.fit() }
                 .onChange(of: CGSize(width: capture.image.width, height: capture.image.height)) { _, _ in zoom.reset() } // crop
             }
-        }
     }
 
     /// Current zoom; click or ⌘0 to go back to the whole image.
@@ -2790,14 +2965,9 @@ struct RecentPanelView: View {
 
     private var header: some View {
         HStack(spacing: 8) {
-            HStack(spacing: 4) {
-                Text(L("Recent:")).font(.system(size: 13, weight: .bold))
-                Text("\(store.captures.count)").font(.system(size: 13, weight: .medium)).monospacedDigit()
-            }
-            .padding(.horizontal, 12).frame(height: 30)
-            .background(Capsule().fill(Smoke.pill))
-            .overlay(Capsule().strokeBorder(Smoke.edge, lineWidth: 0.5))
-            .accessibilityElement(children: .combine)
+            // The logo carries the app name; the number of captures is visible in the strip itself.
+            // Same distance from the top and left edges (panel inset + 6), so its corner follows the panel's corner.
+            BrandLogo(height: 40).padding(.leading, 6).padding(.top, 6)
             Spacer()
             PillButton(title: L("Import"), symbol: "plus.circle", help: L("Import Image from Clipboard")) { store.importImage() }
             PillButton(title: L("Folder"), symbol: "folder.circle", help: L("Open the screenshots folder")) { dismiss(); store.openFolder() }
@@ -2849,9 +3019,7 @@ struct RecentPanelView: View {
     }
 
     private var empty: some View {
-        VStack(spacing: 8) {
-            BrandLogo(height: 34)
-                .padding(.bottom, 2)
+        VStack(spacing: 10) {
             Text(L("No screenshots yet")).font(.system(size: 13, weight: .semibold))
             ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, again: store.repeatShortcut)
                 .font(.system(size: 12))

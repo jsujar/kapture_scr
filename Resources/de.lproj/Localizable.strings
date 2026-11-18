@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Aus Zwischenablage importieren";
 "Screenshot" = "Bildschirmfoto";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Temporärer Verlauf im Arbeitsspeicher: bis zu 10 Bilder für 30 Minuten. „Kopie sichern“ erstellt ein neues PNG und überschreibt nie.";
-"Recent:" = "Zuletzt:";
 "Import" = "Importieren";
 "Import Image from Clipboard" = "Bild aus Zwischenablage importieren";
 "Open the screenshots folder" = "Ordner mit Bildschirmfotos öffnen";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Zoom zurücksetzen";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "Ziehe im Editor zwei Finger auf dem Trackpad auseinander, um ein Detail anzusehen, und streiche mit zwei Fingern, um dich zu bewegen. Tippe zweimal mit zwei Fingern oder drücke ⌘0, um wieder das ganze Bild zu sehen. Der Zoom verändert das Bild nie.";
+
+/* Editor rulers */
+"Rulers" = "Lineale";
+"Show Rulers" = "Lineale einblenden";
+"Hide Rulers" = "Lineale ausblenden";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Der Editor zeigt Lineale in den echten Pixeln der Aufnahme. Sie folgen dem Zoom und markieren den Zeiger; unten stehen die Bildgröße und die Zeigerposition, und beim Ziehen siehst du die Größe des Bereichs. Drücke ⌘R, um sie ein- oder auszublenden.";

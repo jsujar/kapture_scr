@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Importálás a vágólapról";
 "Screenshot" = "Képernyőfotó";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Ideiglenes előzmények a memóriában: legfeljebb 10 kép, 30 percig. A Másolat mentése új PNG-t hoz létre, és sosem ír felül semmit.";
-"Recent:" = "Legutóbbiak:";
 "Import" = "Importálás";
 "Import Image from Clipboard" = "Kép importálása a vágólapról";
 "Open the screenshots folder" = "A képernyőfotók mappájának megnyitása";
@@ -235,3 +234,9 @@
 "Zoom" = "Nagyítás";
 "Reset Zoom" = "Nagyítás visszaállítása";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "A szerkesztőben csippentsd össze vagy széthúzva az ujjaidat a trackpaden egy részlet megtekintéséhez, és húzd két ujjal a mozgatáshoz. Koppints duplán két ujjal, vagy nyomd meg a ⌘0 billentyűket a teljes kép újbóli megjelenítéséhez. A nagyítás sosem módosítja a képet.";
+
+/* Editor rulers */
+"Rulers" = "Vonalzók";
+"Show Rulers" = "Vonalzók megjelenítése";
+"Hide Rulers" = "Vonalzók elrejtése";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "A szerkesztő a rögzítés saját képpontjaiban mutat vonalzókat. Követik a nagyítást és jelölik a mutatót; alul látható a kép mérete és a mutató helyzete, húzáskor pedig a terület mérete. A ⌘R billentyűkkel jelenítheted meg vagy rejtheted el őket.";

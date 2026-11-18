@@ -303,3 +303,49 @@ final class ZoomStateTests: XCTestCase {
         XCTAssertEqual(z.pan, .zero)
     }
 }
+
+/// Editor rulers: round, readable steps at any zoom, numbered in the capture's own pixels.
+final class RulerScaleTests: XCTestCase {
+    func testStepsAreRoundAndReadable() {
+        for ppp: CGFloat in [0.02, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 60] {
+            let s = RulerScale.steps(pointsPerPixel: ppp)
+            XCTAssertGreaterThanOrEqual(CGFloat(s.major) * ppp, 56, "labels never collide at \(ppp)")
+            var m = s.major; while m % 10 == 0 { m /= 10 }
+            XCTAssertTrue([1, 2, 5].contains(m), "round step \(s.major) at \(ppp)")
+            XCTAssertEqual(s.major % s.minor, 0)
+            XCTAssertTrue(s.minor == s.major || CGFloat(s.minor) * ppp >= 5, "small ticks at least 5 pt apart")
+        }
+    }
+
+    func testTypicalCases() {
+        // A 2880 px wide Retina capture shown 720 pt wide: 0.25 pt per pixel.
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 0.25).major, 500)
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 0.25).minor, 50) // 12.5 pt apart
+        // Zoomed in until each pixel is 60 pt wide: every pixel is numbered.
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 60).major, 1)
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 60).minor, 1)
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 1).major, 100)
+    }
+
+    func testZoomingInNeverCoarsens() {
+        var previous = Int.max
+        for ppp in stride(from: CGFloat(0.05), through: 40, by: 0.05) {
+            let major = RulerScale.steps(pointsPerPixel: ppp).major
+            XCTAssertLessThanOrEqual(major, previous)
+            previous = major
+        }
+    }
+
+    func testDegenerateInput() {
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: 0).major, 1)
+        XCTAssertEqual(RulerScale.steps(pointsPerPixel: .infinity).major, 1)
+    }
+
+    func testRulersOnByDefaultAndRemembered() {
+        let settings = Settings(defaults: UserDefaults(suiteName: "KaptureTests-\(UUID().uuidString)")!)
+        XCTAssertTrue(settings.showRulers)
+        let store = CaptureStore(settings: settings)
+        store.showRulers = false
+        XCTAssertFalse(CaptureStore(settings: settings).showRulers)
+    }
+}

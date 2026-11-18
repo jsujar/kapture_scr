@@ -56,7 +56,6 @@
 "Import from Clipboard" = "ক্লিপবোর্ড থেকে ইমপোর্ট করুন";
 "Screenshot" = "স্ক্রিনশট";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "অস্থায়ী ইতিহাস মেমোরিতে থাকে: ৩০ মিনিটের জন্য সর্বোচ্চ ১০টি ছবি। “কপি সংরক্ষণ করুন” নতুন PNG তৈরি করে এবং কখনো ওভাররাইট করে না।";
-"Recent:" = "সাম্প্রতিক:";
 "Import" = "ইমপোর্ট";
 "Import Image from Clipboard" = "ক্লিপবোর্ড থেকে ছবি ইমপোর্ট করুন";
 "Open the screenshots folder" = "স্ক্রিনশট ফোল্ডার খুলুন";
@@ -235,3 +234,9 @@
 "Zoom" = "জুম";
 "Reset Zoom" = "জুম রিসেট করুন";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "এডিটরে কোনো খুঁটিনাটি দেখতে ট্র্যাকপ্যাডে পিঞ্চ করুন এবং সরাতে দুই আঙুলে সোয়াইপ করুন। পুরো ছবি আবার দেখতে দুই আঙুলে দুবার ট্যাপ করুন বা ⌘0 চাপুন। জুম করলে ছবি কখনো বদলায় না।";
+
+/* Editor rulers */
+"Rulers" = "রুলার";
+"Show Rulers" = "রুলার দেখান";
+"Hide Rulers" = "রুলার লুকান";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "এডিটর ক্যাপচারের আসল পিক্সেলে রুলার দেখায়। এগুলো জুমের সাথে চলে এবং পয়েন্টার চিহ্নিত করে; ছবির আকার ও পয়েন্টারের অবস্থান নিচে দেখা যায়, আর টেনে নিলে জায়গার আকার দেখা যায়। দেখাতে বা লুকাতে ⌘R চাপুন।";

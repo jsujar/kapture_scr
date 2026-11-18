@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Импорт из буфера обмена";
 "Screenshot" = "Снимок экрана";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Временная история в памяти: до 10 изображений на 30 минут. «Сохранить копию» создает новый PNG и ничего не перезаписывает.";
-"Recent:" = "Недавние:";
 "Import" = "Импорт";
 "Import Image from Clipboard" = "Импортировать изображение из буфера обмена";
 "Open the screenshots folder" = "Открыть папку со снимками";
@@ -235,3 +234,9 @@
 "Zoom" = "Масштаб";
 "Reset Zoom" = "Сбросить масштаб";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "В редакторе разведите пальцы на трекпаде, чтобы рассмотреть деталь, и смахивайте двумя пальцами, чтобы перемещаться. Дважды коснитесь двумя пальцами или нажмите ⌘0, чтобы снова увидеть всё изображение. Масштаб никогда не меняет само изображение.";
+
+/* Editor rulers */
+"Rulers" = "Линейки";
+"Show Rulers" = "Показать линейки";
+"Hide Rulers" = "Скрыть линейки";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Редактор показывает линейки в настоящих пикселях снимка. Они следуют за масштабом и отмечают указатель; внизу показаны размер изображения и положение указателя, а при перетаскивании — размер области. Нажмите ⌘R, чтобы показать или скрыть их.";

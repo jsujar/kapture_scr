@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Importera från urklipp";
 "Screenshot" = "Skärmavbild";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Tillfällig historik i minnet: upp till 10 bilder i 30 minuter. Spara kopia skapar en ny PNG och skriver aldrig över.";
-"Recent:" = "Senaste:";
 "Import" = "Importera";
 "Import Image from Clipboard" = "Importera bild från urklipp";
 "Open the screenshots folder" = "Öppna mappen med skärmavbilder";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Återställ zoom";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "Nyp på styrplattan i redigeraren för att se en detalj och svep med två fingrar för att flytta runt. Dubbeltryck med två fingrar eller tryck på ⌘0 för att se hela bilden igen. Zoomen ändrar aldrig bilden.";
+
+/* Editor rulers */
+"Rulers" = "Linjaler";
+"Show Rulers" = "Visa linjaler";
+"Hide Rulers" = "Göm linjaler";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Redigeraren visar linjaler i bildens egna pixlar. De följer zoomen och markerar pekaren; bildens storlek och pekarens position visas längst ned, och när du drar ser du områdets storlek. Tryck på ⌘R för att visa eller gömma dem.";

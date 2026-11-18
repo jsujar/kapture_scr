@@ -56,7 +56,6 @@
 "Import from Clipboard" = "Importar da área de transferência";
 "Screenshot" = "Captura";
 "Temporary history kept in memory: up to 10 images for 30 minutes. Save Copy creates a new PNG and never overwrites." = "Histórico temporário na memória: até 10 imagens por 30 minutos. Salvar cópia cria um novo PNG e nunca substitui arquivos.";
-"Recent:" = "Recentes:";
 "Import" = "Importar";
 "Import Image from Clipboard" = "Importar imagem da área de transferência";
 "Open the screenshots folder" = "Abrir a pasta de capturas";
@@ -235,3 +234,9 @@
 "Zoom" = "Zoom";
 "Reset Zoom" = "Redefinir zoom";
 "In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "No editor, faça o gesto de pinça no trackpad para ver um detalhe e deslize com dois dedos para se mover. Toque duas vezes com dois dedos ou pressione ⌘0 para ver a imagem inteira de novo. O zoom nunca altera a imagem.";
+
+/* Editor rulers */
+"Rulers" = "Réguas";
+"Show Rulers" = "Mostrar réguas";
+"Hide Rulers" = "Ocultar réguas";
+"The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "O editor mostra réguas nos pixels reais da captura. Elas acompanham o zoom e marcam o ponteiro; o tamanho da imagem e a posição do ponteiro aparecem embaixo, e ao arrastar você vê o tamanho da área. Pressione ⌘R para mostrá-las ou ocultá-las.";

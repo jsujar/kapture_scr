@@ -12,12 +12,14 @@
   <img src="https://img.shields.io/badge/macOS-14%2B-36383D?logo=apple&logoColor=white" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Swift-SwiftUI%20%2B%20AppKit-36383D?logo=swift&logoColor=white" alt="Swift, SwiftUI and AppKit">
   <img src="https://img.shields.io/badge/network-none-36383D" alt="No network access">
+  <a href="#languages"><img src="https://img.shields.io/badge/languages-10-36383D" alt="10 languages"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-36383D" alt="MIT License"></a>
 </p>
 
 <p align="center">
   <a href="#install">Install</a> ·
   <a href="#features">Features</a> ·
+  <a href="#languages">Languages</a> ·
   <a href="#keyboard-shortcuts">Shortcuts</a> ·
   <a href="#privacy">Privacy</a> ·
   <a href="#build-from-source">Build</a> ·
@@ -92,7 +94,26 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
 - **Liquid Glass.** The guide, options panel, countdown, recent captures panel and editor use Liquid Glass on macOS 26 and later (`glassEffect`, `GlassEffectContainer`), with a translucent fallback on macOS 14–15.
 - **Light and dark.** Every surface has both versions and follows the system appearance.
 - **Accessibility.** Surfaces respect *Reduce motion* and *Reduce transparency*.
-- **10 languages.** English, Spanish, French, Portuguese (Brazil), Russian, Simplified Chinese, Hindi, Bengali, Arabic and Urdu, following the system language. Arabic and Urdu use a right-to-left layout.
+- **10 languages.** The whole interface is translated, including right-to-left layouts. See [Languages](#languages).
+
+## Languages
+
+Kapture SCR follows the language set in **System Settings › General › Language & Region**. To use a different language for this app only, add it under **Applications** in the same pane. If your language is not listed, the app uses English.
+
+| Language | Native name | Code | Direction |
+| --- | --- | --- | --- |
+| English | English | `en` | Left to right |
+| Spanish | Español | `es` | Left to right |
+| French | Français | `fr` | Left to right |
+| Portuguese (Brazil) | Português (Brasil) | `pt-BR` | Left to right |
+| Russian | Русский | `ru` | Left to right |
+| Chinese (Simplified) | 简体中文 | `zh-Hans` | Left to right |
+| Hindi | हिन्दी | `hi` | Left to right |
+| Bengali | বাংলা | `bn` | Left to right |
+| Arabic | العربية | `ar` | Right to left |
+| Urdu | اردو | `ur` | Right to left |
+
+File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png`), so scripts and searches keep working. To add or fix a translation, see [Translations](#translations).
 
 ## Keyboard shortcuts
 

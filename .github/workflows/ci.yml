@@ -13,13 +13,19 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Toolchain
         run: swift --version
 
       - name: Unit tests with coverage
-        run: ./scripts/coverage.sh
+        run: |
+          set -o pipefail
+          # Failures are also reported as annotations, so they show up on the commit and the pull request.
+          ./scripts/coverage.sh 2>&1 | tee test.log || {
+            grep -E "error:|failed|Fatal|fatal error" test.log | head -40 | sed 's/^/::error::/'
+            exit 1
+          }
 
       - name: Translations complete in all 10 languages
         run: python3 scripts/check-strings.py

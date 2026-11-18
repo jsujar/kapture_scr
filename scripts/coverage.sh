@@ -5,5 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 /usr/bin/swift test --enable-code-coverage
 BIN=$(/usr/bin/swift build --show-bin-path)
-/usr/bin/xcrun llvm-cov report "$BIN/KaptureTests.xctest/Contents/MacOS/KaptureTests" \
+# The test bundle is KaptureTests.xctest or KapturePackageTests.xctest depending on the SwiftPM version.
+BUNDLE=$(ls -d "$BIN"/*.xctest | head -n 1)
+/usr/bin/xcrun llvm-cov report "$BUNDLE/Contents/MacOS/$(basename "$BUNDLE" .xctest)" \
     -instr-profile "$BIN/codecov/default.profdata" Sources/

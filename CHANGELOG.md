@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Security
+- **Security policy** (`SECURITY.md`): how to report a vulnerability privately through GitHub, supported versions, and what is in and out of scope.
+- **CodeQL code scanning** of the Swift source (`security-and-quality` queries) on every push and pull request and every week.
+- **Dependabot** keeps the GitHub Actions up to date. Actions are now pinned to full commit SHAs (checkout v7.0.1, CodeQL v4.39.3), checkout no longer keeps the token in the working copy, and workflow tokens are read-only by default.
+
+### Development
+- Repository tests: every action is pinned to a commit, workflows start with read-only permissions and don't use `pull_request_target`, Dependabot watches the actions, the security policy explains private reporting, and the package has no third-party dependencies.
+- CI also runs on `release/**` branches.
+
 ## [1.0.0] – 2026-11-18
 
 The first stable version: repeat capture, highlighter, automatic watermark and number, editor zoom, a Help menu with a way to verify your copy, open at login, and 15 languages. Still no network access.

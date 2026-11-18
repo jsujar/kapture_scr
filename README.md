@@ -10,6 +10,7 @@
 <p align="center">
   <a href="https://github.com/jsujar/kapture_scr/releases/latest"><img src="https://img.shields.io/github/v/release/jsujar/kapture_scr?label=download&color=D5AC36" alt="Download"></a>
   <a href="https://github.com/jsujar/kapture_scr/actions/workflows/ci.yml"><img src="https://github.com/jsujar/kapture_scr/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/jsujar/kapture_scr/actions/workflows/codeql.yml"><img src="https://github.com/jsujar/kapture_scr/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-36383D?logo=apple&logoColor=white" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Swift-SwiftUI%20%2B%20AppKit-36383D?logo=swift&logoColor=white" alt="Swift, SwiftUI and AppKit">
   <img src="https://img.shields.io/badge/network-none-36383D" alt="No network access">
@@ -207,6 +208,12 @@ shasum -a 256 "/Applications/Kapture SCR.app/Contents/MacOS/Kapture"
 
 You can also read the source and [build it yourself](#build-from-source).
 
+## Security
+
+- **Reporting a problem.** Please report vulnerabilities privately through the repository's *Security* tab (*Report a vulnerability*), not in a public issue. [SECURITY.md](SECURITY.md) explains what is in scope and what happens next.
+- **Code scanning.** [CodeQL](.github/workflows/codeql.yml) analyses the Swift source with the `security-and-quality` queries on every change and every week.
+- **Supply chain.** The app has no third-party packages. The GitHub Actions that build and test it are pinned to exact commits and kept up to date by [Dependabot](.github/dependabot.yml); a test fails if an action is not pinned or a workflow token is not read-only.
+
 ## Build from source
 
 **Requirements.**
@@ -252,6 +259,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
 - **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
 - **Files.** Saving never overwrites an existing file, and file names are the same in every language.
 - **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.
+- **Repository.** GitHub Actions are pinned to exact commits, workflow tokens are read-only, Dependabot watches the actions, and there are no third-party packages.
 - **Languages.** All 15 translations are complete, keep their placeholders and match `Info.plist` and the *Language* menu, and macOS picks the expected one for regional settings (for example Portuguese (Portugal) → Portuguese (Brazil)).
 
 **Coverage.** `./scripts/coverage.sh` runs the tests with code coverage. The tests target the logic: about three quarters of the history, editing, file and shortcut code runs under test. Most of the source is user interface, so the overall figure is low.
@@ -320,6 +328,9 @@ Resources/                    Icons, logo and Localizable.strings for 15 languag
 Tests/KaptureTests/           Unit tests
 scripts/                      Build, disk image, coverage, load test and translation check scripts
 .github/workflows/ci.yml      Continuous integration
+.github/workflows/codeql.yml  CodeQL code scanning
+.github/dependabot.yml        Dependabot updates for the GitHub Actions
+SECURITY.md                   How to report a vulnerability
 logo/                         Brand assets (see License)
 Info.plist                    Bundle metadata
 Kapture.entitlements          App Sandbox entitlements

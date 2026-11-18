@@ -1,0 +1,16 @@
+# Keeps the GitHub Actions used by CI and code scanning up to date.
+# The app itself has no third-party dependencies (Package.swift lists none), so there are no Swift packages to watch.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Actions are pinned to full commit SHAs; Dependabot updates the SHA and the version comment together.
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "CI"
+    labels: ["dependencies"]

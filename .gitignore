@@ -1,0 +1,27 @@
+# SwiftPM / Xcode
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+xcuserdata/
+
+# Build output: signed app bundles and disk images (attach DMGs to releases instead)
+dist/
+*.dmg
+
+# Archives
+*.zip
+
+# Local tooling
+graphify-out/
+.claude/
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*

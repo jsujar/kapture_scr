@@ -1,0 +1,26 @@
+{
+  "reference": "/mnt/data/KaptureSCR_Referencia_Aprobada/KaptureSCR_ORIGINAL_APROBADO.png",
+  "reference_dimensions": [
+    1692,
+    517
+  ],
+  "reference_sha256": "424c65e7ddf994e0a0ebfa3a24acd41c8f14eda87cc83c847bc26c7ddab2fe4d",
+  "appicon_master_alpha_corners": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "menu_master_alpha_corners": [
+    0,
+    0
+  ],
+  "menu_crop_bbox": [
+    8,
+    8,
+    490,
+    474
+  ],
+  "png_count": 65,
+  "icns_bytes": 741952
+}

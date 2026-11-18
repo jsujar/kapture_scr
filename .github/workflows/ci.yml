@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Unit tests with coverage
+        run: ./scripts/coverage.sh
+
+      - name: Translations complete in all 10 languages
+        run: python3 scripts/check-strings.py
+
+      - name: Build the signed app bundle (ad hoc)
+        run: ./scripts/build-local.sh --no-install
+
+      - name: Signed app has the sandbox and no network entitlement
+        run: |
+          APP="dist/Kapture SCR.app"
+          codesign -d --entitlements :- "$APP" > entitlements.plist
+          cat entitlements.plist
+          /usr/libexec/PlistBuddy -c 'Print :com.apple.security.app-sandbox' entitlements.plist | grep -qx true
+          if grep -q 'com.apple.security.network' entitlements.plist; then
+            echo "::error::The signed app has a network entitlement"; exit 1
+          fi

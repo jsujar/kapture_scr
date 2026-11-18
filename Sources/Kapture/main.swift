@@ -1150,8 +1150,8 @@ final class CaptureStore: ObservableObject {
         expiryTimer = t
     }
     var current: Capture? { captures.first { $0.id == selected } }
-    func expire() {
-        let cutoff = Date().addingTimeInterval(-1800)
+    func expire(now: Date = Date()) {
+        let cutoff = now.addingTimeInterval(-1800)
         captures.removeAll { $0.created < cutoff }
         if current == nil { select(captures.first?.id) }
     }

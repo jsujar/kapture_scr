@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="https://github.com/jsujar/kapture_scr/releases/latest"><img src="https://img.shields.io/github/v/release/jsujar/kapture_scr?label=download&color=D5AC36" alt="Download"></a>
+  <a href="https://github.com/jsujar/kapture_scr/actions/workflows/ci.yml"><img src="https://github.com/jsujar/kapture_scr/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-36383D?logo=apple&logoColor=white" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Swift-SwiftUI%20%2B%20AppKit-36383D?logo=swift&logoColor=white" alt="Swift, SwiftUI and AppKit">
   <img src="https://img.shields.io/badge/network-none-36383D" alt="No network access">
@@ -137,7 +138,7 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 
 ## Privacy
 
-- **No network.** No networking code, OCR, auto-updates or telemetry, and no network entitlement.
+- **No network.** No networking code, OCR, auto-updates or telemetry, and no network entitlement. The App Sandbox therefore blocks every connection, and [automated tests](#tests) check this on every change.
 - **Files only where you allow.**
   - Captures and edited copies go to the folder you choose.
   - Preferences live in the app's sandbox container.
@@ -174,6 +175,30 @@ open ~/Applications/"Kapture SCR.app"
 Pass `--no-install` to only build into `dist/`.
 
 > Do not run the binary in `.build/` directly: it lacks the signature and therefore the sandbox. Do not disable Gatekeeper or SIP. If you downloaded the source as an archive, remove only its quarantine flag: `xattr -dr com.apple.quarantine .`
+
+### Tests
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
+```
+
+**What the unit tests cover.**
+- **No network, in three layers.**
+  - Entitlements: the App Sandbox is on, there is no network entitlement, and no new entitlement can be added unnoticed.
+  - Source: no networking, web, telemetry or URL-opening APIs, no remote addresses, and no helper process besides `screencapture`.
+  - Binary: the compiled app links no networking framework and imports no socket or URL-loading function.
+- **Image limits.** Oversized, truncated or invalid images are rejected, as are images over the pixel and byte limits.
+- **History.** Up to 10 images and 128 MiB, expiry after 30 minutes, and selection after removal.
+- **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
+- **Files.** Saving never overwrites an existing file, and file names are the same in every language.
+- **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.
+- **Languages.** All 10 translations are complete, keep their placeholders and match `Info.plist`.
+
+**Coverage.** `./scripts/coverage.sh` runs the tests with code coverage. The tests target the logic: about three quarters of the history, editing, file and shortcut code runs under test. Most of the source is user interface, so the overall figure is low.
+
+**Continuous integration.** [GitHub Actions](.github/workflows/ci.yml) runs the tests and the translation check on every push and pull request. It also builds the signed app and checks that it has the sandbox and no network entitlement.
+
+**Load test.** `./scripts/loadtest/run.sh` runs about 5,000 captures, edits, copies and saves with the app's own code. It reports latency percentiles, memory use and any slowdown over time, and takes a few minutes. Run it by hand before a release: it is not part of continuous integration.
 
 ### Disk image
 
@@ -232,7 +257,9 @@ It lists missing or unused keys for each language.
 ```
 Sources/Kapture/main.swift    App, capture flow, overlay, editor and panels
 Resources/                    Icons, logo and Localizable.strings for 10 languages
-scripts/                      Build, disk image and translation check scripts
+Tests/KaptureTests/           Unit tests
+scripts/                      Build, disk image, coverage, load test and translation check scripts
+.github/workflows/ci.yml      Continuous integration
 logo/                         Brand assets (see License)
 Info.plist                    Bundle metadata
 Kapture.entitlements          App Sandbox entitlements

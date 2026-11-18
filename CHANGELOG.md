@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Development
+- **Unit tests** (`swift test`, 57 tests): image limits, history, edits and undo, file saving, shortcuts and the 10 translations, plus a three-layer check that the app cannot reach the network (entitlements, source and compiled binary).
+- **Continuous integration** on GitHub Actions: tests, code coverage, translation check and a signed build whose entitlements are checked for the sandbox and the absence of network access.
+- **Load test** (`scripts/loadtest/run.sh`) and **coverage report** (`scripts/coverage.sh`).
+- `CaptureStore.expire(now:)` takes the current time as a parameter so expiry can be tested.
+
 ### Added
 - **Adjustable selection**, optional (*Options › Adjust Capture Area*, off by default; when off, releasing the mouse captures at once as before). When on, releasing the mouse no longer captures at once. The area keeps eight handles (edge handles hide on short sides); corners and edges resize it with the system resize cursors, dragging inside moves it, dragging outside starts a new one, and arrow keys nudge it (⇧ ×10, ⌥ resizes). The glass hint anchors under the area (above it, or inside, when there is no room) and gains a *Capture* button; Return or a double-click also confirm.
 - **New logo** (approved version, `logo/KaptureSCR_Assets_PNG_Aprobado_v2/`): carbon-grey and gold frame around the hat-and-cursor symbol. The app icon (Dock, Finder, editor empty state; full `AppIcon.icns` from 16 to 1024 px) places the artwork on the standard macOS grid (824 px continuous-corner tile on a 1024 canvas, soft shadow and a faint rim so the black tile reads on a dark Dock); the kit's tile filled the whole canvas and showed a slightly lighter square around the artwork, so the artwork is flattened onto pure black. The menu bar uses a monochrome template derived from the same artwork at its true proportions (pixel bar kept as half-tone) that macOS tints for light, dark and highlighted states. Derived files are in `07_Kapture_Ajustado/`; the README header uses the horizontal logo.

@@ -12,6 +12,7 @@ DMG="$PWD/dist/$NAME $VERSION.dmg"
 
 ./scripts/build-local.sh --no-install
 APP="$PWD/dist/$NAME.app"
+EXEC_SHA=$(shasum -a 256 "$APP/Contents/MacOS/Kapture" | cut -d" " -f1)
 
 WORK=$(mktemp -d)
 MOUNT=""
@@ -76,3 +77,6 @@ IDENTITY=$(/usr/bin/security find-identity -p codesigning | awk '/"Kapture Local
 /usr/bin/codesign --force --sign "${IDENTITY:--}" "$DMG"
 hdiutil verify -quiet "$DMG"
 printf '\nDisk image: %s (%s)\n' "$DMG" "$(du -h "$DMG" | cut -f1 | xargs)"
+# Checksums to publish in the release notes; About Kapture SCR shows the app's.
+DMG_SHA=$(shasum -a 256 "$DMG" | cut -d" " -f1)
+printf 'SHA-256 disk image: %s\nSHA-256 app (Contents/MacOS/Kapture): %s\n' "$DMG_SHA" "$EXEC_SHA" | tee "${DMG%.dmg}.sha256.txt"

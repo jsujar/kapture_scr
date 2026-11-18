@@ -1,4 +1,5 @@
 import XCTest
+@testable import Kapture
 
 /// Kapture SCR must never reach the network or report anything. This is enforced in three layers:
 /// 1. Entitlements: the app runs in the App Sandbox without the network entitlements, so macOS itself
@@ -18,8 +19,11 @@ final class NoNetworkTests: XCTestCase {
     }
 
     /// True if the code calls a free C function such as `socket(`; methods like `.system(` (SwiftUI fonts) don't count.
+    /// Line comments are ignored, so prose such as "with the system (no helper)" doesn't count.
     private func callsCFunction(_ name: String, in code: String) -> Bool {
-        code.range(of: #"(?<![.\w])"# + name + #"\s*\("#, options: .regularExpression) != nil
+        let withoutComments = code.split(separator: "\n", omittingEmptySubsequences: false)
+            .map { line in line.range(of: "//").map { String(line[..<$0.lowerBound]) } ?? String(line) }.joined(separator: "\n")
+        return withoutComments.range(of: #"(?<![.\w])"# + name + #"\s*\("#, options: .regularExpression) != nil
     }
 
     // MARK: 1. Entitlements
@@ -72,11 +76,18 @@ final class NoNetworkTests: XCTestCase {
 
     func testSourceContainsNoRemoteAddresses() throws {
         let code = try source
-        let remote = try NSRegularExpression(pattern: #"(?i)\b(https?|wss?|ftp)://"#)
-        let matches = remote.matches(in: code, range: NSRange(code.startIndex..., in: code))
-        let found = matches.map { (code as NSString).substring(with: NSRange(location: $0.range.location, length: min(60, (code as NSString).length - $0.range.location))) }
-        XCTAssertEqual(found, [], "remote addresses in the source")
-        XCTAssertFalse(code.contains("URL(string:"), "URLs are built from file paths only")
+        let remote = try NSRegularExpression(pattern: #"(?i)\b(https?|wss?|ftp)://[^\s"]*"#)
+        let found = remote.matches(in: code, range: NSRange(code.startIndex..., in: code)).map { (code as NSString).substring(with: $0.range) }
+        // The release page is the only web address. The browser opens it when the user asks; the app never connects.
+        XCTAssertEqual(found, ["https://github.com/jsujar/kapture_scr/releases"], "remote addresses in the source")
+        XCTAssertEqual(code.components(separatedBy: "URL(string:").count - 1, 1, "URLs are built from file paths, except the release page")
+    }
+
+    func testReleasePageCarriesNoData() {
+        // A fixed address with nothing appended: no version, no identifier, no query.
+        XCTAssertEqual(Links.releases.absoluteString, "https://github.com/jsujar/kapture_scr/releases")
+        XCTAssertNil(Links.releases.query)
+        XCTAssertNil(Links.releases.fragment)
     }
 
     func testOnlyHelperProcessIsScreencapture() throws {
@@ -97,7 +108,7 @@ final class NoNetworkTests: XCTestCase {
         // NSWorkspace.open with a web address would hand data to a browser; the app only opens the capture folder.
         let code = try source
         let calls = code.components(separatedBy: "NSWorkspace.shared.open(").dropFirst().map { String($0.prefix(while: { $0 != ")" })) }
-        XCTAssertEqual(calls, ["folder"])
+        XCTAssertEqual(calls, ["folder", "Links.releases", "Links.releases"], "the folder, and the release page from Check for Updates")
         // Restarting to change the language opens only this same app.
         let apps = code.components(separatedBy: "openApplication(at: ").dropFirst().map { String($0.prefix(while: { $0 != "," })) }
         XCTAssertEqual(apps, ["Bundle.main.bundleURL"])

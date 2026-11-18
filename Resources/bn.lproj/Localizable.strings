@@ -3,7 +3,7 @@
 "Crop" = "ক্রপ";
 "Arrow" = "তীর";
 "Text" = "টেক্সট";
-"Redact" = "আড়াল করুন";
+"Redact" = "ঢেকে দিন";
 "Selection" = "নির্বাচন";
 "Window" = "উইন্ডো";
 "Full Screen" = "পূর্ণ স্ক্রিন";
@@ -75,7 +75,7 @@
 "Remove all screenshots from memory" = "মেমোরি থেকে সব স্ক্রিনশট সরান";
 "Open in Kapture SCR to edit" = "সম্পাদনা করতে Kapture SCR-এ খুলুন";
 "Global shortcuts unavailable; use the menu." = "গ্লোবাল শর্টকাট উপলভ্য নয়; মেনু ব্যবহার করুন।";
-"Allow Screen Recording for Kapture SCR in System Settings › Privacy & Security, then reopen the app." = "সিস্টেম সেটিংস › গোপনীয়তা ও নিরাপত্তায় Kapture SCR-কে স্ক্রিন রেকর্ডিংয়ের অনুমতি দিন, তারপর অ্যাপটি আবার খুলুন।";
+"Allow Screen Recording for Kapture SCR in System Settings › Privacy & Security, then reopen the app." = "System Settings › Privacy & Security-এ Kapture SCR-কে স্ক্রিন রেকর্ডিংয়ের অনুমতি দিন, তারপর অ্যাপটি আবার খুলুন।";
 "Capture cancelled: no folder was chosen." = "ক্যাপচার বাতিল: কোনো ফোল্ডার বেছে নেওয়া হয়নি।";
 "Couldn’t read the screenshot." = "স্ক্রিনশট পড়া যায়নি।";
 "Saved as %@" = "%@ হিসেবে সংরক্ষিত";
@@ -119,7 +119,6 @@
 /* Watermark */
 "Watermark not applied." = "ওয়াটারমার্ক যোগ করা হয়নি।";
 "Add Watermark" = "ওয়াটারমার্ক যোগ করুন";
-"Watermark Settings…" = "ওয়াটারমার্ক সেটিংস…";
 "Watermark" = "ওয়াটারমার্ক";
 "PNG with transparency works best." = "স্বচ্ছতাসহ PNG সবচেয়ে ভালো কাজ করে।";
 "Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "এই ছবিটি ব্যবহার করা যায়নি। ৪০৯৬ px পর্যন্ত PNG, JPEG, HEIC বা TIFF বেছে নিন।";
@@ -156,3 +155,83 @@
 "Later" = "পরে";
 "The new language will be used the next time Kapture SCR opens." = "পরের বার Kapture SCR খুললে নতুন ভাষা ব্যবহার হবে।";
 "Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Kapture SCR আবার চালু করা যায়নি। ভাষা পরিবর্তন করতে এটি বন্ধ করে আবার খুলুন।";
+
+/* Repeat capture, highlighter, number, login */
+"Open at Login" = "লগইনের সময় খুলুন";
+"Couldn’t change Open at Login: %@" = "“লগইনের সময় খুলুন” পরিবর্তন করা যায়নি: %@";
+"Allow Kapture SCR in System Settings › General › Login Items & Extensions." = "System Settings › General › Login Items & Extensions-এ Kapture SCR-কে অনুমতি দিন।";
+"Repeat Last Capture" = "শেষ ক্যাপচার আবার নিন";
+"Change Repeat Shortcut…" = "পুনরাবৃত্তি শর্টকাট বদলান…";
+"Repeat Shortcut" = "পুনরাবৃত্তি শর্টকাট";
+"Repeat shortcut: %@" = "পুনরাবৃত্তি শর্টকাট: %@";
+"The window from the last capture is no longer open." = "শেষ ক্যাপচারের উইন্ডোটি আর খোলা নেই।";
+"Highlight" = "হাইলাইট";
+"Custom color" = "কাস্টম রং";
+"Drag over the image to highlight" = "হাইলাইট করতে ছবির উপর টেনে আনুন";
+"Thin" = "সরু";
+"Medium" = "মাঝারি";
+"Thick" = "মোটা";
+"Yellow" = "হলুদ";
+"Green" = "সবুজ";
+"Pink" = "গোলাপি";
+"Blue" = "নীল";
+"Orange" = "কমলা";
+"Purple" = "বেগুনি";
+"Red" = "লাল";
+"White" = "সাদা";
+"Black" = "কালো";
+"Number" = "সংখ্যা";
+"Add Number" = "সংখ্যা যোগ করুন";
+"Watermark and Number…" = "ওয়াটারমার্ক ও সংখ্যা…";
+"Watermark and Number" = "ওয়াটারমার্ক ও সংখ্যা";
+"Add a number to every capture and imported image" = "প্রতিটি স্ক্রিনশট ও ইমপোর্ট করা ছবিতে একটি সংখ্যা যোগ করুন";
+"Next number" = "পরবর্তী সংখ্যা";
+"Increase after each capture" = "প্রতিটি ক্যাপচারের পর বাড়ান";
+"Font" = "ফন্ট";
+"System Font" = "সিস্টেম ফন্ট";
+"Color" = "রং";
+"Drag the number in the preview, or choose a position." = "প্রিভিউতে সংখ্যাটি টেনে আনুন, বা একটি অবস্থান বেছে নিন।";
+
+/* Help, About and updates */
+"A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains." = "কারসাজি করা কপি এই উইন্ডোটিও নকল করতে পারে। নিশ্চিত হতে, SHA-256 রিলিজ পেজেরটির সাথে মিলিয়ে দেখুন, অথবা সহায়তায় যেভাবে বলা আছে সেভাবে টার্মিনালে অ্যাপটি যাচাই করুন।";
+"About Kapture SCR" = "Kapture SCR সম্পর্কে";
+"About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page." = "“Kapture SCR সম্পর্কে” অ্যাপের সংস্করণ, কোড স্বাক্ষর ও SHA-256 দেখায়। অ্যাপের ওপর ভরসা না করে যাচাই করতে, টার্মিনালে এই কমান্ডগুলো চালান: স্বাক্ষর বৈধ হতে হবে, এনটাইটেলমেন্টে App Sandbox থাকতে হবে এবং কোনো নেটওয়ার্ক অ্যাক্সেস থাকবে না, আর SHA-256 রিলিজ পেজেরটির সাথে মিলতে হবে।";
+"Ad hoc (no certificate)" = "Ad hoc (কোনো সার্টিফিকেট নেই)";
+"Allowed" = "অনুমোদিত";
+"App Sandbox" = "App Sandbox";
+"Built" = "বিল্ডের তারিখ";
+"Captures stay in memory for 30 minutes (10 at most) unless you save them. Kapture SCR has no network access: the macOS App Sandbox blocks it, so nothing is ever sent." = "সংরক্ষণ না করলে ক্যাপচারগুলো ৩০ মিনিট মেমোরিতে থাকে (সর্বোচ্চ ১০টি)। Kapture SCR-এর কোনো নেটওয়ার্ক অ্যাক্সেস নেই: macOS-এর App Sandbox তা আটকে দেয়, তাই কখনো কিছু পাঠানো হয় না।";
+"Check for Updates" = "আপডেট খুঁজুন";
+"Check for Updates…" = "আপডেট খুঁজুন…";
+"Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "সাম্প্রতিক কোনো ক্যাপচার খুলতে সেটিতে ক্লিক করুন। ক্রপ, তীর, টেক্সট, ঢেকে দেওয়া ও হাইলাইটার (⌘1 থেকে ⌘5), পাঁচ ধাপ পর্যন্ত পূর্বাবস্থায় ফেরানোর সুবিধাসহ। “কপি সংরক্ষণ করুন” নতুন ফাইল তৈরি করে এবং মূলটি কখনো বদলায় না।";
+"Click any window to capture it, whatever mode is selected." = "যে মোডই বেছে নেওয়া থাকুক, কোনো উইন্ডো ক্যাপচার করতে সেটিতে ক্লিক করুন।";
+"Commit" = "Commit";
+"Copied" = "কপি হয়েছে";
+"Copy Commands" = "কমান্ড কপি করুন";
+"Copy Details" = "বিবরণ কপি করুন";
+"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "যে এলাকা চান তার ওপর টেনে নিন, অথবা মেনুতে উইন্ডো বা পূর্ণ স্ক্রিন বেছে নিন। টানার আগে টাইমার বেছে নিতে স্পেস চাপুন; Esc বাতিল করে। বিকল্প › ক্যাপচার এলাকা বদলান দিয়ে ক্যাপচারের আগে এলাকাটি সরাতে ও এর আকার বদলাতে পারবেন।";
+"Help" = "সহায়তা";
+"Kapture SCR Help" = "Kapture SCR সহায়তা";
+"Network access" = "নেটওয়ার্ক অ্যাক্সেস";
+"None (blocked by macOS)" = "নেই (macOS অবরুদ্ধ করেছে)";
+"Not signed" = "স্বাক্ষরিত নয়";
+"Not valid: this copy was changed after signing" = "বৈধ নয়: স্বাক্ষরের পরে এই কপি বদলানো হয়েছে";
+"On" = "চালু";
+"Open Release Page" = "রিলিজ পেজ খুলুন";
+"Opens a copied image in the editor. Auto images imports PNG and TIFF images as you copy them." = "কপি করা ছবি এডিটরে খোলে। “অটো ছবি” আপনি কপি করার সাথে সাথে PNG ও TIFF ছবি ইমপোর্ট করে।";
+"Options › Watermark and Number… adds your logo, a running number or both to every capture and imported image. The preview shows exactly what your captures will get." = "বিকল্প › ওয়াটারমার্ক ও সংখ্যা… প্রতিটি ক্যাপচার ও ইমপোর্ট করা ছবিতে আপনার লোগো, একটি ক্রমিক সংখ্যা বা দুটোই যোগ করে। প্রিভিউতে ঠিক সেটাই দেখায় যা আপনার ক্যাপচারে যুক্ত হবে।";
+"Privacy" = "গোপনীয়তা";
+"Private screenshots. Offline. No network access." = "ব্যক্তিগত স্ক্রিনশট। অফলাইন। কোনো নেটওয়ার্ক অ্যাক্সেস নেই।";
+"Signature" = "স্বাক্ষর";
+"Signed by" = "স্বাক্ষরকারী";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "টাইমার ছাড়াই শেষ ক্যাপচারটি সঙ্গে সঙ্গে আবার নেয়: একই এলাকা, একই উইন্ডো, সেটি সরানো বা আকার বদলানো হলেও, অথবা পূর্ণ স্ক্রিন। সেই উইন্ডো বন্ধ হয়ে গেলে একটি সাধারণ ক্যাপচার শুরু হয়।";
+"Team" = "টিম";
+"Valid: unchanged since it was signed" = "বৈধ: স্বাক্ষরের পর থেকে অপরিবর্তিত";
+"Verify This Copy" = "এই কপি যাচাই করুন";
+"Version" = "সংস্করণ";
+"You have version %@ (build %@). New versions are published on GitHub. Kapture SCR can’t connect to the internet, so the release page opens in your browser." = "আপনার কাছে সংস্করণ %@ (বিল্ড %@) আছে। নতুন সংস্করণ GitHub-এ প্রকাশিত হয়। Kapture SCR ইন্টারনেটে সংযোগ করতে পারে না, তাই রিলিজ পেজটি আপনার ব্রাউজারে খোলে।";
+
+/* Editor zoom */
+"Zoom" = "জুম";
+"Reset Zoom" = "জুম রিসেট করুন";
+"In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "এডিটরে কোনো খুঁটিনাটি দেখতে ট্র্যাকপ্যাডে পিঞ্চ করুন এবং সরাতে দুই আঙুলে সোয়াইপ করুন। পুরো ছবি আবার দেখতে দুই আঙুলে দুবার ট্যাপ করুন বা ⌘0 চাপুন। জুম করলে ছবি কখনো বদলায় না।";

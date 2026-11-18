@@ -3,6 +3,9 @@ import Carbon
 import SwiftUI
 import ImageIO
 import UniformTypeIdentifiers
+import ServiceManagement
+import CryptoKit
+import Security
 
 struct Capture: Identifiable {
     let id = UUID()
@@ -29,8 +32,57 @@ func appLanguage(for preferences: [String]) -> String {
 }
 
 enum EditTool: CaseIterable {
-    case crop, arrow, text, redact
-    var title: String { switch self { case .crop: L("Crop"); case .arrow: L("Arrow"); case .text: L("Text"); case .redact: L("Redact") } }
+    case crop, arrow, text, redact, highlight
+    var title: String {
+        switch self { case .crop: L("Crop"); case .arrow: L("Arrow"); case .text: L("Text"); case .redact: L("Redact"); case .highlight: L("Highlight") }
+    }
+}
+
+/// An sRGB colour that can be stored in preferences.
+struct RGB: Equatable {
+    var r: Double, g: Double, b: Double
+    var cgColor: CGColor { CGColor(srgbRed: r, green: g, blue: b, alpha: 1) }
+    var color: Color { Color(.sRGB, red: r, green: g, blue: b) }
+    var nsColor: NSColor { NSColor(srgbRed: r, green: g, blue: b, alpha: 1) }
+    var stored: [Double] { [r, g, b] }
+    init(r: Double, g: Double, b: Double) { self.r = r; self.g = g; self.b = b }
+    init?(stored: Any?) {
+        guard let v = stored as? [Double], v.count == 3 else { return nil }
+        self.init(r: v[0], g: v[1], b: v[2])
+    }
+    init(_ color: Color) {
+        let c = NSColor(color).usingColorSpace(.sRGB) ?? .black
+        self.init(r: Double(c.redComponent), g: Double(c.greenComponent), b: Double(c.blueComponent))
+    }
+    /// Perceived brightness, 0 (black) to 1 (white).
+    var luminance: Double { 0.2126 * r + 0.7152 * g + 0.0722 * b }
+
+    static let highlighterPresets: [(RGB, String)] = [
+        (RGB(r: 1, g: 0.86, b: 0.1), L("Yellow")), (RGB(r: 0.4, g: 0.88, b: 0.35), L("Green")), (RGB(r: 1, g: 0.47, b: 0.72), L("Pink")),
+        (RGB(r: 0.35, g: 0.72, b: 1), L("Blue")), (RGB(r: 1, g: 0.62, b: 0.2), L("Orange")), (RGB(r: 0.72, g: 0.52, b: 1), L("Purple")),
+    ]
+}
+
+enum HighlightSize: String, CaseIterable {
+    case thin, medium, thick
+    var title: String { switch self { case .thin: L("Thin"); case .medium: L("Medium"); case .thick: L("Thick") } }
+    /// Stroke width relative to the image, like the arrow tool, so it looks the same at any resolution.
+    var factor: CGFloat { switch self { case .thin: 2.5; case .medium: 4; case .thick: 6.5 } }
+    func width(for size: CGSize) -> CGFloat { max(6, min(size.width, size.height) / 180 * factor) }
+}
+
+/// A smooth stroke through points: quadratic curves between midpoints, so freehand jitter reads as one elegant line.
+func smoothPath(_ points: [CGPoint]) -> CGPath {
+    let path = CGMutablePath()
+    guard let first = points.first else { return path }
+    path.move(to: first)
+    guard points.count > 1 else { path.addLine(to: first); return path } // a single click draws a dot
+    for i in 1..<points.count - 1 {
+        let mid = CGPoint(x: (points[i].x + points[i + 1].x) / 2, y: (points[i].y + points[i + 1].y) / 2)
+        path.addQuadCurve(to: mid, control: points[i])
+    }
+    path.addLine(to: points[points.count - 1])
+    return path
 }
 
 // MARK: - Preferences
@@ -99,6 +151,41 @@ final class Settings {
         get { d.bool(forKey: "watermarkEnabled") }
         set { d.set(newValue, forKey: "watermarkEnabled") }
     }
+    /// Automatic number on every capture and import, off by default.
+    var numberEnabled: Bool {
+        get { d.bool(forKey: "numberEnabled") }
+        set { d.set(newValue, forKey: "numberEnabled") }
+    }
+    /// The number the next capture gets.
+    var numberNext: Int {
+        get { max(0, d.object(forKey: "numberNext") as? Int ?? 1) }
+        set { d.set(max(0, newValue), forKey: "numberNext") }
+    }
+    var numberIncrement: Bool {
+        get { d.object(forKey: "numberIncrement") as? Bool ?? true }
+        set { d.set(newValue, forKey: "numberIncrement") }
+    }
+    var number: NumberOptions {
+        get {
+            let fallback = NumberOptions()
+            func value(_ key: String, _ standard: Double) -> Double { d.object(forKey: key) as? Double ?? standard }
+            return NumberOptions(x: value("numberX", fallback.x), y: value("numberY", fallback.y), size: value("numberSize", fallback.size),
+                                 opacity: value("numberOpacity", fallback.opacity), font: d.string(forKey: "numberFont") ?? fallback.font,
+                                 color: RGB(stored: d.object(forKey: "numberColor")) ?? fallback.color)
+        }
+        set {
+            d.set(newValue.x, forKey: "numberX"); d.set(newValue.y, forKey: "numberY"); d.set(newValue.size, forKey: "numberSize")
+            d.set(newValue.opacity, forKey: "numberOpacity"); d.set(newValue.font, forKey: "numberFont"); d.set(newValue.color.stored, forKey: "numberColor")
+        }
+    }
+    var highlightColor: RGB {
+        get { RGB(stored: d.object(forKey: "highlightColor")) ?? RGB.highlighterPresets[0].0 }
+        set { d.set(newValue.stored, forKey: "highlightColor") }
+    }
+    var highlightSize: HighlightSize {
+        get { HighlightSize(rawValue: d.string(forKey: "highlightSize") ?? "") ?? .medium }
+        set { d.set(newValue.rawValue, forKey: "highlightSize") }
+    }
     var watermark: WatermarkOptions {
         get {
             let fallback = WatermarkOptions()
@@ -151,6 +238,7 @@ struct Shortcut: Codable, Equatable {
     static let defaultCapture = Shortcut(keyCode: UInt32(kVK_ANSI_6), modifiers: UInt32(cmdKey | shiftKey), chars: "6")
     static let defaultWindow = Shortcut(keyCode: UInt32(kVK_ANSI_7), modifiers: UInt32(cmdKey | shiftKey), chars: "7")
     static let importFromClipboard = Shortcut(keyCode: UInt32(kVK_ANSI_E), modifiers: UInt32(cmdKey | shiftKey), chars: "e")
+    static let defaultRepeat = Shortcut(keyCode: UInt32(kVK_ANSI_8), modifiers: UInt32(cmdKey | shiftKey), chars: "8")
     /// Shortcuts macOS keeps for itself (screenshots, lock screen, force quit, emoji, full screen).
     private static let reserved: [(Int, Int)] = [
         (kVK_ANSI_3, cmdKey | shiftKey), (kVK_ANSI_4, cmdKey | shiftKey), (kVK_ANSI_5, cmdKey | shiftKey),
@@ -223,16 +311,20 @@ struct Shortcut: Codable, Equatable {
 
 /// Actions with a user-configurable global shortcut.
 enum ShortcutAction: CaseIterable {
-    case capture, captureWindow, importClipboard
+    case capture, captureWindow, repeatCapture, importClipboard
     var defaultsKey: String {
-        switch self { case .capture: "captureShortcut"; case .captureWindow: "windowShortcut"; case .importClipboard: "importShortcut" }
+        switch self {
+        case .capture: "captureShortcut"; case .captureWindow: "windowShortcut"; case .repeatCapture: "repeatShortcut"; case .importClipboard: "importShortcut"
+        }
     }
     var defaultShortcut: Shortcut {
-        switch self { case .capture: .defaultCapture; case .captureWindow: .defaultWindow; case .importClipboard: .importFromClipboard }
+        switch self { case .capture: .defaultCapture; case .captureWindow: .defaultWindow; case .repeatCapture: .defaultRepeat; case .importClipboard: .importFromClipboard }
     }
-    var hotKeyID: UInt32 { switch self { case .capture: 2; case .captureWindow: 3; case .importClipboard: 1 } }
+    var hotKeyID: UInt32 { switch self { case .capture: 2; case .captureWindow: 3; case .repeatCapture: 4; case .importClipboard: 1 } }
     var recorderTitle: String {
-        switch self { case .capture: L("Capture Shortcut"); case .captureWindow: L("Window Shortcut"); case .importClipboard: L("Import Shortcut") }
+        switch self {
+        case .capture: L("Capture Shortcut"); case .captureWindow: L("Window Shortcut"); case .repeatCapture: L("Repeat Shortcut"); case .importClipboard: L("Import Shortcut")
+        }
     }
 }
 
@@ -448,14 +540,16 @@ struct KeyCap: View {
     }
 }
 
-/// The two capture shortcuts as keycaps with what each one does, for empty states.
+/// The capture shortcuts as keycaps with what each one does, for empty states.
 struct ShortcutHints: View {
     let capture: Shortcut
     let window: Shortcut
+    let again: Shortcut
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
             row(capture, L("Take Screenshot"))
             row(window, L("Capture Window"))
+            row(again, L("Repeat Last Capture"))
         }
     }
     private func row(_ shortcut: Shortcut, _ title: String) -> some View {
@@ -1060,8 +1154,22 @@ final class SelectionOverlay {
 
 // MARK: - Capture via /usr/sbin/screencapture
 
+/// What a capture covered, so the repeat shortcut can take it again. Kept in memory only.
+enum CaptureTarget: Equatable {
+    /// A selected area, in global screen points (Cocoa coordinates).
+    case region(NSRect)
+    /// A window, followed by its window number even after it moves or is resized.
+    case window(CGWindowID)
+    /// The main display.
+    case screen
+}
+
+enum RepeatResult { case started, nothingToRepeat, targetGone }
+
 final class ScreenCapturer {
     private(set) var isCapturing = false
+    /// The last successful capture; the repeat shortcut takes it again.
+    private(set) var last: CaptureTarget?
     private let overlay = SelectionOverlay()
     private let countdown = CountdownHUD()
     private var previousApp: NSRunningApplication?
@@ -1102,13 +1210,44 @@ final class ScreenCapturer {
         countdown.run(seconds: settings.delay, around: around) { completed in completed ? go() : cancel() }
     }
 
+    /// What a finished capture covered. After the system window picker, the chosen window is the one under the pointer,
+    /// which is still where the user clicked.
+    private func target(mode: CaptureMode, region: NSRect?, windowID: CGWindowID?) -> CaptureTarget? {
+        if let windowID { return .window(windowID) }
+        if let region { return .region(region) }
+        guard mode == .window else { return .screen }
+        let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        let height = NSScreen.screens.first?.frame.height ?? 0
+        return Self.windowID(at: NSEvent.mouseLocation, in: windows, mainScreenHeight: height, excludingPID: ProcessInfo.processInfo.processIdentifier).map { .window($0) }
+    }
+
     /// Gives focus back so window order on screen is what the user saw before.
     private func restoreFocus() { previousApp?.activate(); previousApp = nil }
 
-    private func run(_ settings: Settings, mode: CaptureMode, region: NSRect?, delay: Int, completion: @escaping (URL?) -> Void) {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("kapture-\(UUID().uuidString).\(settings.format.rawValue)")
-        var args = ["-t", settings.format.rawValue]
-        if let region, let main = NSScreen.screens.first?.frame {
+    /// Takes the last capture again at once: the same area, the same window wherever it is now, or the main display.
+    func repeatLast(_ settings: Settings, completion: @escaping (URL?) -> Void) -> RepeatResult {
+        guard !isCapturing, let last else { return .nothingToRepeat }
+        let windows = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
+        switch last {
+        case .window(let id):
+            guard Self.windowExists(id, in: windows) else { self.last = nil; return .targetGone }
+            isCapturing = true; run(settings, mode: .window, region: nil, windowID: id, delay: 0, completion: completion)
+        case .region(let rect):
+            guard NSScreen.screens.contains(where: { $0.frame.intersects(rect) }) else { self.last = nil; return .targetGone }
+            isCapturing = true; run(settings, mode: .selection, region: rect, delay: 0, completion: completion)
+        case .screen:
+            isCapturing = true; run(settings, mode: .screen, region: nil, delay: 0, completion: completion)
+        }
+        return .started
+    }
+
+    /// screencapture arguments, without the output path. `mainScreen` is the main display's frame in Cocoa coordinates.
+    static func arguments(format: ImageFormat, mode: CaptureMode, region: NSRect?, windowID: CGWindowID?, delay: Int,
+                          showCursor: Bool, windowShadow: Bool, mainScreen: NSRect?) -> [String] {
+        var args = ["-t", format.rawValue]
+        if let windowID {
+            args.append("-l\(windowID)")
+        } else if let region, let main = mainScreen {
             // screencapture -R uses points with the origin at the top-left of the main display.
             let r = region.integral
             args.append("-R\(Int(r.minX - main.minX)),\(Int(main.maxY - r.maxY)),\(Int(r.width)),\(Int(r.height))")
@@ -1119,8 +1258,35 @@ final class ScreenCapturer {
             }
         }
         if delay > 0 { args += ["-T", String(delay)] }
-        if settings.showCursor { args.append("-C") }
-        if !settings.windowShadow { args.append("-o") }
+        if showCursor { args.append("-C") }
+        if !windowShadow { args.append("-o") }
+        return args
+    }
+
+    /// The front-most normal window under a point (Cocoa global coordinates), ignoring this app's own windows.
+    /// `windows` is CGWindowListCopyWindowInfo output, front to back; its bounds use a top-left origin.
+    static func windowID(at point: NSPoint, in windows: [[String: Any]], mainScreenHeight: CGFloat, excludingPID: pid_t) -> CGWindowID? {
+        let p = CGPoint(x: point.x, y: mainScreenHeight - point.y)
+        for w in windows {
+            guard (w[kCGWindowLayer as String] as? Int) == 0,
+                  (w[kCGWindowOwnerPID as String] as? pid_t) != excludingPID,
+                  (w[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+                  let boundsDict = w[kCGWindowBounds as String] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: boundsDict), bounds.contains(p),
+                  let number = w[kCGWindowNumber as String] as? Int else { continue }
+            return CGWindowID(number)
+        }
+        return nil
+    }
+
+    static func windowExists(_ id: CGWindowID, in windows: [[String: Any]]) -> Bool {
+        windows.contains { ($0[kCGWindowNumber as String] as? Int).map { CGWindowID($0) } == id }
+    }
+
+    private func run(_ settings: Settings, mode: CaptureMode, region: NSRect?, windowID: CGWindowID? = nil, delay: Int, completion: @escaping (URL?) -> Void) {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("kapture-\(UUID().uuidString).\(settings.format.rawValue)")
+        var args = Self.arguments(format: settings.format, mode: mode, region: region, windowID: windowID, delay: delay,
+                                  showCursor: settings.showCursor, windowShadow: settings.windowShadow, mainScreen: NSScreen.screens.first?.frame)
         args.append(url.path)
 
         let process = Process()
@@ -1128,8 +1294,11 @@ final class ScreenCapturer {
         process.arguments = args
         process.terminationHandler = { [weak self] _ in
             DispatchQueue.main.async {
-                self?.isCapturing = false
-                completion(FileManager.default.fileExists(atPath: url.path) ? url : nil)
+                guard let self else { return }
+                self.isCapturing = false
+                let captured = FileManager.default.fileExists(atPath: url.path)
+                if captured { self.last = self.target(mode: mode, region: region, windowID: windowID) }
+                completion(captured ? url : nil)
             }
         }
         do { isCapturing = true; try process.run() } catch { isCapturing = false; completion(nil) }
@@ -1144,7 +1313,10 @@ final class CaptureStore: ObservableObject {
     @Published var message: String
     @Published var captureShortcut: Shortcut
     @Published var windowShortcut: Shortcut
+    @Published var repeatShortcut: Shortcut
     @Published var autoImport = false
+    @Published var highlightColor: RGB { didSet { settings.highlightColor = highlightColor } }
+    @Published var highlightSize: HighlightSize { didSet { settings.highlightSize = highlightSize } }
     let settings: Settings
     private var lastChange = NSPasteboard.general.changeCount
     private var undoImages: [CGImage] = []
@@ -1190,8 +1362,11 @@ final class CaptureStore: ObservableObject {
     private var expiryTimer: Timer?
     init(settings: Settings) {
         self.settings = settings
+        highlightColor = settings.highlightColor
+        highlightSize = settings.highlightSize
         captureShortcut = settings.captureShortcut
         windowShortcut = settings.shortcut(for: .captureWindow)
+        repeatShortcut = settings.shortcut(for: .repeatCapture)
         let keys = settings.captureShortcut.display
         message = L("Press \(keys) or use the menu to take a screenshot.")
     }
@@ -1231,15 +1406,26 @@ final class CaptureStore: ObservableObject {
     lazy var watermarkImage: CGImage? = Watermark.loadStored()
     /// True when new captures and imports get the watermark.
     var watermarkActive: Bool { settings.watermarkEnabled && watermarkImage != nil }
-    /// The image with the watermark when it is on; otherwise unchanged.
-    func watermarked(_ image: CGImage) -> CGImage {
-        guard settings.watermarkEnabled, let mark = watermarkImage else { return image }
-        return Watermark.apply(mark, to: image, options: settings.watermark) ?? image
+    /// True when new captures and imports get the watermark, the number or both.
+    var stampActive: Bool { watermarkActive || settings.numberEnabled }
+    /// The image with the watermark and the number when they are on; otherwise unchanged.
+    /// Each numbered image uses up the current number when it is set to increase.
+    func stamped(_ image: CGImage) -> CGImage {
+        var result = image
+        if settings.watermarkEnabled, let mark = watermarkImage {
+            result = Watermark.apply(mark, to: result, options: settings.watermark) ?? result
+        }
+        if settings.numberEnabled {
+            let n = settings.numberNext
+            result = NumberStamp.apply(n, to: result, options: settings.number) ?? result
+            if settings.numberIncrement { settings.numberNext = n + 1 }
+        }
+        return result
     }
 
     @discardableResult
     private func insert(_ image: CGImage, baseName: String) -> Capture {
-        let capture = Capture(image: watermarked(image), baseName: baseName)
+        let capture = Capture(image: stamped(image), baseName: baseName)
         captures.insert(capture, at: 0); if captures.count > 10 { captures.removeLast() }
         // Limit total resident raster data, in addition to number of images.
         while captures.count > 1 && captures.reduce(0, { $0 + $1.image.bytesPerRow * $1.image.height }) > 128 * 1024 * 1024 { captures.removeLast() }
@@ -1333,6 +1519,22 @@ final class CaptureStore: ObservableObject {
         catch { message = L("Couldn’t save: \(error.localizedDescription)") }
     }
 
+    /// Highlighter stroke through points given as fractions of the image (top-left origin). Multiply blending tints
+    /// light areas and leaves dark text dark, like a marker on paper.
+    func highlight(points: [CGPoint], color: RGB, size: HighlightSize) {
+        expire(); guard let image = current?.image, !points.isEmpty else { return }
+        let w = CGFloat(image.width), h = CGFloat(image.height)
+        let pixels = points.map { CGPoint(x: min(w, max(0, $0.x * w)), y: h - min(h, max(0, $0.y * h))) }
+        guard let result = Self.raster(image, draw: { ctx in
+            ctx.setBlendMode(.multiply)
+            ctx.setStrokeColor(color.cgColor)
+            ctx.setLineWidth(size.width(for: CGSize(width: w, height: h)))
+            ctx.setLineCap(.round); ctx.setLineJoin(.round)
+            ctx.addPath(smoothPath(pixels)); ctx.strokePath()
+        }) else { return }
+        replace(result)
+    }
+
     func edit(tool: EditTool, start: CGPoint, end: CGPoint, text: String) {
         expire(); guard let image = current?.image else { return }
         let w = CGFloat(image.width), h = CGFloat(image.height)
@@ -1364,7 +1566,7 @@ final class CaptureStore: ObservableObject {
                 let size = s.size(withAttributes: attrs)
                 s.draw(at: CGPoint(x:min(p.x,max(0,w-size.width)),y:max(0,p.y-size.height)), withAttributes:attrs)
                 NSGraphicsContext.restoreGraphicsState()
-            case .crop: break
+            case .crop, .highlight: break
             }
         }) else { return }
         replace(result)
@@ -1488,31 +1690,121 @@ enum Watermark {
     }
 }
 
+/// Where and how the automatic number is drawn. Position and size work like the watermark's.
+struct NumberOptions: Equatable {
+    var x = 0.03
+    var y = 0.05
+    /// Text height as a fraction of the capture's height.
+    var size = 0.08
+    var opacity = 1.0
+    /// Font family; empty means the system font.
+    var font = ""
+    var color = RGB(r: 1, g: 0.23, b: 0.19)
+
+    static let colorPresets: [(RGB, String)] = [
+        (RGB(r: 1, g: 0.23, b: 0.19), L("Red")), (RGB(r: 1, g: 1, b: 1), L("White")), (RGB(r: 0, g: 0, b: 0), L("Black")),
+        (RGB(r: 1, g: 0.8, b: 0), L("Yellow")), (RGB(r: 0, g: 0.48, b: 1), L("Blue")), (RGB(r: 0.2, g: 0.78, b: 0.35), L("Green")),
+    ]
+}
+
+enum NumberStamp {
+    static let sizeRange = 0.03...0.4
+
+    /// Bold face of the family when it has one; the system font when the family is empty or not installed.
+    static func font(family: String, size: CGFloat) -> NSFont {
+        if !family.isEmpty, let font = NSFontManager.shared.font(withFamily: family, traits: .boldFontMask, weight: 9, size: size)
+            ?? NSFontManager.shared.font(withFamily: family, traits: [], weight: 5, size: size) { return font }
+        return .systemFont(ofSize: size, weight: .bold)
+    }
+
+    /// The number in the chosen colour with a thin contrasting outline, so it reads on light and dark content.
+    static func attributes(_ options: NumberOptions, canvas: CGSize) -> [NSAttributedString.Key: Any] {
+        let size = max(8, canvas.height * CGFloat(min(max(options.size, sizeRange.lowerBound), sizeRange.upperBound)))
+        let outline: NSColor = options.color.luminance > 0.6 ? .black : .white
+        return [.font: font(family: options.font, size: size), .foregroundColor: options.color.nsColor,
+                .strokeColor: outline.withAlphaComponent(0.75), .strokeWidth: -4.0]
+    }
+
+    /// Where the number goes, in Core Graphics coordinates. It always stays inside the capture.
+    static func rect(for number: Int, canvas: CGSize, options: NumberOptions) -> CGRect {
+        let size = ("\(number)" as NSString).size(withAttributes: attributes(options, canvas: canvas))
+        let w = min(ceil(size.width), canvas.width), h = min(ceil(size.height), canvas.height)
+        let x = CGFloat(min(max(options.x, 0), 1)), y = CGFloat(min(max(options.y, 0), 1))
+        return CGRect(x: ((canvas.width - w) * x).rounded(), y: ((canvas.height - h) * (1 - y)).rounded(), width: w, height: h)
+    }
+
+    static func apply(_ number: Int, to image: CGImage, options: NumberOptions) -> CGImage? {
+        let canvas = CGSize(width: image.width, height: image.height)
+        let attrs = attributes(options, canvas: canvas)
+        let origin = rect(for: number, canvas: canvas, options: options).origin
+        return CaptureStore.raster(image) { ctx in
+            // One transparency layer, so the outline and the fill fade together instead of doubling up.
+            ctx.setAlpha(CGFloat(min(max(options.opacity, Watermark.opacityRange.lowerBound), 1)))
+            ctx.beginTransparencyLayer(auxiliaryInfo: nil)
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current = NSGraphicsContext(cgContext: ctx, flipped: false)
+            ("\(number)" as NSString).draw(at: origin, withAttributes: attrs)
+            NSGraphicsContext.restoreGraphicsState()
+            ctx.endTransparencyLayer()
+        }
+    }
+}
+
 final class WatermarkModel: ObservableObject {
+    enum Section: Hashable { case watermark, number }
     let store: CaptureStore
+    @Published var section = Section.watermark { didSet { render() } }
     @Published var enabled: Bool { didSet { store.settings.watermarkEnabled = enabled } }
     @Published var options: WatermarkOptions { didSet { store.settings.watermark = options; render() } }
+    @Published var numberEnabled: Bool { didSet { store.settings.numberEnabled = numberEnabled; render() } }
+    @Published var numberNext: Int { didSet { if numberNext < 0 { numberNext = 0 }; store.settings.numberNext = numberNext; render() } }
+    @Published var numberIncrement: Bool { didSet { store.settings.numberIncrement = numberIncrement } }
+    @Published var number: NumberOptions { didSet { store.settings.number = number; render() } }
     @Published private(set) var preview: CGImage?
     @Published var error: String?
     private let sample = Watermark.sampleScreenshot()
+    lazy var fontFamilies: [String] = NSFontManager.shared.availableFontFamilies.filter { !$0.hasPrefix(".") }.sorted()
 
     init(store: CaptureStore) {
         self.store = store
         enabled = store.settings.watermarkEnabled
         options = store.settings.watermark
+        numberEnabled = store.settings.numberEnabled
+        numberNext = store.settings.numberNext
+        numberIncrement = store.settings.numberIncrement
+        number = store.settings.number
         render()
+    }
+
+    /// Picks up changes made elsewhere (menu toggles, the number used up by captures) when the window opens.
+    func refresh() {
+        enabled = store.settings.watermarkEnabled
+        numberEnabled = store.settings.numberEnabled
+        numberNext = store.settings.numberNext
     }
 
     var mark: CGImage? { store.watermarkImage }
 
+    /// The sample with exactly what captures will get; the number is also shown while its tab is open.
     func render() {
-        guard let sample else { preview = nil; return }
-        preview = mark.flatMap { Watermark.apply($0, to: sample, options: options) } ?? sample
+        guard var image = sample else { preview = nil; return }
+        if let mark { image = Watermark.apply(mark, to: image, options: options) ?? image }
+        if numberEnabled || section == .number { image = NumberStamp.apply(numberNext, to: image, options: number) ?? image }
+        preview = image
     }
 
-    /// Places a single mark centred under a point of the preview (fractions of its width and height).
+    /// Places the mark or the number (whichever tab is open) centred under a point of the preview.
     func move(to p: CGPoint) {
-        guard let sample, let mark else { return }
+        guard let sample else { return }
+        let canvas = CGSize(width: sample.width, height: sample.height)
+        if section == .number {
+            let r = NumberStamp.rect(for: numberNext, canvas: canvas, options: number)
+            let fw = r.width / canvas.width, fh = r.height / canvas.height
+            number.x = fw < 1 ? min(max((p.x - fw / 2) / (1 - fw), 0), 1) : 0.5
+            number.y = fh < 1 ? min(max((p.y - fh / 2) / (1 - fh), 0), 1) : 0.5
+            return
+        }
+        guard let mark else { return }
         if options.tiled { options.x = min(max(p.x, 0), 1); options.y = min(max(p.y, 0), 1); return }
         let s = Watermark.markSize(mark, canvas: CGSize(width: sample.width, height: sample.height), size: options.size)
         let mw = s.width / CGFloat(sample.width), mh = s.height / CGFloat(sample.height)
@@ -1549,7 +1841,7 @@ final class WatermarkModel: ObservableObject {
 struct WatermarkView: View {
     @ObservedObject var model: WatermarkModel
     @Environment(\.layoutDirection) private var direction
-    /// Corners and edges keep a small margin; bottom right matches the default position.
+    /// Corners and edges keep a small margin; bottom right matches the default watermark position.
     private let presets: [(x: Double, y: Double, label: String)] = [
         (0.03, 0.05, L("Top Left")), (0.5, 0.05, L("Top")), (0.97, 0.05, L("Top Right")),
         (0.03, 0.5, L("Left")), (0.5, 0.5, L("Center")), (0.97, 0.5, L("Right")),
@@ -1558,34 +1850,40 @@ struct WatermarkView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            imageRow
-            HStack {
-                Text(L("Add the watermark to every capture and imported image"))
-                Spacer()
-                Toggle(L("Add the watermark to every capture and imported image"), isOn: $model.enabled)
-                    .toggleStyle(.switch).labelsHidden()
+            Picker(L("Watermark and Number"), selection: $model.section) {
+                Text(L("Watermark")).tag(WatermarkModel.Section.watermark)
+                Text(L("Number")).tag(WatermarkModel.Section.number)
             }
-            .disabled(model.mark == nil)
+            .pickerStyle(.segmented).labelsHidden()
+            if model.section == .watermark {
+                imageRow
+                switchRow(L("Add the watermark to every capture and imported image"), isOn: $model.enabled).disabled(model.mark == nil)
+            } else {
+                switchRow(L("Add a number to every capture and imported image"), isOn: $model.numberEnabled)
+                numberRow
+            }
             preview
-            HStack(alignment: .top, spacing: 24) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(L("Position")).font(.system(size: 13, weight: .semibold))
-                    // Positions are physical places in the image, which is never mirrored, so the grid is not mirrored either.
-                    presetGrid.environment(\.layoutDirection, .leftToRight)
-                }
-                // A grid sizes the label column to the longest label in the current language.
-                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 8) {
-                    slider(L("Horizontal"), value: $model.options.x, in: 0...1, physical: true)
-                    slider(L("Vertical"), value: $model.options.y, in: 0...1)
-                    slider(L("Size"), value: $model.options.size, in: Watermark.sizeRange)
-                    slider(L("Opacity"), value: $model.options.opacity, in: Watermark.opacityRange)
-                }
+            if model.section == .watermark {
+                positionControls(x: $model.options.x, y: $model.options.y, size: $model.options.size, sizeRange: Watermark.sizeRange,
+                                 opacity: $model.options.opacity)
+                    .disabled(model.mark == nil)
+                Toggle(L("Repeat as a pattern"), isOn: $model.options.tiled).disabled(model.mark == nil)
+            } else {
+                positionControls(x: $model.number.x, y: $model.number.y, size: $model.number.size, sizeRange: NumberStamp.sizeRange,
+                                 opacity: $model.number.opacity)
+                fontAndColorRow
             }
-            .disabled(model.mark == nil)
-            Toggle(L("Repeat as a pattern"), isOn: $model.options.tiled).disabled(model.mark == nil)
         }
         .padding(20)
         .frame(width: 600)
+    }
+
+    private func switchRow(_ title: String, isOn: Binding<Bool>) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Toggle(title, isOn: isOn).toggleStyle(.switch).labelsHidden()
+        }
     }
 
     private var imageRow: some View {
@@ -1608,12 +1906,48 @@ struct WatermarkView: View {
         }
     }
 
+    private var numberRow: some View {
+        HStack(spacing: 10) {
+            Text(L("Next number"))
+            TextField(L("Next number"), value: $model.numberNext, format: .number.grouping(.never))
+                .labelsHidden().multilineTextAlignment(.trailing).frame(width: 72)
+            Stepper(L("Next number"), value: $model.numberNext, in: 0...999_999).labelsHidden()
+            Spacer()
+            Toggle(L("Increase after each capture"), isOn: $model.numberIncrement)
+        }
+    }
+
+    private var fontAndColorRow: some View {
+        HStack(spacing: 10) {
+            Text(L("Font"))
+            Picker(L("Font"), selection: $model.number.font) {
+                Text(L("System Font")).tag("")
+                Divider()
+                ForEach(model.fontFamilies, id: \.self) { Text($0).tag($0) }
+            }
+            .labelsHidden().frame(maxWidth: 200)
+            Spacer()
+            Text(L("Color"))
+            ForEach(Array(NumberOptions.colorPresets.enumerated()), id: \.offset) { _, preset in
+                let on = model.number.color == preset.0
+                Button { model.number.color = preset.0 } label: {
+                    Circle().fill(preset.0.color).frame(width: 18, height: 18)
+                        .overlay(Circle().strokeBorder(Color.primary.opacity(on ? 0.9 : 0.25), lineWidth: on ? 2 : 0.5).padding(on ? -3 : 0))
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain).help(preset.1).accessibilityLabel(preset.1).accessibilityAddTraits(on ? .isSelected : [])
+            }
+            ColorPicker(L("Custom color"), selection: Binding(get: { model.number.color.color }, set: { model.number.color = RGB($0) }), supportsOpacity: false)
+                .labelsHidden().help(L("Custom color"))
+        }
+    }
+
     private var preview: some View {
         VStack(alignment: .leading, spacing: 6) {
             GeometryReader { geo in
                 ZStack {
                     if let image = model.preview { Image(decorative: image, scale: 1).resizable() }
-                    if model.mark == nil {
+                    if model.section == .watermark && model.mark == nil {
                         Text(L("Choose an image to see the watermark here."))
                             .font(.system(size: 13, weight: .medium)).padding(.horizontal, 12).padding(.vertical, 8)
                             .background(.regularMaterial, in: Capsule())
@@ -1629,18 +1963,37 @@ struct WatermarkView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
             .accessibilityLabel(L("Watermark preview"))
-            Text(L("Drag the watermark in the preview, or choose a position.")).font(.system(size: 12)).foregroundStyle(.secondary)
+            Text(model.section == .watermark ? L("Drag the watermark in the preview, or choose a position.") : L("Drag the number in the preview, or choose a position."))
+                .font(.system(size: 12)).foregroundStyle(.secondary)
         }
     }
 
-    private var presetGrid: some View {
+    private func positionControls(x: Binding<Double>, y: Binding<Double>, size: Binding<Double>, sizeRange: ClosedRange<Double>,
+                                  opacity: Binding<Double>) -> some View {
+        HStack(alignment: .top, spacing: 24) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(L("Position")).font(.system(size: 13, weight: .semibold))
+                // Positions are physical places in the image, which is never mirrored, so the grid is not mirrored either.
+                presetGrid(x: x, y: y).environment(\.layoutDirection, .leftToRight)
+            }
+            // A grid sizes the label column to the longest label in the current language.
+            Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 8) {
+                slider(L("Horizontal"), value: x, in: 0...1, physical: true)
+                slider(L("Vertical"), value: y, in: 0...1)
+                slider(L("Size"), value: size, in: sizeRange)
+                slider(L("Opacity"), value: opacity, in: Watermark.opacityRange)
+            }
+        }
+    }
+
+    private func presetGrid(x: Binding<Double>, y: Binding<Double>) -> some View {
         Grid(horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(0..<3, id: \.self) { row in
                 GridRow {
                     ForEach(0..<3, id: \.self) { col in
                         let p = presets[row * 3 + col]
-                        let on = abs(model.options.x - p.x) < 0.005 && abs(model.options.y - p.y) < 0.005
-                        Button { model.options.x = p.x; model.options.y = p.y } label: {
+                        let on = abs(x.wrappedValue - p.x) < 0.005 && abs(y.wrappedValue - p.y) < 0.005
+                        Button { x.wrappedValue = p.x; y.wrappedValue = p.y } label: {
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
                                 .fill(on ? Color.accentColor : Color.primary.opacity(0.10))
                                 .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).strokeBorder(Color.primary.opacity(0.2), lineWidth: 0.5))
@@ -1665,11 +2018,238 @@ struct WatermarkView: View {
     }
 }
 
+// MARK: - Help and About
+
+/// The only web address in the app. Kapture SCR never connects to it: when the user asks, the address is handed to
+/// the browser. Nothing is added to it, so nothing about the user or the app is sent.
+enum Links {
+    static let releases = URL(string: "https://github.com/jsujar/kapture_scr/releases")!
+}
+
+/// Facts about this copy of the app, read from its own bundle and code signature on this Mac. Nothing is sent anywhere.
+struct BuildInfo: Equatable {
+    var version = "?"
+    var build = "?"
+    /// The git commit it was built from; ends in "-modified" when built with uncommitted changes.
+    var commit: String?
+    var buildDate: String?
+    /// Common name of the signing certificate; nil when signed ad hoc or not at all.
+    var signer: String?
+    var team: String?
+    var identifier: String?
+    /// OSStatus of the signature check: 0 means the app is exactly as it was signed.
+    var signatureStatus: Int32 = -1
+    var sandboxed = false
+    var networkAccess = false
+    var sha256: String?
+
+    var signatureValid: Bool { signatureStatus == errSecSuccess }
+
+    /// Builds the facts from an Info.plist, the signing information and the executable's bytes (pure, for tests).
+    static func make(info: [String: Any], signing: [String: Any]?, signatureStatus: Int32, executable: Data?) -> BuildInfo {
+        var b = BuildInfo()
+        b.version = info["CFBundleShortVersionString"] as? String ?? "?"
+        b.build = info["CFBundleVersion"] as? String ?? "?"
+        b.commit = info["KaptureCommit"] as? String
+        b.buildDate = info["KaptureBuildDate"] as? String
+        if let signing {
+            if let leaf = (signing[kSecCodeInfoCertificates as String] as? [SecCertificate])?.first {
+                b.signer = SecCertificateCopySubjectSummary(leaf) as String?
+            }
+            b.team = signing[kSecCodeInfoTeamIdentifier as String] as? String
+            b.identifier = signing[kSecCodeInfoIdentifier as String] as? String
+            let entitlements = signing[kSecCodeInfoEntitlementsDict as String] as? [String: Any] ?? [:]
+            b.sandboxed = entitlements["com.apple.security.app-sandbox"] as? Bool == true
+            b.networkAccess = entitlements["com.apple.security.network.client"] as? Bool == true
+                || entitlements["com.apple.security.network.server"] as? Bool == true
+        }
+        b.signatureStatus = signatureStatus
+        b.sha256 = executable.map { SHA256.hash(data: $0).map { String(format: "%02x", $0) }.joined() }
+        return b
+    }
+
+    /// This running copy.
+    static func current(bundle: Bundle = .main) -> BuildInfo {
+        var code: SecStaticCode?
+        var signing: [String: Any]?
+        var status: OSStatus = errSecCSUnsigned
+        if SecStaticCodeCreateWithPath(bundle.bundleURL as CFURL, [], &code) == errSecSuccess, let code {
+            var info: CFDictionary?
+            if SecCodeCopySigningInformation(code, SecCSFlags(rawValue: kSecCSSigningInformation | kSecCSRequirementInformation), &info) == errSecSuccess {
+                signing = info as? [String: Any]
+            }
+            status = SecStaticCodeCheckValidity(code, SecCSFlags(rawValue: kSecCSStrictValidate | kSecCSCheckAllArchitectures), nil)
+        }
+        let executable = bundle.executableURL.flatMap { try? Data(contentsOf: $0, options: .mappedIfSafe) }
+        return make(info: bundle.infoDictionary ?? [:], signing: signing, signatureStatus: status, executable: executable)
+    }
+
+    var signerText: String { signer ?? L("Ad hoc (no certificate)") }
+    var signatureText: String {
+        if signatureValid { return L("Valid: unchanged since it was signed") }
+        if signatureStatus == errSecCSUnsigned { return L("Not signed") }
+        return L("Not valid: this copy was changed after signing") + " (\(signatureStatus))"
+    }
+    var networkText: String { networkAccess ? L("Allowed") : L("None (blocked by macOS)") }
+
+    /// Rows shown in the About window and copied by Copy Details. Team appears only with a developer certificate.
+    var rows: [(String, String)] {
+        [(L("Version"), "\(version) (\(build))"), (L("Commit"), commit ?? "—"), (L("Built"), buildDate ?? "—"),
+         (L("Signed by"), signerText)] + (team.map { [(L("Team"), $0)] } ?? []) +
+        [(L("Signature"), signatureText), (L("App Sandbox"), sandboxed ? L("On") : L("Off")), (L("Network access"), networkText),
+         ("SHA-256", sha256 ?? "—")]
+    }
+    var report: String { (["Kapture SCR"] + rows.map { "\($0.0): \($0.1)" }).joined(separator: "\n") }
+}
+
+/// Terminal commands that check this copy without trusting the app itself.
+func verificationCommands(appPath: String) -> String {
+    let app = "\"\(appPath)\""
+    return """
+    codesign --verify --deep --strict --verbose=2 \(app)
+    codesign -d --entitlements - \(app)
+    shasum -a 256 \(app.dropLast())/Contents/MacOS/Kapture"
+    """
+}
+
+struct AboutView: View {
+    let info: BuildInfo
+    var openHelp: () -> Void
+    @State private var copied = false
+
+    var body: some View {
+        VStack(spacing: 14) {
+            // The same horizontal logo as the empty states; it already carries the app name.
+            BrandLogo(height: 64).padding(.bottom, 4)
+            Text(L("Private screenshots. Offline. No network access.")).font(.system(size: 12)).foregroundStyle(.secondary)
+                .padding(.bottom, 4)
+            Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 12, verticalSpacing: 7) {
+                ForEach(Array(info.rows.enumerated()), id: \.offset) { _, row in
+                    GridRow {
+                        Text(row.0).font(.system(size: 12)).foregroundStyle(.secondary).gridColumnAlignment(.trailing).fixedSize()
+                        Text(row.1).font(.system(size: 12, design: row.0 == "SHA-256" || row.0 == L("Commit") ? .monospaced : .default))
+                            .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                            .foregroundStyle(color(for: row.0))
+                    }
+                }
+            }
+            .padding(14)
+            .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.05)))
+            Text(L("A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains."))
+                .font(.system(size: 11)).foregroundStyle(.secondary).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Button(copied ? L("Copied") : L("Copy Details")) {
+                    NSPasteboard.general.clearContents(); NSPasteboard.general.setString(info.report, forType: .string); copied = true
+                }
+                Button(L("Help")) { openHelp() }
+                Spacer()
+                Button(L("Check for Updates…")) { NSWorkspace.shared.open(Links.releases) }.keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 26)
+        .frame(width: 540)
+    }
+
+    private func color(for label: String) -> Color {
+        switch label {
+        case L("Signature"): info.signatureValid ? .green : .red
+        case L("App Sandbox"): info.sandboxed ? .green : .red
+        case L("Network access"): info.networkAccess ? .red : .green
+        default: .primary
+        }
+    }
+}
+
+struct HelpView: View {
+    @ObservedObject var store: CaptureStore
+    var openAbout: () -> Void
+    @State private var copied = false
+
+    private struct Topic: Identifiable {
+        let id: String, symbol: String, text: String
+        var shortcut: Shortcut? = nil
+    }
+
+    private var topics: [Topic] {
+        [
+            Topic(id: L("Take Screenshot"), symbol: "viewfinder",
+                  text: L("Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing."),
+                  shortcut: store.captureShortcut),
+            Topic(id: L("Capture Window"), symbol: "macwindow", text: L("Click any window to capture it, whatever mode is selected."), shortcut: store.windowShortcut),
+            Topic(id: L("Repeat Last Capture"), symbol: "arrow.clockwise",
+                  text: L("Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts."),
+                  shortcut: store.repeatShortcut),
+            Topic(id: L("Editor"), symbol: "pencil.tip.crop.circle",
+                  text: L("Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original.")),
+            Topic(id: L("Zoom"), symbol: "plus.magnifyingglass",
+                  text: L("In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image.")),
+            Topic(id: L("Watermark and Number"), symbol: "seal",
+                  text: L("Options › Watermark and Number… adds your logo, a running number or both to every capture and imported image. The preview shows exactly what your captures will get.")),
+            Topic(id: L("Import from Clipboard"), symbol: "doc.on.clipboard",
+                  text: L("Opens a copied image in the editor. Auto images imports PNG and TIFF images as you copy them."),
+                  shortcut: store.settings.shortcut(for: .importClipboard)),
+            Topic(id: L("Privacy"), symbol: "lock.shield",
+                  text: L("Captures stay in memory for 30 minutes (10 at most) unless you save them. Kapture SCR has no network access: the macOS App Sandbox blocks it, so nothing is ever sent.")),
+        ]
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(topics) { topic in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: topic.symbol).font(.system(size: 18)).foregroundStyle(Color.accentColor).frame(width: 28)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(topic.id).font(.system(size: 13, weight: .semibold))
+                                Spacer()
+                                if let shortcut = topic.shortcut {
+                                    HStack(spacing: 4) { ForEach(shortcut.symbols, id: \.self) { KeyCap(label: $0) } }
+                                }
+                            }
+                            Text(topic.text).font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                Divider()
+                verify
+            }
+            .padding(22)
+        }
+        .frame(width: 560, height: 640)
+    }
+
+    private var verify: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "checkmark.seal").font(.system(size: 18)).foregroundStyle(.green).frame(width: 28)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(L("Verify This Copy")).font(.system(size: 13, weight: .semibold))
+                Text(L("About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page."))
+                    .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Text(verificationCommands(appPath: Bundle.main.bundlePath))
+                    .font(.system(size: 11, design: .monospaced)).textSelection(.enabled)
+                    .padding(10).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.06)))
+                    .environment(\.layoutDirection, .leftToRight)
+                HStack {
+                    Button(copied ? L("Copied") : L("Copy Commands")) {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(verificationCommands(appPath: Bundle.main.bundlePath), forType: .string); copied = true
+                    }
+                    Button(L("About Kapture SCR")) { openAbout() }
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Views
 
 extension EditTool {
     var symbol: String {
-        switch self { case .crop: "crop"; case .arrow: "arrow.up.right"; case .text: "textformat"; case .redact: "rectangle.inset.filled" }
+        switch self {
+        case .crop: "crop"; case .arrow: "arrow.up.right"; case .text: "textformat"; case .redact: "rectangle.inset.filled"; case .highlight: "highlighter"
+        }
     }
 }
 
@@ -1692,13 +2272,103 @@ extension View {
     }
 }
 
+/// View-only zoom of the editor canvas: it magnifies what you see, never the image itself.
+/// Positions are relative to the centre of the canvas area, in points.
+struct ZoomState: Equatable {
+    static let range: ClosedRange<CGFloat> = 1...8
+    var zoom: CGFloat = 1
+    var pan: CGSize = .zero
+    var isZoomed: Bool { zoom > 1.001 }
+
+    /// Zooms by `factor` keeping the spot under `point` where it is. `content` is the image as shown at 1×.
+    mutating func zoom(by factor: CGFloat, at point: CGPoint, content: CGSize, container: CGSize) {
+        let new = min(max(zoom * factor, Self.range.lowerBound), Self.range.upperBound)
+        guard new != zoom else { return }
+        let k = new / zoom
+        pan = CGSize(width: point.x - (point.x - pan.width) * k, height: point.y - (point.y - pan.height) * k)
+        zoom = new
+        clamp(content: content, container: container)
+    }
+
+    mutating func move(by delta: CGSize, content: CGSize, container: CGSize) {
+        guard isZoomed else { return }
+        pan = CGSize(width: pan.width + delta.width, height: pan.height + delta.height)
+        clamp(content: content, container: container)
+    }
+
+    /// Keeps the image covering the canvas: you can't drag it out of view. At 1× it is centred.
+    mutating func clamp(content: CGSize, container: CGSize) {
+        if !isZoomed { self = ZoomState(); return }
+        let maxX = max(0, (content.width * zoom - container.width) / 2)
+        let maxY = max(0, (content.height * zoom - container.height) / 2)
+        pan = CGSize(width: min(max(pan.width, -maxX), maxX), height: min(max(pan.height, -maxY), maxY))
+    }
+}
+
+/// Trackpad pinch, two-finger swipe and smart zoom (double tap with two fingers) over the editor canvas.
+/// AppKit events, because SwiftUI on macOS 14 has no two-finger pan.
+final class CanvasZoom: ObservableObject {
+    @Published var state = ZoomState()
+    /// The canvas area and the image size at 1×, in the window's SwiftUI coordinates.
+    var frame: CGRect = .zero
+    var content: CGSize = .zero
+    weak var window: NSWindow?
+    private var monitor: Any?
+
+    func start() {
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.magnify, .smartMagnify, .scrollWheel]) { [weak self] event in
+            guard let self, event.window === self.window, let point = self.point(of: event) else { return event }
+            switch event.type {
+            case .magnify:
+                state.zoom(by: 1 + event.magnification, at: point, content: content, container: frame.size)
+            case .smartMagnify:
+                if state.isZoomed { reset() } else { state.zoom(by: 2.5, at: point, content: content, container: frame.size) }
+            case .scrollWheel:
+                guard state.isZoomed else { return event }
+                let step: CGFloat = event.hasPreciseScrollingDeltas ? 1 : 10
+                state.move(by: CGSize(width: event.scrollingDeltaX * step, height: event.scrollingDeltaY * step), content: content, container: frame.size)
+            default: return event
+            }
+            return nil
+        }
+    }
+
+    func stop() { if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil }
+    func reset() { state = ZoomState() }
+    func fit() { state.clamp(content: content, container: frame.size) }
+
+    /// The pointer relative to the canvas centre, or nil when it is outside the canvas.
+    private func point(of event: NSEvent) -> CGPoint? {
+        guard let view = event.window?.contentView else { return nil }
+        var p = view.convert(event.locationInWindow, from: nil)
+        if !view.isFlipped { p.y = view.bounds.height - p.y }
+        guard frame.contains(p) else { return nil }
+        return CGPoint(x: p.x - frame.midX, y: p.y - frame.midY)
+    }
+}
+
+/// Hands the hosting window to the zoom monitor, so events from other windows are ignored.
+struct WindowReader: NSViewRepresentable {
+    let found: (NSWindow?) -> Void
+    func makeNSView(context: Context) -> NSView { NSView() }
+    func updateNSView(_ view: NSView, context: Context) { DispatchQueue.main.async { found(view.window) } }
+}
+
 struct EditorView: View {
     @ObservedObject var store: CaptureStore
-    @State private var tool: EditTool = .redact
+    @State private var tool: EditTool
+
+    init(store: CaptureStore, initialTool: EditTool = .redact) {
+        self.store = store
+        _tool = State(initialValue: initialTool)
+    }
     @State private var annotation = ""
     @State private var start: CGPoint?
     @State private var end: CGPoint?
+    @State private var stroke: [CGPoint] = []
     @State private var toastVisible = false
+    @StateObject private var zoom = CanvasZoom()
     @Namespace private var toolSelection
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -1712,13 +2382,14 @@ struct EditorView: View {
                 emptyState.ignoresSafeArea()
             } else {
                 canvas
-                    .padding(.top, tool == .text ? 56 : 12)
+                    .padding(.top, tool == .text || tool == .highlight ? 56 : 12)
                     .padding(.bottom, store.captures.isEmpty ? 24 : 112)
                     .padding(.horizontal, 24)
             }
             VStack(spacing: 10) {
                 toolbar
                 if tool == .text && store.current != nil { annotationField.transition(.move(edge: .top).combined(with: .opacity)) }
+                if tool == .highlight && store.current != nil { highlightOptions.transition(.move(edge: .top).combined(with: .opacity)) }
                 Spacer()
                 if toastVisible && !store.message.isEmpty { toast.transition(.move(edge: .bottom).combined(with: .opacity)) }
                 if !store.captures.isEmpty { filmstrip }
@@ -1731,7 +2402,10 @@ struct EditorView: View {
         .animation(motion, value: toastVisible)
         .animation(motion, value: store.captures.map(\.id))
         .animation(motion, value: store.selected)
-        .onChange(of: store.selected) { _, _ in annotation = ""; start = nil; end = nil }
+        .onChange(of: store.selected) { _, _ in annotation = ""; start = nil; end = nil; stroke = []; zoom.reset() }
+        .background(WindowReader { zoom.window = $0 })
+        .onAppear { zoom.start() }
+        .onDisappear { zoom.stop() }
         .task(id: store.message) {
             toastVisible = true
             try? await Task.sleep(for: .seconds(4))
@@ -1828,6 +2502,39 @@ struct EditorView: View {
         .overlay(Capsule().strokeBorder(Smoke.rim, lineWidth: 0.5))
     }
 
+    /// Colour swatches, a custom colour and three stroke widths for the highlighter.
+    private var highlightOptions: some View {
+        HStack(spacing: 10) {
+            ForEach(Array(RGB.highlighterPresets.enumerated()), id: \.offset) { _, preset in
+                let on = store.highlightColor == preset.0
+                Button { store.highlightColor = preset.0 } label: {
+                    Circle().fill(preset.0.color).frame(width: 18, height: 18)
+                        .overlay(Circle().strokeBorder(Color.primary.opacity(on ? 0.9 : 0.2), lineWidth: on ? 2 : 0.5).padding(on ? -3 : 0))
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain).help(preset.1).accessibilityLabel(preset.1).accessibilityAddTraits(on ? .isSelected : [])
+            }
+            ColorPicker(L("Custom color"), selection: Binding(get: { store.highlightColor.color }, set: { store.highlightColor = RGB($0) }), supportsOpacity: false)
+                .labelsHidden().help(L("Custom color"))
+            Divider().frame(height: 18)
+            ForEach(HighlightSize.allCases, id: \.self) { size in
+                let on = store.highlightSize == size
+                Button { store.highlightSize = size } label: {
+                    Capsule().fill(Color.primary.opacity(on ? 0.9 : 0.35))
+                        .frame(width: 22, height: size.factor * 1.3)
+                        .frame(width: 30, height: 24)
+                        .background(Capsule().fill(on ? Color.primary.opacity(0.12) : .clear))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain).help(size.title).accessibilityLabel(size.title).accessibilityAddTraits(on ? .isSelected : [])
+            }
+        }
+        .padding(.horizontal, 14).frame(height: 34)
+        .glassSurface(Capsule(), tint: Smoke.panelTint)
+        .overlay(Capsule().strokeBorder(Smoke.rim, lineWidth: 0.5))
+        .help(L("Drag over the image to highlight"))
+    }
+
     // MARK: Canvas
 
     @ViewBuilder private var canvas: some View {
@@ -1837,6 +2544,14 @@ struct EditorView: View {
                 let size = CGSize(width: CGFloat(capture.image.width) * ratio, height: CGFloat(capture.image.height) * ratio)
                 ZStack(alignment: .topLeading) {
                     Image(decorative: capture.image, scale: 1).resizable().frame(width: size.width, height: size.height)
+                    if !stroke.isEmpty {
+                        // Live preview at the final width, scaled to the canvas.
+                        Path(smoothPath(stroke))
+                            .stroke(store.highlightColor.color.opacity(0.55),
+                                    style: StrokeStyle(lineWidth: store.highlightSize.width(for: CGSize(width: capture.image.width, height: capture.image.height)) * ratio,
+                                                       lineCap: .round, lineJoin: .round))
+                            .blendMode(.multiply)
+                    }
                     if let a = start, let b = end {
                         Path { p in
                             if tool == .arrow { p.move(to: a); p.addLine(to: b) }
@@ -1851,8 +2566,20 @@ struct EditorView: View {
                 .shadow(color: .black.opacity(0.45), radius: 24, y: 10)
                 .contentShape(Rectangle())
                 .gesture(DragGesture(minimumDistance: 0)
-                    .onChanged { v in start = v.startLocation; end = v.location }
+                    .onChanged { v in
+                        guard tool == .highlight else { start = v.startLocation; end = v.location; return }
+                        if stroke.isEmpty { stroke = [v.startLocation] }
+                        // Skip points closer than 2 pt: smoother curves and less work.
+                        if let last = stroke.last, hypot(v.location.x - last.x, v.location.y - last.y) >= 2 { stroke.append(v.location) }
+                    }
                     .onEnded { v in
+                        if tool == .highlight {
+                            if store.selected == capture.id {
+                                store.highlight(points: stroke.map { CGPoint(x: $0.x / size.width, y: $0.y / size.height) },
+                                                color: store.highlightColor, size: store.highlightSize)
+                            }
+                            stroke = []; return
+                        }
                         guard store.selected == capture.id else { start = nil; end = nil; return }
                         store.edit(tool: tool,
                                    start: CGPoint(x: v.startLocation.x / size.width, y: v.startLocation.y / size.height),
@@ -1860,9 +2587,39 @@ struct EditorView: View {
                                    text: annotation)
                         start = nil; end = nil; annotation = ""
                     })
+                // The drag above reports points in the image's own coordinates, so tools stay exact while zoomed.
+                .scaleEffect(zoom.state.zoom)
+                .offset(zoom.state.pan)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Clip to the canvas only while zoomed, so the shadow shows at normal size.
+                .mask(Rectangle().padding(zoom.state.isZoomed ? 0 : -80))
+                .overlay(alignment: .bottomTrailing) { if zoom.state.isZoomed { zoomBadge } }
+                .onAppear { zoom.frame = geo.frame(in: .global); zoom.content = size }
+                .onChange(of: geo.frame(in: .global)) { _, frame in zoom.frame = frame; zoom.fit() }
+                .onChange(of: size) { _, new in zoom.content = new; zoom.fit() }
+                .onChange(of: CGSize(width: capture.image.width, height: capture.image.height)) { _, _ in zoom.reset() } // crop
             }
         }
+    }
+
+    /// Current zoom; click or ⌘0 to go back to the whole image.
+    private var zoomBadge: some View {
+        Button { zoom.reset() } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.down.right.and.arrow.up.left")
+                Text(Double(zoom.state.zoom).formatted(.percent.precision(.fractionLength(0)))).monospacedDigit()
+            }
+            .font(.system(size: 12, weight: .semibold))
+            .padding(.horizontal, 12).frame(height: 28)
+            .glassSurface(Capsule(), tint: Smoke.panelTint)
+            .overlay(Capsule().strokeBorder(Smoke.rim, lineWidth: 0.5))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("0", modifiers: .command)
+        .help(L("Reset Zoom") + " (⌘0)")
+        .accessibilityLabel(L("Reset Zoom"))
+        .padding(10)
     }
 
     private var emptyState: some View {
@@ -1870,7 +2627,7 @@ struct EditorView: View {
             BrandLogo(height: 84)
                 .padding(.bottom, 8)
             Text(L("No screenshots")).font(.system(size: 17, weight: .semibold))
-            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut)
+            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, again: store.repeatShortcut)
                 .font(.system(size: 13))
             PillButton(title: L("Import from Clipboard"), symbol: "doc.on.clipboard") { store.importImage() }
                 .padding(.top, 6)
@@ -2096,7 +2853,7 @@ struct RecentPanelView: View {
             BrandLogo(height: 34)
                 .padding(.bottom, 2)
             Text(L("No screenshots yet")).font(.system(size: 13, weight: .semibold))
-            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut)
+            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, again: store.repeatShortcut)
                 .font(.system(size: 12))
         }
         .frame(maxWidth: .infinity).frame(height: 132)
@@ -2213,6 +2970,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var actionHotKeys: [ShortcutAction: EventHotKeyRef] = [:]
     let recorder = ShortcutRecorder()
     var watermarkWindow: NSWindow?
+    var helpWindow: NSWindow?
+    var aboutWindow: NSWindow?
     var watermarkModel: WatermarkModel?
     var eventHandler: EventHandlerRef?
     var hoverSuppressed = false
@@ -2230,6 +2989,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 switch hk.id {
                 case ShortcutAction.capture.hotKeyID: delegate.capture()
                 case ShortcutAction.captureWindow.hotKeyID: delegate.captureWindow()
+                case ShortcutAction.repeatCapture.hotKeyID: delegate.repeatCapture()
                 case ShortcutAction.importClipboard.hotKeyID: delegate.importCapture()
                 default: break
                 }
@@ -2254,6 +3014,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func changeShortcut() { recordShortcut(for: .capture) }
     @objc func changeWindowShortcut() { recordShortcut(for: .captureWindow) }
     @objc func changeImportShortcut() { recordShortcut(for: .importClipboard) }
+    @objc func changeRepeatShortcut() { recordShortcut(for: .repeatCapture) }
 
     /// Opens the recorder; the action's current shortcut is released meanwhile so it can be pressed again.
     func recordShortcut(for action: ShortcutAction) {
@@ -2282,6 +3043,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .capture: store.captureShortcut = shortcut; store.message = L("Capture shortcut: \(keys)")
         case .captureWindow: store.windowShortcut = shortcut; store.message = L("Window shortcut: \(keys)")
         case .importClipboard: store.message = L("Import shortcut: \(keys)")
+        case .repeatCapture: store.repeatShortcut = shortcut; store.message = L("Repeat shortcut: \(keys)")
         }
         return nil
     }
@@ -2292,18 +3054,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Captures a whole window with the system picker, whatever mode is selected in the menu.
     @objc func captureWindow() { startCapture(mode: .window) }
 
-    func startCapture(mode: CaptureMode?) {
-        guard !capturer.isCapturing else { return }
+    /// Screen Recording permission and, when saving to a folder, a chosen folder. False when the capture can't start.
+    private func readyToCapture() -> Bool {
+        guard !capturer.isCapturing else { return false }
         if !CGPreflightScreenCaptureAccess() {
             CGRequestScreenCaptureAccess()
             store.message = L("Allow Screen Recording for Kapture SCR in System Settings › Privacy & Security, then reopen the app.")
-            show(); return
+            show(); return false
         }
         if settings.destination.usesFolder && settings.folder == nil {
-            guard let folder = FolderAccess.chooseFolder() else { store.message = L("Capture cancelled: no folder was chosen."); return }
+            guard let folder = FolderAccess.chooseFolder() else { store.message = L("Capture cancelled: no folder was chosen."); return false }
             settings.folder = folder
         }
         thumbnail.hide(); recentPanel.orderOut(nil)
+        return true
+    }
+
+    /// Takes the last area, window or screen again. With nothing to repeat, or when that window has closed or that
+    /// area is off every display, it starts a normal capture instead (the window picker for a window).
+    @objc func repeatCapture() {
+        guard readyToCapture() else { return }
+        let result = capturer.repeatLast(settings) { [weak self] url in
+            guard let self, let url else { return }
+            self.finishCapture(url)
+        }
+        switch result {
+        case .started: break
+        case .nothingToRepeat: startCapture(mode: nil)
+        case .targetGone: store.message = L("The window from the last capture is no longer open."); startCapture(mode: nil)
+        }
+    }
+
+    func startCapture(mode: CaptureMode?) {
+        guard readyToCapture() else { return }
         capturer.capture(settings, mode: mode ?? settings.mode) { [weak self] url in
             guard let self, let url else { return } // Esc or failure: nothing to do
             self.finishCapture(url)
@@ -2316,7 +3099,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let base = FolderAccess.baseName()
         let capture = store.addOwnCapture(data, baseName: base)
         // With a watermark, the file and the clipboard get the watermarked pixels instead of the raw screenshot.
-        let marked = store.watermarkActive ? capture : nil
+        let marked = store.stampActive ? capture : nil
         var notes: [String] = []
 
         if settings.destination.usesFolder {
@@ -2333,7 +3116,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         if capture == nil {
             notes.append(L("Too large for the editor."))
-            if store.watermarkActive { notes.append(L("Watermark not applied.")) }
+            if store.stampActive { notes.append(L("Watermark not applied.")) }
         }
         store.message = notes.joined(separator: " ")
         if let capture { thumbnail.show(capture) }
@@ -2407,6 +3190,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let windowShortcut = settings.shortcut(for: .captureWindow)
         let win = item(L("Capture Window"), #selector(captureWindow), key: windowShortcut.chars); win.keyEquivalentModifierMask = windowShortcut.menuFlags
         menu.addItem(win)
+        let repeatShortcut = settings.shortcut(for: .repeatCapture)
+        let again = item(L("Repeat Last Capture"), #selector(repeatCapture), key: repeatShortcut.chars); again.keyEquivalentModifierMask = repeatShortcut.menuFlags
+        menu.addItem(again)
         menu.addItem(.separator())
         menu.addItem(NSMenuItem.sectionHeader(title: L("Mode")))
         for (n, m) in CaptureMode.allCases.enumerated() { menu.addItem(item(m.title, #selector(setMode(_:)), tag: n, on: settings.mode == m)) }
@@ -2427,10 +3213,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         options.addItem(.separator())
         options.addItem(item(L("Change Capture Shortcut…"), #selector(changeShortcut)))
         options.addItem(item(L("Change Window Shortcut…"), #selector(changeWindowShortcut)))
+        options.addItem(item(L("Change Repeat Shortcut…"), #selector(changeRepeatShortcut)))
         options.addItem(item(L("Change Import Shortcut…"), #selector(changeImportShortcut)))
         options.addItem(.separator())
         options.addItem(item(L("Add Watermark"), #selector(toggleWatermark), on: store.watermarkActive))
-        options.addItem(item(L("Watermark Settings…"), #selector(showWatermarkSettings)))
+        options.addItem(item(L("Add Number"), #selector(toggleNumber), on: settings.numberEnabled))
+        options.addItem(item(L("Watermark and Number…"), #selector(showWatermarkSettings)))
         options.addItem(.separator())
         let languages = NSMenu()
         let chosen = settings.language
@@ -2442,9 +3230,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let languageItem = NSMenuItem(title: L("Language"), action: nil, keyEquivalent: "")
         languageItem.submenu = languages
         options.addItem(languageItem)
+        options.addItem(item(L("Open at Login"), #selector(toggleOpenAtLogin), on: SMAppService.mainApp.status == .enabled))
         let optionsItem = NSMenuItem(title: L("Options"), action: nil, keyEquivalent: "")
         optionsItem.submenu = options
         menu.addItem(optionsItem)
+        let help = NSMenu()
+        help.addItem(item(L("Kapture SCR Help"), #selector(showHelp)))
+        help.addItem(item(L("About Kapture SCR"), #selector(showAbout)))
+        help.addItem(item(L("Check for Updates…"), #selector(checkForUpdates)))
+        let helpItem = NSMenuItem(title: L("Help"), action: nil, keyEquivalent: "")
+        helpItem.submenu = help
+        menu.addItem(helpItem)
 
         menu.addItem(.separator())
         menu.addItem(item(L("Open Kapture SCR"), #selector(show)))
@@ -2517,18 +3313,73 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         attempt()
     }
 
+    /// Registers the app as a login item with the system (no helper, no extra entitlement).
+    @objc func toggleOpenAtLogin() {
+        let service = SMAppService.mainApp
+        do {
+            if service.status == .enabled { try service.unregister() } else { try service.register() }
+        } catch {
+            store.message = L("Couldn’t change Open at Login: \(error.localizedDescription)"); show(); return
+        }
+        if service.status == .requiresApproval {
+            store.message = L("Allow Kapture SCR in System Settings › General › Login Items & Extensions.")
+            SMAppService.openSystemSettingsLoginItems()
+        }
+    }
+
+    @objc func toggleNumber() {
+        settings.numberEnabled.toggle()
+        watermarkModel?.refresh()
+    }
+
+    private func present(_ window: inout NSWindow?, title: String, _ content: () -> some View) {
+        if window == nil {
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 600), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            w.title = title; w.isReleasedWhenClosed = false
+            let host = NSHostingController(rootView: content())
+            host.sizingOptions = [.preferredContentSize]
+            w.contentViewController = host
+            w.center()
+            window = w
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        window?.makeKeyAndOrderFront(nil)
+    }
+
+    @objc func showHelp() {
+        present(&helpWindow, title: L("Kapture SCR Help")) { HelpView(store: store) { [weak self] in self?.showAbout() } }
+    }
+
+    @objc func showAbout() {
+        // Read fresh each time, so the window reflects the copy on disk right now.
+        aboutWindow?.close(); aboutWindow = nil
+        present(&aboutWindow, title: L("About Kapture SCR")) { AboutView(info: BuildInfo.current()) { [weak self] in self?.showHelp() } }
+    }
+
+    /// Shows this version and offers the release page. Kapture SCR has no network access, so the browser opens it.
+    @objc func checkForUpdates() {
+        let info = BuildInfo.current()
+        let alert = NSAlert()
+        alert.messageText = L("Check for Updates")
+        alert.informativeText = L("You have version \(info.version) (build \(info.build)). New versions are published on GitHub. Kapture SCR can’t connect to the internet, so the release page opens in your browser.")
+        alert.addButton(withTitle: L("Open Release Page"))
+        alert.addButton(withTitle: L("Cancel"))
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn { NSWorkspace.shared.open(Links.releases) }
+    }
+
     @objc func showWatermarkSettings() {
         if watermarkWindow == nil {
             let model = WatermarkModel(store: store)
             let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 700), styleMask: [.titled, .closable], backing: .buffered, defer: false)
-            w.title = L("Watermark"); w.isReleasedWhenClosed = false
+            w.title = L("Watermark and Number"); w.isReleasedWhenClosed = false
             let host = NSHostingController(rootView: WatermarkView(model: model))
             host.sizingOptions = [.preferredContentSize]
             w.contentViewController = host
             w.center()
             watermarkWindow = w; watermarkModel = model
         }
-        watermarkModel?.enabled = settings.watermarkEnabled
+        watermarkModel?.refresh()
         NSApp.activate(ignoringOtherApps: true)
         watermarkWindow?.makeKeyAndOrderFront(nil)
     }

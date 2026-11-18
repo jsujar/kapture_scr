@@ -55,6 +55,11 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
   - **Window** uses the system camera picker.
   - **Full screen** captures the main display.
 - **Capture Window anytime.** <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>7</kbd> picks a window, whatever mode is selected.
+- **Repeat Last Capture.** <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd> takes the last capture again at once, with no timer.
+  - **An area:** the same place on screen.
+  - **A window:** the same window, even if it has moved or been resized. If it has closed, Kapture SCR says so and starts a normal capture.
+  - **Full screen:** the main display.
+  - With nothing to repeat yet, it starts a normal capture. The last target is kept in memory only.
 - **Destinations.** Save to the clipboard, a folder, or both. Pick the folder once and Kapture SCR remembers it.
 - **Options.**
   - Timer: none, 3, 5 or 15 s.
@@ -78,14 +83,18 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
 ### Editor
 
 - **Canvas.** A dark canvas with a floating glass toolbar and a filmstrip of recent captures.
-- **Tools.** Crop, arrow, text and opaque redaction (<kbd>⌘</kbd> <kbd>1</kbd>–<kbd>4</kbd>).
+- **Tools.** Crop, arrow, text, opaque redaction and highlighter (<kbd>⌘</kbd> <kbd>1</kbd>–<kbd>5</kbd>).
+- **Highlighter.** Draw freehand; the stroke is smoothed into one even line. It blends like a marker on paper, so text under it stays readable. Six colours plus a custom one, and three widths. The choice is remembered.
+- **Zoom to look at a detail.** Pinch the trackpad over the image, swipe with two fingers to move around, and double-tap with two fingers or press <kbd>⌘</kbd> <kbd>0</kbd> to see the whole image again. It only magnifies the view: the image never changes, and every tool still works while zoomed.
 - **Undo and redo.** Up to five steps within 64 MiB.
 - **Save Copy** (<kbd>⌘</kbd> <kbd>S</kbd>) writes a new `… (edited).png` next to your captures. The original file is never touched.
 - **Copy** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>C</kbd>) puts the edited PNG on the clipboard.
 
-### Watermark
+### Watermark and number
 
-Open *Options › Watermark Settings…* to add your logo or signature to every capture and imported image.
+Open *Options › Watermark and Number…* to add your logo or signature, a running number, or both, to every capture and imported image. The two tabs share one preview that shows exactly what your captures will get.
+
+**Watermark**
 
 - **Your image.** PNG, JPEG, HEIC or TIFF up to 4096 px. PNG with transparency works best. Kapture SCR keeps a copy in its sandbox container, so the original file can move.
 - **Live preview.** The mark is drawn on a sample screenshot exactly as it will appear on your captures. Drag it to place it, or pick one of nine positions.
@@ -93,12 +102,20 @@ Open *Options › Watermark Settings…* to add your logo or signature to every 
 - **Pattern.** *Repeat as a pattern* tiles the mark over the whole capture; the position then shifts the pattern.
 - **Where it goes.** Files, the clipboard and the editor all get the watermarked image. Edits never add it twice. Turn it on or off from *Options › Add Watermark*.
 
+**Number**
+- **Counting.** Choose the next number and whether it goes up by one after each capture or import. Turn it off to stamp the same number every time.
+- **Look.** Any font installed on your Mac, or the system font, in bold. Six colours plus a custom one; a thin contrasting outline keeps it readable on any background.
+- **Position, size and opacity** work like the watermark's: drag it in the preview or pick one of nine positions. Size is a share of the capture's height.
+- Turn it on or off from *Options › Add Number*.
+
 ### Menu bar
 
 - **Recent captures panel.** Hover over the menu bar icon to see your recent captures in a smoked-glass panel. Click one to edit it, or drag it into another app.
 - **Floating thumbnail.** It appears in the top-right corner for 5 seconds after each capture. Click it to open the editor; hovering keeps it visible.
 - **Import from the clipboard** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>E</kbd>). Opens the copied image in the editor.
 - **Auto images.** Optionally imports PNG and TIFF images you copy. It is off at launch and never saved.
+- **Help menu.** *Kapture SCR Help* explains every feature with its current shortcut, *About Kapture SCR* shows how to [verify your copy](#verify-your-copy), and *Check for Updates…* opens the release page in your browser.
+- **Open at Login** (*Options › Open at Login*). Registers Kapture SCR as a login item with macOS, so it appears in System Settings › General › Login Items & Extensions.
 
 ### Design and languages
 
@@ -139,16 +156,18 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 |---|---|
 | Take Screenshot | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>6</kbd> |
 | Capture Window | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>7</kbd> |
+| Repeat Last Capture | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd> |
 | Import from Clipboard | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>E</kbd> |
 | Timer options (while selecting) | <kbd>Space</kbd>, then <kbd>←</kbd> <kbd>→</kbd> |
 | Capture the adjusted area | <kbd>Return</kbd> |
 | Cancel | <kbd>Esc</kbd> |
-| Editor tools | <kbd>⌘</kbd> <kbd>1</kbd>–<kbd>4</kbd> |
+| Editor tools | <kbd>⌘</kbd> <kbd>1</kbd>–<kbd>5</kbd> |
+| Editor zoom | Pinch, two-finger swipe; <kbd>⌘</kbd> <kbd>0</kbd> resets |
 | Undo / Redo | <kbd>⌘</kbd> <kbd>Z</kbd> / <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>Z</kbd> |
 | Save Copy · Copy edited image | <kbd>⌘</kbd> <kbd>S</kbd> · <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>C</kbd> |
 
-**Changing the three global shortcuts.**
-- Use *Options › Change Capture Shortcut…*, *Change Window Shortcut…* or *Change Import Shortcut…*.
+**Changing the four global shortcuts.**
+- Use *Options › Change Capture Shortcut…*, *Change Window Shortcut…*, *Change Repeat Shortcut…* or *Change Import Shortcut…*.
 - A combination needs at least two modifier keys, including <kbd>⌘</kbd> or <kbd>⌃</kbd>. Function keys work on their own.
 - Shortcuts reserved by macOS or already taken are rejected.
 - *Restore Default* brings back the original shortcut.
@@ -156,6 +175,7 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 ## Privacy
 
 - **No network.** No networking code, OCR, auto-updates or telemetry, and no network entitlement. The App Sandbox therefore blocks every connection, and [automated tests](#tests) check this on every change.
+- **Updates without connecting.** *Help › Check for Updates…* shows your version and opens the [release page](https://github.com/jsujar/kapture_scr/releases) in your browser. Kapture SCR itself never connects, and nothing is added to the address.
 - **Files only where you allow.**
   - Captures and edited copies go to the folder you choose.
   - Preferences, and the copy of your watermark image, live in the app's sandbox container.
@@ -168,6 +188,24 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 **Limits.**
 - Own captures: up to 16384 px per side and 50 MP.
 - Clipboard imports: up to 8192 px, 16 MP and 48 MiB.
+
+## Verify your copy
+
+*Help › About Kapture SCR* shows the version and build, the git commit and date it was built from (`-modified` means uncommitted changes), who signed it, whether the signature is intact, the App Sandbox, network access and the SHA-256 of the app's executable. Everything is read on your Mac.
+
+A tampered copy could fake that window too, so check it without trusting the app. *Help › Kapture SCR Help* lists these commands with your app's path:
+
+```sh
+codesign --verify --deep --strict --verbose=2 "/Applications/Kapture SCR.app"
+codesign -d --entitlements - "/Applications/Kapture SCR.app"
+shasum -a 256 "/Applications/Kapture SCR.app/Contents/MacOS/Kapture"
+```
+
+- The first must report `valid on disk` and `satisfies its Designated Requirement`.
+- The second must list only `app-sandbox`, `files.user-selected.read-write` and `files.bookmarks.app-scope`, with no `network` entitlement.
+- The SHA-256 must match the one published with the release, next to the disk image's own checksum. `scripts/make-dmg.sh` prints both and writes them to `dist/Kapture SCR <version>.sha256.txt`.
+
+You can also read the source and [build it yourself](#build-from-source).
 
 ## Build from source
 
@@ -207,6 +245,10 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
 - **Image limits.** Oversized, truncated or invalid images are rejected, as are images over the pixel and byte limits.
 - **History.** Up to 10 images and 128 MiB, expiry after 30 minutes, and selection after removal.
 - **Watermark.** Position, size, opacity, transparency and pattern, and that captures, imports and saved files get it exactly once.
+- **Number.** Placement, size, font fallback, outline contrast, counting up or staying fixed, and drawing together with the watermark.
+- **Highlighter.** It tints white in the chosen colour, leaves black text black, follows the chosen width, and undo restores the image.
+- **About.** Version, commit, signature, sandbox and network facts, the checksum, the commands to verify a copy, and that the release page is a fixed address with no data attached.
+- **Repeat capture.** The `screencapture` arguments for an area (including displays above or left of the main one), a window and the full screen, and finding the window that was picked.
 - **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
 - **Files.** Saving never overwrites an existing file, and file names are the same in every language.
 - **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.

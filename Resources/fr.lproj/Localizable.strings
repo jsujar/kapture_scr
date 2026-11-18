@@ -119,7 +119,6 @@
 /* Watermark */
 "Watermark not applied." = "Filigrane non appliqué.";
 "Add Watermark" = "Ajouter un filigrane";
-"Watermark Settings…" = "Réglages du filigrane…";
 "Watermark" = "Filigrane";
 "PNG with transparency works best." = "Un PNG avec transparence donne le meilleur résultat.";
 "Couldn’t use that image. Choose a PNG, JPEG, HEIC or TIFF up to 4096 px." = "Impossible d’utiliser cette image. Choisissez un PNG, JPEG, HEIC ou TIFF de 4096 px maximum.";
@@ -156,3 +155,83 @@
 "Later" = "Plus tard";
 "The new language will be used the next time Kapture SCR opens." = "La nouvelle langue sera utilisée à la prochaine ouverture de Kapture SCR.";
 "Couldn’t restart Kapture SCR. Quit and open it again to change the language." = "Impossible de redémarrer Kapture SCR. Quittez-le et rouvrez-le pour changer de langue.";
+
+/* Repeat capture, highlighter, number, login */
+"Open at Login" = "Ouvrir à l’ouverture de session";
+"Couldn’t change Open at Login: %@" = "Impossible de modifier « Ouvrir à l’ouverture de session » : %@";
+"Allow Kapture SCR in System Settings › General › Login Items & Extensions." = "Autorisez Kapture SCR dans Réglages Système › Général › Ouverture et extensions.";
+"Repeat Last Capture" = "Répéter la dernière capture";
+"Change Repeat Shortcut…" = "Modifier le raccourci de répétition…";
+"Repeat Shortcut" = "Raccourci de répétition";
+"Repeat shortcut: %@" = "Raccourci de répétition : %@";
+"The window from the last capture is no longer open." = "La fenêtre de la dernière capture n’est plus ouverte.";
+"Highlight" = "Surligner";
+"Custom color" = "Couleur personnalisée";
+"Drag over the image to highlight" = "Faites glisser sur l’image pour surligner";
+"Thin" = "Fin";
+"Medium" = "Moyen";
+"Thick" = "Épais";
+"Yellow" = "Jaune";
+"Green" = "Vert";
+"Pink" = "Rose";
+"Blue" = "Bleu";
+"Orange" = "Orange";
+"Purple" = "Violet";
+"Red" = "Rouge";
+"White" = "Blanc";
+"Black" = "Noir";
+"Number" = "Numéro";
+"Add Number" = "Ajouter un numéro";
+"Watermark and Number…" = "Filigrane et numéro…";
+"Watermark and Number" = "Filigrane et numéro";
+"Add a number to every capture and imported image" = "Ajouter un numéro à chaque capture et image importée";
+"Next number" = "Numéro suivant";
+"Increase after each capture" = "Augmenter après chaque capture";
+"Font" = "Police";
+"System Font" = "Police du système";
+"Color" = "Couleur";
+"Drag the number in the preview, or choose a position." = "Faites glisser le numéro dans l’aperçu ou choisissez une position.";
+
+/* Help, About and updates */
+"A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains." = "Une copie altérée pourrait aussi falsifier cette fenêtre. Pour en être sûr, comparez le SHA-256 avec celui de la page de la version, ou vérifiez l’app dans Terminal comme l’explique l’Aide.";
+"About Kapture SCR" = "À propos de Kapture SCR";
+"About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page." = "« À propos de Kapture SCR » affiche la version, la signature de code et le SHA-256 de l’app. Pour vérifier sans faire confiance à l’app, exécutez ces commandes dans Terminal : la signature doit être valide, les droits (entitlements) doivent inclure l’App Sandbox et aucun accès au réseau, et le SHA-256 doit correspondre à celui de la page de la version.";
+"Ad hoc (no certificate)" = "Ad hoc (sans certificat)";
+"Allowed" = "Autorisé";
+"App Sandbox" = "App Sandbox";
+"Built" = "Compilée le";
+"Captures stay in memory for 30 minutes (10 at most) unless you save them. Kapture SCR has no network access: the macOS App Sandbox blocks it, so nothing is ever sent." = "Les captures restent en mémoire pendant 30 minutes (10 au maximum) sauf si vous les enregistrez. Kapture SCR n’a pas accès au réseau : l’App Sandbox de macOS le bloque, donc rien n’est jamais envoyé.";
+"Check for Updates" = "Rechercher des mises à jour";
+"Check for Updates…" = "Rechercher des mises à jour…";
+"Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Cliquez sur une capture récente pour l’ouvrir. Recadrer, flèche, texte, masquer et surligner (⌘1 à ⌘5), avec jusqu’à cinq étapes d’annulation. Enregistrer une copie crée un nouveau fichier et ne modifie jamais l’original.";
+"Click any window to capture it, whatever mode is selected." = "Cliquez sur n’importe quelle fenêtre pour la capturer, quel que soit le mode sélectionné.";
+"Commit" = "Commit";
+"Copied" = "Copié";
+"Copy Commands" = "Copier les commandes";
+"Copy Details" = "Copier les détails";
+"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Faites glisser sur la zone voulue, ou choisissez Fenêtre ou Plein écran dans le menu. Avant de faire glisser, appuyez sur Espace pour choisir un minuteur ; Esc annule. Avec Options › Ajuster la zone de capture, vous pouvez déplacer et redimensionner la zone avant de capturer.";
+"Help" = "Aide";
+"Kapture SCR Help" = "Aide Kapture SCR";
+"Network access" = "Accès au réseau";
+"None (blocked by macOS)" = "Aucun (bloqué par macOS)";
+"Not signed" = "Non signée";
+"Not valid: this copy was changed after signing" = "Non valide : cette copie a été modifiée après sa signature";
+"On" = "Activé";
+"Open Release Page" = "Ouvrir la page des versions";
+"Opens a copied image in the editor. Auto images imports PNG and TIFF images as you copy them." = "Ouvre une image copiée dans l’éditeur. Images auto importe les images PNG et TIFF au fur et à mesure que vous les copiez.";
+"Options › Watermark and Number… adds your logo, a running number or both to every capture and imported image. The preview shows exactly what your captures will get." = "Options › Filigrane et numéro… ajoute votre logo, un numéro séquentiel ou les deux à chaque capture et image importée. L’aperçu montre exactement ce que recevront vos captures.";
+"Privacy" = "Confidentialité";
+"Private screenshots. Offline. No network access." = "Captures d’écran privées. Hors ligne. Aucun accès au réseau.";
+"Signature" = "Signature";
+"Signed by" = "Signée par";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Reprend immédiatement la dernière capture, sans minuteur : la même zone, la même fenêtre même si elle a été déplacée ou redimensionnée, ou le plein écran. Si cette fenêtre a été fermée, une capture normale démarre.";
+"Team" = "Équipe";
+"Valid: unchanged since it was signed" = "Valide : inchangée depuis sa signature";
+"Verify This Copy" = "Vérifier cette copie";
+"Version" = "Version";
+"You have version %@ (build %@). New versions are published on GitHub. Kapture SCR can’t connect to the internet, so the release page opens in your browser." = "Vous avez la version %@ (build %@). Les nouvelles versions sont publiées sur GitHub. Kapture SCR ne peut pas se connecter à Internet, la page des versions s’ouvre donc dans votre navigateur.";
+
+/* Editor zoom */
+"Zoom" = "Zoom";
+"Reset Zoom" = "Réinitialiser le zoom";
+"In the editor, pinch the trackpad to look at a detail and swipe with two fingers to move around. Double-tap with two fingers or press ⌘0 to see the whole image again. Zooming never changes the image." = "Dans l’éditeur, pincez le trackpad pour examiner un détail et balayez avec deux doigts pour vous déplacer. Touchez deux fois avec deux doigts ou appuyez sur ⌘0 pour revoir l’image entière. Le zoom ne modifie jamais l’image.";

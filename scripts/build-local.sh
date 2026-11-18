@@ -14,6 +14,10 @@ rm -rf "$PWD/dist/Kapture.app"   # pre-rename bundle name
 mkdir -p "$APP/Contents/MacOS"
 cp "$BIN" "$APP/Contents/MacOS/Kapture"
 cp Info.plist "$APP/Contents/Info.plist"
+# Where this build came from, shown in About Kapture SCR. "-modified" marks uncommitted changes.
+COMMIT=$(git rev-parse --short=12 HEAD 2>/dev/null || echo unknown)
+git diff --quiet HEAD 2>/dev/null || COMMIT="$COMMIT-modified"
+/usr/libexec/PlistBuddy -c "Add :KaptureCommit string $COMMIT" -c "Add :KaptureBuildDate string $(date -u +%Y-%m-%dT%H:%M:%SZ)" "$APP/Contents/Info.plist"
 # Translations: Resources/<lang>.lproj/Localizable.strings
 rm -rf "$APP/Contents/Resources"; mkdir -p "$APP/Contents/Resources"
 cp -R Resources/*.lproj "$APP/Contents/Resources/"

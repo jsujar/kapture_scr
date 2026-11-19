@@ -40,8 +40,7 @@
 
 1. Download **`Kapture SCR <version>.dmg`** from the [latest release](https://github.com/jsujar/kapture_scr/releases/latest).
 2. Open it and drag **Kapture SCR** to **Applications**.
-3. The app is not notarized, so on first launch macOS says it cannot verify the developer. Open **System Settings › Privacy & Security** and click **Open Anyway**. You only do this once.
-4. Allow **Screen Recording** when asked, then reopen the app.
+3. Allow **Screen Recording** when asked, then reopen the app.
 
 The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>6</kbd> to take your first screenshot.
 
@@ -202,10 +201,12 @@ A tampered copy could fake that window too, so check it without trusting the app
 codesign --verify --deep --strict --verbose=2 "/Applications/Kapture SCR.app"
 codesign -d --entitlements - "/Applications/Kapture SCR.app"
 shasum -a 256 "/Applications/Kapture SCR.app/Contents/MacOS/Kapture"
+spctl --assess --type execute --verbose=2 "/Applications/Kapture SCR.app"
 ```
 
 - The first must report `valid on disk` and `satisfies its Designated Requirement`.
 - The second must list only `app-sandbox`, `files.user-selected.read-write` and `files.bookmarks.app-scope`, with no `network` entitlement.
+- The fourth must say `accepted` and `source=Notarized Developer ID`.
 - The SHA-256 must match the one published with the release, next to the disk image's own checksum. `scripts/make-dmg.sh` prints both and writes them to `dist/Kapture SCR <version>.sha256.txt`.
 
 You can also read the source and [build it yourself](#build-from-source).
@@ -282,20 +283,26 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/make-dmg.sh
 
 **Window layout.** Arranging the window needs permission for Terminal to control Finder the first time (*System Settings › Privacy & Security › Automation*). Without it the image is still built, just without the layout.
 
-**Signing.** The app is signed with the local certificate, or ad hoc, and is **not notarized**, which would need a paid Apple Developer account. Updates signed with the same certificate keep the Screen Recording permission on other Macs.
+**Signing and notarization.** With a **Developer ID Application** certificate in your keychain, the app and the disk image are signed with it and the disk image is notarized by Apple and stapled, so it opens on any Mac without warnings. Store the notarization credentials once (an [app-specific password](https://support.apple.com/102654) works):
+
+```sh
+xcrun notarytool store-credentials kapture-notary --apple-id <apple-id> --team-id <team-id>
+```
+
+Without a Developer ID the image is signed with the local certificate, or ad hoc, and is not notarized: on another Mac, the first launch needs *System Settings › Privacy & Security › Open Anyway*. Set `KAPTURE_SIGN_IDENTITY` to choose a certificate yourself and `KAPTURE_NOTARY_PROFILE` to use another credentials profile.
 
 ### Signing and the Screen Recording permission
 
 Kapture SCR captures through `/usr/sbin/screencapture`, so macOS asks for **Screen Recording** permission the first time. Reopen the app after granting it.
 
-macOS ties that permission to the app's code signature, and an ad hoc signature loses it on every rebuild. To keep it across builds:
+macOS ties that permission to the app's code signature, and an ad hoc signature loses it on every rebuild. A Developer ID certificate keeps it. Without one:
 - Create a self-signed **code signing** certificate named `Kapture Local Signing` in your login keychain (*Keychain Access › Certificate Assistant › Create a Certificate…*, type *Code Signing*). No Apple account is needed.
-- The build scripts use it automatically when present, and fall back to ad hoc signing otherwise.
+- The build scripts use it automatically when there is no Developer ID certificate, and fall back to ad hoc signing otherwise.
 
 If you delete or replace the certificate, reset the old grant:
 
 ```sh
-tccutil reset ScreenCapture local.kapture.app
+tccutil reset ScreenCapture io.github.jsujar.kapture
 ```
 
 **Entitlements.**

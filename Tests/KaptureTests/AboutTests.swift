@@ -22,12 +22,12 @@ final class AboutTests: XCTestCase {
 
     func testEntitlementsFromTheSignature() {
         let sandboxOnly: [String: Any] = [kSecCodeInfoEntitlementsDict as String: ["com.apple.security.app-sandbox": true],
-                                          kSecCodeInfoIdentifier as String: "local.kapture.app"]
+                                          kSecCodeInfoIdentifier as String: "io.github.jsujar.kapture"]
         let safe = BuildInfo.make(info: info, signing: sandboxOnly, signatureStatus: errSecSuccess, executable: nil)
         XCTAssertTrue(safe.sandboxed)
         XCTAssertFalse(safe.networkAccess)
         XCTAssertTrue(safe.signatureValid)
-        XCTAssertEqual(safe.identifier, "local.kapture.app")
+        XCTAssertEqual(safe.identifier, "io.github.jsujar.kapture")
 
         let withNetwork: [String: Any] = [kSecCodeInfoEntitlementsDict as String: ["com.apple.security.app-sandbox": true,
                                                                                     "com.apple.security.network.client": true]]

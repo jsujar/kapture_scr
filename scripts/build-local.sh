@@ -1,8 +1,11 @@
 #!/bin/bash
 # Builds Kapture SCR, signs it and installs it to ~/Applications.
-# Signs with the "Kapture Local Signing" certificate from the login keychain when present, so macOS
-# keeps the Screen Recording permission across builds. Otherwise it signs ad hoc
-# (the permission must then be granted again after every build).
+# Signing identity, first found wins:
+#   1. $KAPTURE_SIGN_IDENTITY (name or SHA-1 of a certificate in the keychain);
+#   2. a valid "Developer ID Application" certificate (needed for notarized releases);
+#   3. the self-signed "Kapture Local Signing" certificate;
+#   4. ad hoc (the Screen Recording permission must then be granted again after every build).
+# A stable certificate lets macOS keep the Screen Recording permission across builds.
 # Usage: DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/build-local.sh [--no-install]
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -24,14 +27,11 @@ cp -R Resources/*.lproj "$APP/Contents/Resources/"
 # App icon and menu bar template icon
 cp Resources/AppIcon.icns Resources/MenuBarIcon.png Resources/MenuBarIcon@2x.png Resources/KaptureLogo.png "$APP/Contents/Resources/"
 
-IDENTITY=$(/usr/bin/security find-identity -p codesigning | awk '/"Kapture Local Signing"/ {print $2; exit}')
-if [[ -n "$IDENTITY" ]]; then
-    echo "Signing with Kapture Local Signing ($IDENTITY)"
-else
-    IDENTITY=-
-    echo "Warning: no Kapture Local Signing certificate found; signing ad hoc (Screen Recording must be granted again)."
-fi
-/usr/bin/codesign --force --sign "$IDENTITY" --options runtime --entitlements Kapture.entitlements "$APP"
+source scripts/signing-identity.sh
+echo "Signing with $IDENTITY_NAME"
+TIMESTAMP=--timestamp=none
+[[ "$IDENTITY_KIND" == developer-id ]] && TIMESTAMP=--timestamp   # notarization requires a secure timestamp
+/usr/bin/codesign --force --sign "$IDENTITY" --options runtime $TIMESTAMP --entitlements Kapture.entitlements "$APP"
 /usr/bin/codesign --verify --strict --verbose=2 "$APP"
 /usr/bin/codesign -d --entitlements - "$APP"
 /usr/bin/codesign -d -r- "$APP" 2>&1 | grep designated
@@ -41,7 +41,8 @@ printf '\nBuilt: %s\n' "$APP"
 DEST="$HOME/Applications/Kapture SCR.app"
 LEGACY="$HOME/Applications/Kapture.app"   # same app, installed before the rename
 if pgrep -x Kapture >/dev/null; then
-    osascript -e 'tell application id "local.kapture.app" to quit' 2>/dev/null || true
+    BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" Info.plist)
+    osascript -e "tell application id \"$BUNDLE_ID\" to quit" 2>/dev/null || true
     for _ in 1 2 3 4 5; do pgrep -x Kapture >/dev/null || break; sleep 1; done
     pkill -x Kapture 2>/dev/null || true
 fi

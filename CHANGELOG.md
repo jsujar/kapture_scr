@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [1.3.0] – 2026-11-19
+
+Signed with Developer ID and notarized by Apple: it opens without warnings.
+
+### Changed
+- **Signed with Developer ID and notarized by Apple.** The disk image opens on any Mac without the *Open Anyway* step. `scripts/make-dmg.sh` notarizes and staples it when a Developer ID certificate is present.
+- **Bundle identifier `io.github.jsujar.kapture`** (it was `local.kapture.app`). macOS treats it as a new app: grant Screen Recording again, and choose the capture folder and your settings again once.
+
 ## [1.2.0] – 2026-11-19
 
 One shortcut for each kind of capture, including the full screen.

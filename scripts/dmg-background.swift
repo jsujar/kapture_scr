@@ -44,9 +44,7 @@ func render(scale: CGFloat) -> Data {
         NSAttributedString(string: s, attributes: attrs).draw(in: NSRect(x: 40, y: y, width: size.width - 80, height: points * 1.5))
     }
     text("Drag Kapture SCR to Applications", size: 14, weight: .semibold, color: NSColor(white: 0.22, alpha: 1), y: 92)
-    text("First launch: if macOS blocks it, open System Settings › Privacy & Security and click Open Anyway.",
-         size: 11, weight: .regular, color: NSColor(white: 0.45, alpha: 1), y: 52)
-    text("Then allow Screen Recording when asked.", size: 11, weight: .regular, color: NSColor(white: 0.45, alpha: 1), y: 36)
+    text("On first launch, allow Screen Recording when asked.", size: 11, weight: .regular, color: NSColor(white: 0.45, alpha: 1), y: 52)
 
     NSGraphicsContext.restoreGraphicsState()
     return rep.representation(using: .png, properties: [:])!

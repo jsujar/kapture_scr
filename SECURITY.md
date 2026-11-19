@@ -34,7 +34,6 @@ This is a small, independent project. Reports are read and acknowledged as soon 
 
 - Anything that needs an attacker who already controls your Mac or your user account.
 - macOS features outside the app's control: Handoff, Universal Clipboard, backups of your capture folder, or other apps you drag captures into.
-- The app not being notarized by Apple. This is known; see [Verify your copy](README.md#verify-your-copy) for how to check a download.
 
 ## How the promises are checked
 

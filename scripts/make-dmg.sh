@@ -2,20 +2,28 @@
 # Builds Kapture SCR and packs it into a drag-to-install disk image: dist/Kapture SCR <version>.dmg
 # Signed like build-local.sh (see scripts/signing-identity.sh). With a Developer ID certificate the disk
 # image is also notarized by Apple and the ticket stapled, so it opens on any Mac without warnings.
-# Notarization uses the notarytool keychain profile $KAPTURE_NOTARY_PROFILE (default "kapture-notary"),
-# created once with: xcrun notarytool store-credentials kapture-notary --apple-id <id> --team-id <team>
+# Notarization credentials, either:
+#   - an App Store Connect API key file (recommended; notarytool keychain profiles can vanish):
+#     KAPTURE_NOTARY_KEY=<path to AuthKey_XXXX.p8> KAPTURE_NOTARY_KEY_ID=<key id> KAPTURE_NOTARY_ISSUER=<issuer id>,
+#     which can also be set in ~/.config/kapture/notary.env (outside the repo);
+#   - or the notarytool keychain profile $KAPTURE_NOTARY_PROFILE (default "kapture-notary"), created with:
+#     xcrun notarytool store-credentials kapture-notary --apple-id <id> --team-id <team>
 # Without a Developer ID, the first launch on another Mac needs System Settings › Privacy & Security › Open Anyway.
 # Apple can take longer than the 30 minute wait, mostly on a new account. The submission keeps going; finish it
 # later, without rebuilding, with --finish <submission id>.
 # Usage: DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/make-dmg.sh [--finish <submission id>]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-NOTARY_PROFILE=${KAPTURE_NOTARY_PROFILE:-kapture-notary}
+[[ -f "$HOME/.config/kapture/notary.env" ]] && source "$HOME/.config/kapture/notary.env"
+if [[ -n "${KAPTURE_NOTARY_KEY:-}" ]]; then
+    NOTARY_AUTH=(--key "$KAPTURE_NOTARY_KEY" --key-id "${KAPTURE_NOTARY_KEY_ID:?set KAPTURE_NOTARY_KEY_ID}" --issuer "${KAPTURE_NOTARY_ISSUER:?set KAPTURE_NOTARY_ISSUER}")
+else
+    NOTARY_AUTH=(--keychain-profile "${KAPTURE_NOTARY_PROFILE:-kapture-notary}")
+fi
 source scripts/signing-identity.sh
 # Fail before the build, not after it, when a release cannot be notarized.
-if [[ "$IDENTITY_KIND" == developer-id ]] && ! xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1; then
-    echo "No notarytool profile \"$NOTARY_PROFILE\" in the keychain. Create it once with:"
-    echo "  xcrun notarytool store-credentials $NOTARY_PROFILE --apple-id <apple-id> --team-id <team-id>"
+if [[ "$IDENTITY_KIND" == developer-id ]] && ! xcrun notarytool history "${NOTARY_AUTH[@]}" >/dev/null 2>&1; then
+    echo "The notarization credentials do not work (${NOTARY_AUTH[*]}). See the top of this script."
     exit 1
 fi
 
@@ -43,8 +51,8 @@ finish() {
 # Waits for a submission. Returns 0 when accepted, 2 while Apple is still processing it, 1 when rejected.
 wait_notary() {
     local out; out=$(mktemp)
-    xcrun notarytool wait "$1" --keychain-profile "$NOTARY_PROFILE" --timeout 30m | tee "$out" || true
-    xcrun notarytool info "$1" --keychain-profile "$NOTARY_PROFILE" > "$out" 2>&1 || true
+    xcrun notarytool wait "$1" "${NOTARY_AUTH[@]}" --timeout 30m | tee "$out" || true
+    xcrun notarytool info "$1" "${NOTARY_AUTH[@]}" > "$out" 2>&1 || true
     if grep -q 'status: Accepted' "$out"; then rm -f "$out"; return 0; fi
     if grep -q 'status: In Progress' "$out"; then
         rm -f "$out"
@@ -54,7 +62,7 @@ wait_notary() {
         return 2
     fi
     cat "$out"; rm -f "$out"
-    xcrun notarytool log "$1" --keychain-profile "$NOTARY_PROFILE" || true
+    xcrun notarytool log "$1" "${NOTARY_AUTH[@]}" || true
     echo "Notarization failed"; return 1
 }
 
@@ -138,7 +146,7 @@ TIMESTAMP=--timestamp=none
 /usr/bin/codesign --force --sign "$IDENTITY" $TIMESTAMP "$DMG"
 if [[ "$IDENTITY_KIND" == developer-id ]]; then
     echo "Notarizing (usually a few minutes)…"
-    SUBMISSION=$(xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --no-wait | tee /dev/stderr | awk '/^  id: / && !n {print $2; n=1}')
+    SUBMISSION=$(xcrun notarytool submit "$DMG" "${NOTARY_AUTH[@]}" --no-wait | tee /dev/stderr | awk '/^  id: / && !n {print $2; n=1}')
     [[ -n "$SUBMISSION" ]] || { echo "Could not submit to the notary service"; exit 1; }
     wait_notary "$SUBMISSION" || exit $?
 fi

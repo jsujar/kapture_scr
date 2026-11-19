@@ -283,11 +283,15 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/make-dmg.sh
 
 **Window layout.** Arranging the window needs permission for Terminal to control Finder the first time (*System Settings › Privacy & Security › Automation*). Without it the image is still built, just without the layout.
 
-**Signing and notarization.** With a **Developer ID Application** certificate in your keychain, the app and the disk image are signed with it and the disk image is notarized by Apple and stapled, so it opens on any Mac without warnings. Store the notarization credentials once (an [app-specific password](https://support.apple.com/102654) works):
+**Signing and notarization.** With a **Developer ID Application** certificate in your keychain, the app and the disk image are signed with it and the disk image is notarized by Apple and stapled, so it opens on any Mac without warnings. For the notarization credentials, an App Store Connect API key (*Users and Access › Integrations › Team Keys*, role *Developer*) is the most reliable: keep the `.p8` file outside the repo and point to it in `~/.config/kapture/notary.env`:
 
 ```sh
-xcrun notarytool store-credentials kapture-notary --apple-id <apple-id> --team-id <team-id>
+KAPTURE_NOTARY_KEY="$HOME/.appstoreconnect/private_keys/AuthKey_<key-id>.p8"
+KAPTURE_NOTARY_KEY_ID=<key-id>
+KAPTURE_NOTARY_ISSUER=<issuer-id>
 ```
+
+A notarytool keychain profile also works (`xcrun notarytool store-credentials kapture-notary --apple-id <apple-id> --team-id <team-id>`, with an [app-specific password](https://support.apple.com/102654)), but such profiles sometimes vanish from the keychain.
 
 Without a Developer ID the image is signed with the local certificate, or ad hoc, and is not notarized: on another Mac, the first launch needs *System Settings › Privacy & Security › Open Anyway*. Set `KAPTURE_SIGN_IDENTITY` to choose a certificate yourself and `KAPTURE_NOTARY_PROFILE` to use another credentials profile.
 

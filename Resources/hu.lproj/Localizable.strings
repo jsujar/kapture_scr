@@ -4,9 +4,6 @@
 "Arrow" = "Nyíl";
 "Text" = "Szöveg";
 "Redact" = "Kitakarás";
-"Selection" = "Kijelölés";
-"Window" = "Ablak";
-"Full Screen" = "Teljes képernyő";
 "Clipboard" = "Vágólap";
 "Folder" = "Mappa";
 "Clipboard and Folder" = "Vágólap és mappa";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Nem sikerült a vágólapra másolni.";
 "Too large for the editor." = "Túl nagy a szerkesztőhöz.";
 "Take Screenshot" = "Képernyőfotó készítése";
-"Mode" = "Mód";
 "Save To" = "Mentés helye";
 "Folder: %@…" = "Mappa: %@…";
 "Choose Folder…" = "Mappa kiválasztása…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Frissítések keresése";
 "Check for Updates…" = "Frissítések keresése…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Kattints egy legutóbbi rögzítésre a megnyitásához. Körülvágás, nyíl, szöveg, kitakarás és kiemelés (⌘1–⌘5), legfeljebb öt visszavonási lépéssel. A Másolat mentése új fájlt hoz létre, és sosem módosítja az eredetit.";
-"Click any window to capture it, whatever mode is selected." = "Kattints bármelyik ablakra a rögzítéséhez, bármelyik mód is van kiválasztva.";
+"Click any window to capture it." = "Kattints bármelyik ablakra a rögzítéséhez.";
 "Commit" = "Commit";
 "Copied" = "Kimásolva";
 "Copy Commands" = "Parancsok másolása";
 "Copy Details" = "Részletek másolása";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Húzd végig a kívánt területen, vagy válaszd a menüben az Ablak vagy a Teljes képernyő lehetőséget. Húzás előtt nyomd meg a Szóközt időzítő választásához; az Esc megszakítja. A Beállítások › Rögzítési terület igazítása funkcióval rögzítés előtt áthelyezheted és átméretezheted a területet.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Húzd végig a kívánt területen. Húzás előtt nyomd meg a Szóközt időzítő választásához; az Esc megszakítja. A Beállítások › Rögzítési terület igazítása funkcióval rögzítés előtt áthelyezheted és átméretezheted a területet.";
 "Help" = "Súgó";
 "Kapture SCR Help" = "Kapture SCR súgó";
 "Network access" = "Hálózati hozzáférés";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Privát képernyőképek. Offline. Nincs hálózati hozzáférés.";
 "Signature" = "Aláírás";
 "Signed by" = "Aláíró";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Azonnal megismétli a legutóbbi rögzítést, időzítő nélkül: ugyanazt a területet, ugyanazt az ablakot akkor is, ha közben elmozdult vagy átméretezték, illetve a teljes képernyőt. Ha az ablakot bezárták, normál rögzítés indul.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Azonnal megismétli a legutóbbi rögzítést, időzítő nélkül: ugyanazt a területet, ugyanazt az ablakot akkor is, ha közben elmozdult vagy átméretezték, illetve ugyanazt a képernyőt. Ha az ablakot bezárták vagy a képernyőt leválasztották, új, azonos típusú rögzítés indul.";
 "Team" = "Csapat";
 "Valid: unchanged since it was signed" = "Érvényes: az aláírás óta változatlan";
 "Verify This Copy" = "Példány ellenőrzése";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Vonalzók megjelenítése";
 "Hide Rulers" = "Vonalzók elrejtése";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "A szerkesztő a rögzítés saját képpontjaiban mutat vonalzókat. Követik a nagyítást és jelölik a mutatót; alul látható a kép mérete és a mutató helyzete, húzáskor pedig a terület mérete. A ⌘R billentyűkkel jelenítheted meg vagy rejtheted el őket.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Teljes képernyő rögzítése";
+"Full Screen Shortcut" = "Teljes képernyő billentyűparancsa";
+"Change Full Screen Shortcut…" = "Teljes képernyő billentyűparancsának módosítása…";
+"Full screen shortcut: %@" = "Teljes képernyő billentyűparancsa: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Rögzíti azt a teljes képernyőt, amelyen a mutató van, az időzítő után, ha választottál egyet. Több képernyő esetén vidd a mutatót a kívántra.";
+"The area from the last capture is no longer on any display." = "A legutóbbi rögzítés területe már egyik képernyőn sincs rajta.";
+"The display from the last capture is no longer connected." = "A legutóbbi rögzítés képernyője már nincs csatlakoztatva.";

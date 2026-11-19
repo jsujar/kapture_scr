@@ -4,9 +4,6 @@
 "Arrow" = "Pfeil";
 "Text" = "Text";
 "Redact" = "Schwärzen";
-"Selection" = "Auswahl";
-"Window" = "Fenster";
-"Full Screen" = "Ganzer Bildschirm";
 "Clipboard" = "Zwischenablage";
 "Folder" = "Ordner";
 "Clipboard and Folder" = "Zwischenablage und Ordner";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Kopieren in die Zwischenablage nicht möglich.";
 "Too large for the editor." = "Zu groß für den Editor.";
 "Take Screenshot" = "Bildschirmfoto aufnehmen";
-"Mode" = "Modus";
 "Save To" = "Sichern in";
 "Folder: %@…" = "Ordner: %@ …";
 "Choose Folder…" = "Ordner auswählen …";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Nach Updates suchen";
 "Check for Updates…" = "Nach Updates suchen …";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Klicke auf eine letzte Aufnahme, um sie zu öffnen. Beschneiden, Pfeil, Text, Schwärzen und Hervorheben (⌘1 bis ⌘5), mit bis zu fünf Schritten zum Widerrufen. „Kopie sichern“ erstellt eine neue Datei und ändert nie das Original.";
-"Click any window to capture it, whatever mode is selected." = "Klicke auf ein beliebiges Fenster, um es aufzunehmen, unabhängig vom ausgewählten Modus.";
+"Click any window to capture it." = "Klicke auf ein beliebiges Fenster, um es aufzunehmen.";
 "Commit" = "Commit";
 "Copied" = "Kopiert";
 "Copy Commands" = "Befehle kopieren";
 "Copy Details" = "Details kopieren";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Ziehe über den gewünschten Bereich oder wähle „Fenster“ oder „Ganzer Bildschirm“ im Menü. Drücke vor dem Ziehen die Leertaste, um einen Timer auszuwählen; Esc bricht ab. Mit „Optionen“ › „Aufnahmebereich anpassen“ kannst du den Bereich vor der Aufnahme verschieben und seine Größe ändern.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Ziehe über den gewünschten Bereich. Drücke vor dem Ziehen die Leertaste, um einen Timer auszuwählen; Esc bricht ab. Mit „Optionen“ › „Aufnahmebereich anpassen“ kannst du den Bereich vor der Aufnahme verschieben und seine Größe ändern.";
 "Help" = "Hilfe";
 "Kapture SCR Help" = "Kapture SCR-Hilfe";
 "Network access" = "Netzwerkzugriff";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Private Bildschirmfotos. Offline. Kein Netzwerkzugriff.";
 "Signature" = "Signatur";
 "Signed by" = "Signiert von";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Wiederholt sofort die letzte Aufnahme, ohne Timer: derselbe Bereich, dasselbe Fenster, auch wenn es bewegt oder in der Größe verändert wurde, oder der ganze Bildschirm. Wurde das Fenster geschlossen, beginnt eine normale Aufnahme.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Wiederholt sofort die letzte Aufnahme, ohne Timer: derselbe Bereich, dasselbe Fenster, auch wenn es bewegt oder in der Größe verändert wurde, oder derselbe Bildschirm. Wurde das Fenster geschlossen oder der Bildschirm getrennt, beginnt eine neue Aufnahme derselben Art.";
 "Team" = "Team";
 "Valid: unchanged since it was signed" = "Gültig: seit dem Signieren unverändert";
 "Verify This Copy" = "Diese Kopie prüfen";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Lineale einblenden";
 "Hide Rulers" = "Lineale ausblenden";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Der Editor zeigt Lineale in den echten Pixeln der Aufnahme. Sie folgen dem Zoom und markieren den Zeiger; unten stehen die Bildgröße und die Zeigerposition, und beim Ziehen siehst du die Größe des Bereichs. Drücke ⌘R, um sie ein- oder auszublenden.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Ganzen Bildschirm aufnehmen";
+"Full Screen Shortcut" = "Kurzbefehl für ganzen Bildschirm";
+"Change Full Screen Shortcut…" = "Kurzbefehl für ganzen Bildschirm ändern …";
+"Full screen shortcut: %@" = "Kurzbefehl für ganzen Bildschirm: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Nimmt den ganzen Bildschirm auf, auf dem sich der Zeiger befindet, nach dem Timer, falls einer ausgewählt ist. Bei mehreren Bildschirmen bewege den Zeiger auf den gewünschten.";
+"The area from the last capture is no longer on any display." = "Der Bereich der letzten Aufnahme liegt auf keinem Bildschirm mehr.";
+"The display from the last capture is no longer connected." = "Der Bildschirm der letzten Aufnahme ist nicht mehr angeschlossen.";

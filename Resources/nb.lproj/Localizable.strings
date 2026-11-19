@@ -4,9 +4,6 @@
 "Arrow" = "Pil";
 "Text" = "Tekst";
 "Redact" = "Sladd";
-"Selection" = "Markering";
-"Window" = "Vindu";
-"Full Screen" = "Fullskjerm";
 "Clipboard" = "Utklippstavle";
 "Folder" = "Mappe";
 "Clipboard and Folder" = "Utklippstavle og mappe";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Kunne ikke kopiere til utklippstavlen.";
 "Too large for the editor." = "For stort for redigeringsvinduet.";
 "Take Screenshot" = "Ta skjermbilde";
-"Mode" = "Modus";
 "Save To" = "Lagre i";
 "Folder: %@…" = "Mappe: %@…";
 "Choose Folder…" = "Velg mappe…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Se etter oppdateringer";
 "Check for Updates…" = "Se etter oppdateringer…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Klikk på et nylig skjermbilde for å åpne det. Beskjær, pil, tekst, sladd og uthev (⌘1 til ⌘5), med opptil fem angretrinn. Lagre kopi skriver en ny fil og endrer aldri originalen.";
-"Click any window to capture it, whatever mode is selected." = "Klikk på et hvilket som helst vindu for å ta bilde av det, uansett hvilken modus som er valgt.";
+"Click any window to capture it." = "Klikk på et hvilket som helst vindu for å ta bilde av det.";
 "Commit" = "Commit";
 "Copied" = "Kopiert";
 "Copy Commands" = "Kopier kommandoer";
 "Copy Details" = "Kopier detaljer";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Dra over området du vil ha, eller velg Vindu eller Fullskjerm i menyen. Før du drar, trykker du på mellomromstasten for å velge en tidtaker; Esc avbryter. Med Valg › Juster området kan du flytte området og endre størrelsen før du tar bildet.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Dra over området du vil ha. Før du drar, trykker du på mellomromstasten for å velge en tidtaker; Esc avbryter. Med Valg › Juster området kan du flytte området og endre størrelsen før du tar bildet.";
 "Help" = "Hjelp";
 "Kapture SCR Help" = "Kapture SCR-hjelp";
 "Network access" = "Nettverkstilgang";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Private skjermbilder. Frakoblet. Ingen nettverkstilgang.";
 "Signature" = "Signatur";
 "Signed by" = "Signert av";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Tar det siste skjermbildet på nytt med en gang, uten tidtaker: det samme området, det samme vinduet selv om det er flyttet eller har endret størrelse, eller hele skjermen. Hvis vinduet er lukket, starter et vanlig skjermbilde.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Tar det siste skjermbildet på nytt med en gang, uten tidtaker: det samme området, det samme vinduet selv om det er flyttet eller har endret størrelse, eller den samme skjermen. Hvis vinduet er lukket eller skjermen er koblet fra, starter et nytt skjermbilde av samme type.";
 "Team" = "Team";
 "Valid: unchanged since it was signed" = "Gyldig: uendret siden signering";
 "Verify This Copy" = "Kontroller denne kopien";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Vis linjaler";
 "Hide Rulers" = "Skjul linjaler";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Redigeringsvinduet viser linjaler i skjermbildets egne piksler. De følger zoomen og markerer pekeren; bildestørrelsen og pekerens posisjon vises nederst, og når du drar, ser du størrelsen på området. Trykk ⌘R for å vise eller skjule dem.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Ta bilde av hele skjermen";
+"Full Screen Shortcut" = "Snarvei for hele skjermen";
+"Change Full Screen Shortcut…" = "Endre snarvei for hele skjermen…";
+"Full screen shortcut: %@" = "Snarvei for hele skjermen: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Tar bilde av hele skjermen pekeren er på, etter tidtakeren hvis du har valgt en. Med flere skjermer flytter du pekeren til den du vil ha.";
+"The area from the last capture is no longer on any display." = "Området fra det siste skjermbildet er ikke lenger på noen skjerm.";
+"The display from the last capture is no longer connected." = "Skjermen fra det siste skjermbildet er ikke lenger tilkoblet.";

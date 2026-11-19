@@ -76,11 +76,44 @@ final class RepeatCaptureTests: XCTestCase {
 
     func testRepeatShortcutDefault() {
         let s = ShortcutAction.repeatCapture.defaultShortcut
-        XCTAssertEqual(s.display, "⇧⌘8")
+        XCTAssertEqual(s.display, "⇧⌘9")
         XCTAssertTrue(s.isAllowed)
         XCTAssertFalse(s.isReserved)
         // ⌘⇧5 belongs to macOS's screenshot toolbar.
         XCTAssertTrue(Shortcut(keyCode: UInt32(kVK_ANSI_5), modifiers: UInt32(cmdKey | shiftKey), chars: "5").isReserved)
+    }
+}
+
+/// Full screen: its own shortcut, and the display under the pointer rather than always the main one.
+final class FullScreenCaptureTests: XCTestCase {
+    func testShortcutsInOrder() {
+        XCTAssertEqual(ShortcutAction.capture.defaultShortcut.display, "⇧⌘6")
+        XCTAssertEqual(ShortcutAction.captureWindow.defaultShortcut.display, "⇧⌘7")
+        XCTAssertEqual(ShortcutAction.captureScreen.defaultShortcut.display, "⇧⌘8")
+        XCTAssertEqual(ShortcutAction.repeatCapture.defaultShortcut.display, "⇧⌘9")
+        XCTAssertEqual(ShortcutAction.captureScreen.defaultsKey, "screenShortcut")
+    }
+
+    func testDisplayUnderThePointer() {
+        let main = NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let right = NSRect(x: 1440, y: -200, width: 2560, height: 1440)
+        XCTAssertEqual(ScreenCapturer.screenFrame(containing: NSPoint(x: 700, y: 400), in: [main, right]), main)
+        XCTAssertEqual(ScreenCapturer.screenFrame(containing: NSPoint(x: 2000, y: 1000), in: [main, right]), right)
+        XCTAssertNil(ScreenCapturer.screenFrame(containing: NSPoint(x: -50, y: 0), in: [main, right]))
+    }
+
+    func testSecondDisplayIsCapturedAsItsWholeArea() {
+        // A display to the right of a 1440×900 main one, 200 pt lower: -R uses the main display's top-left origin.
+        let main = NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let right = NSRect(x: 1440, y: -200, width: 2560, height: 1440)
+        let args = ScreenCapturer.arguments(format: .png, mode: .screen, region: right, windowID: nil, delay: 0,
+                                            showCursor: false, windowShadow: true, mainScreen: main)
+        XCTAssertEqual(args, ["-t", "png", "-R1440,-340,2560,1440"])
+    }
+
+    func testRepeatResultsTellWhatIsGone() {
+        XCTAssertNotEqual(RepeatResult.targetGone(.screen(1)), .targetGone(.window(1)))
+        XCTAssertEqual(RepeatResult.targetGone(.screen(2)), .targetGone(.screen(2)))
     }
 }
 

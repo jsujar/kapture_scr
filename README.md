@@ -51,22 +51,21 @@ The Kapture SCR icon appears in the menu bar. Press <kbd>⌘</kbd> <kbd>⇧</kbd
 
 ### Capture
 
-- **Three modes.**
-  - **Selection** uses Kapture SCR's own crosshair overlay.
-  - **Window** uses the system camera picker.
-  - **Full screen** captures the main display.
-- **Capture Window anytime.** <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>7</kbd> picks a window, whatever mode is selected.
-- **Repeat Last Capture.** <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd> takes the last capture again at once, with no timer.
+- **One shortcut for each kind of capture.**
+  - **An area** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>6</kbd>) with Kapture SCR's own crosshair overlay.
+  - **A window** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>7</kbd>) with the system camera picker.
+  - **The full screen** (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd>): the whole display the pointer is on, so with several displays you choose one by moving the pointer there.
+- **Repeat Last Capture.** <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>9</kbd> takes the last capture again at once, with no timer.
   - **An area:** the same place on screen.
-  - **A window:** the same window, even if it has moved or been resized. If it has closed, Kapture SCR says so and starts a normal capture.
-  - **Full screen:** the main display.
-  - With nothing to repeat yet, it starts a normal capture. The last target is kept in memory only.
+  - **A window:** the same window, even if it has moved or been resized.
+  - **Full screen:** the same display.
+  - If that window has closed or that display is disconnected, Kapture SCR says so and starts a new capture of the same kind. With nothing to repeat yet, it starts an area capture. The last target is kept in memory only.
 - **Destinations.** Save to the clipboard, a folder, or both. Pick the folder once and Kapture SCR remembers it.
 - **Options.**
   - Timer: none, 3, 5 or 15 s.
   - Format: PNG or JPG.
   - Show pointer and window shadow.
-- **Glass countdown.** Delayed Selection and Full screen captures show a countdown with a progress ring over the area being captured. It disappears before the shot is taken, and <kbd>Esc</kbd> cancels.
+- **Glass countdown.** Delayed area and full screen captures show a countdown with a progress ring over the area being captured. It disappears before the shot is taken, and <kbd>Esc</kbd> cancels.
 - **File handling.**
   - Names look like `Kapture SCR 2026-11-17 13.05.22.png` in every language and never overwrite an existing file.
   - The clipboard always gets lossless PNG; files use the format you chose.
@@ -158,7 +157,8 @@ File names stay the same in every language (`Kapture SCR 2026-11-17 13.05.22.png
 |---|---|
 | Take Screenshot | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>6</kbd> |
 | Capture Window | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>7</kbd> |
-| Repeat Last Capture | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd> |
+| Capture Full Screen | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>8</kbd> |
+| Repeat Last Capture | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>9</kbd> |
 | Import from Clipboard | <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>E</kbd> |
 | Timer options (while selecting) | <kbd>Space</kbd>, then <kbd>←</kbd> <kbd>→</kbd> |
 | Capture the adjusted area | <kbd>Return</kbd> |
@@ -257,7 +257,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
 - **Number.** Placement, size, font fallback, outline contrast, counting up or staying fixed, and drawing together with the watermark.
 - **Highlighter.** It tints white in the chosen colour, leaves black text black, follows the chosen width, and undo restores the image.
 - **About.** Version, commit, signature, sandbox and network facts, the checksum, the commands to verify a copy, and that the release page is a fixed address with no data attached.
-- **Repeat capture.** The `screencapture` arguments for an area (including displays above or left of the main one), a window and the full screen, and finding the window that was picked.
+- **Repeat capture.** The `screencapture` arguments for an area (including displays above or left of the main one), a window and a whole display (including one beside the main display), and finding the window that was picked and the display under the pointer.
 - **Edits and undo.** Redact, crop, arrow and text change exactly the expected pixels, and undo restores them exactly. Undo is limited to 5 steps and 64 MiB.
 - **Files.** Saving never overwrites an existing file, and file names are the same in every language.
 - **Shortcuts.** Combination rules, shortcuts reserved by macOS, symbol order and storage.

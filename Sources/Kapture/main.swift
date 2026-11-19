@@ -87,9 +87,9 @@ func smoothPath(_ points: [CGPoint]) -> CGPath {
 
 // MARK: - Preferences
 
+/// What a capture shortcut takes: an area, a window or a whole display. Each has its own shortcut.
 enum CaptureMode: String, CaseIterable {
     case selection, window, screen
-    var title: String { switch self { case .selection: L("Selection"); case .window: L("Window"); case .screen: L("Full Screen") } }
 }
 
 enum Destination: String, CaseIterable {
@@ -116,10 +116,6 @@ final class Settings {
     var language: String? {
         get { (domain.flatMap { d.persistentDomain(forName: $0) }?["AppleLanguages"] as? [String])?.first.map { appLanguage(for: [$0]) } }
         set { if let newValue { d.set([newValue], forKey: "AppleLanguages") } else { d.removeObject(forKey: "AppleLanguages") } }
-    }
-    var mode: CaptureMode {
-        get { CaptureMode(rawValue: d.string(forKey: "mode") ?? "") ?? .selection }
-        set { d.set(newValue.rawValue, forKey: "mode") }
     }
     var delay: Int {
         get { captureDelays.contains(d.integer(forKey: "delay")) ? d.integer(forKey: "delay") : 0 }
@@ -243,7 +239,8 @@ struct Shortcut: Codable, Equatable {
     static let defaultCapture = Shortcut(keyCode: UInt32(kVK_ANSI_6), modifiers: UInt32(cmdKey | shiftKey), chars: "6")
     static let defaultWindow = Shortcut(keyCode: UInt32(kVK_ANSI_7), modifiers: UInt32(cmdKey | shiftKey), chars: "7")
     static let importFromClipboard = Shortcut(keyCode: UInt32(kVK_ANSI_E), modifiers: UInt32(cmdKey | shiftKey), chars: "e")
-    static let defaultRepeat = Shortcut(keyCode: UInt32(kVK_ANSI_8), modifiers: UInt32(cmdKey | shiftKey), chars: "8")
+    static let defaultScreen = Shortcut(keyCode: UInt32(kVK_ANSI_8), modifiers: UInt32(cmdKey | shiftKey), chars: "8")
+    static let defaultRepeat = Shortcut(keyCode: UInt32(kVK_ANSI_9), modifiers: UInt32(cmdKey | shiftKey), chars: "9")
     /// Shortcuts macOS keeps for itself (screenshots, lock screen, force quit, emoji, full screen).
     private static let reserved: [(Int, Int)] = [
         (kVK_ANSI_3, cmdKey | shiftKey), (kVK_ANSI_4, cmdKey | shiftKey), (kVK_ANSI_5, cmdKey | shiftKey),
@@ -316,19 +313,24 @@ struct Shortcut: Codable, Equatable {
 
 /// Actions with a user-configurable global shortcut.
 enum ShortcutAction: CaseIterable {
-    case capture, captureWindow, repeatCapture, importClipboard
+    case capture, captureWindow, captureScreen, repeatCapture, importClipboard
     var defaultsKey: String {
         switch self {
-        case .capture: "captureShortcut"; case .captureWindow: "windowShortcut"; case .repeatCapture: "repeatShortcut"; case .importClipboard: "importShortcut"
+        case .capture: "captureShortcut"; case .captureWindow: "windowShortcut"; case .captureScreen: "screenShortcut"
+        case .repeatCapture: "repeatShortcut"; case .importClipboard: "importShortcut"
         }
     }
     var defaultShortcut: Shortcut {
-        switch self { case .capture: .defaultCapture; case .captureWindow: .defaultWindow; case .repeatCapture: .defaultRepeat; case .importClipboard: .importFromClipboard }
+        switch self {
+        case .capture: .defaultCapture; case .captureWindow: .defaultWindow; case .captureScreen: .defaultScreen
+        case .repeatCapture: .defaultRepeat; case .importClipboard: .importFromClipboard
+        }
     }
-    var hotKeyID: UInt32 { switch self { case .capture: 2; case .captureWindow: 3; case .repeatCapture: 4; case .importClipboard: 1 } }
+    var hotKeyID: UInt32 { switch self { case .capture: 2; case .captureWindow: 3; case .captureScreen: 5; case .repeatCapture: 4; case .importClipboard: 1 } }
     var recorderTitle: String {
         switch self {
-        case .capture: L("Capture Shortcut"); case .captureWindow: L("Window Shortcut"); case .repeatCapture: L("Repeat Shortcut"); case .importClipboard: L("Import Shortcut")
+        case .capture: L("Capture Shortcut"); case .captureWindow: L("Window Shortcut"); case .captureScreen: L("Full Screen Shortcut")
+        case .repeatCapture: L("Repeat Shortcut"); case .importClipboard: L("Import Shortcut")
         }
     }
 }
@@ -549,11 +551,13 @@ struct KeyCap: View {
 struct ShortcutHints: View {
     let capture: Shortcut
     let window: Shortcut
+    let screen: Shortcut
     let again: Shortcut
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
             row(capture, L("Take Screenshot"))
             row(window, L("Capture Window"))
+            row(screen, L("Capture Full Screen"))
             row(again, L("Repeat Last Capture"))
         }
     }
@@ -1165,11 +1169,11 @@ enum CaptureTarget: Equatable {
     case region(NSRect)
     /// A window, followed by its window number even after it moves or is resized.
     case window(CGWindowID)
-    /// The main display.
-    case screen
+    /// A whole display, by its display ID.
+    case screen(CGDirectDisplayID)
 }
 
-enum RepeatResult { case started, nothingToRepeat, targetGone }
+enum RepeatResult: Equatable { case started, nothingToRepeat, targetGone(CaptureTarget) }
 
 final class ScreenCapturer {
     private(set) var isCapturing = false
@@ -1192,7 +1196,9 @@ final class ScreenCapturer {
             previousApp = nil
             run(settings, mode: mode, region: nil, delay: settings.delay, completion: completion)
         case .screen:
-            countdownThenRun(settings, mode: mode, region: nil, around: NSScreen.screens.first?.frame ?? .zero, cancel: cancel, completion: completion)
+            // The display under the pointer, captured as its whole area.
+            let frame = Self.screenFrame(containing: NSEvent.mouseLocation, in: NSScreen.screens.map(\.frame)) ?? NSScreen.screens.first?.frame ?? .zero
+            countdownThenRun(settings, mode: mode, region: frame, around: frame, cancel: cancel, completion: completion)
         case .selection:
             let hud = CaptureHUDModel(delay: settings.delay)
             hud.onDelayChange = { settings.delay = $0 }
@@ -1219,8 +1225,11 @@ final class ScreenCapturer {
     /// which is still where the user clicked.
     private func target(mode: CaptureMode, region: NSRect?, windowID: CGWindowID?) -> CaptureTarget? {
         if let windowID { return .window(windowID) }
+        if mode == .screen, let region {
+            return NSScreen.screens.first(where: { $0.frame == region }).flatMap(\.displayID).map { .screen($0) } ?? .region(region)
+        }
         if let region { return .region(region) }
-        guard mode == .window else { return .screen }
+        guard mode == .window else { return nil }
         let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
         let height = NSScreen.screens.first?.frame.height ?? 0
         return Self.windowID(at: NSEvent.mouseLocation, in: windows, mainScreenHeight: height, excludingPID: ProcessInfo.processInfo.processIdentifier).map { .window($0) }
@@ -1229,19 +1238,26 @@ final class ScreenCapturer {
     /// Gives focus back so window order on screen is what the user saw before.
     private func restoreFocus() { previousApp?.activate(); previousApp = nil }
 
-    /// Takes the last capture again at once: the same area, the same window wherever it is now, or the main display.
+    /// The frame of the display that contains a point, in Cocoa global coordinates.
+    static func screenFrame(containing point: NSPoint, in frames: [NSRect]) -> NSRect? {
+        frames.first { NSMouseInRect(point, $0, false) }
+    }
+
+    /// Takes the last capture again at once: the same area, the same window wherever it is now, or the same display.
     func repeatLast(_ settings: Settings, completion: @escaping (URL?) -> Void) -> RepeatResult {
         guard !isCapturing, let last else { return .nothingToRepeat }
         let windows = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
         switch last {
         case .window(let id):
-            guard Self.windowExists(id, in: windows) else { self.last = nil; return .targetGone }
+            guard Self.windowExists(id, in: windows) else { self.last = nil; return .targetGone(last) }
             isCapturing = true; run(settings, mode: .window, region: nil, windowID: id, delay: 0, completion: completion)
         case .region(let rect):
-            guard NSScreen.screens.contains(where: { $0.frame.intersects(rect) }) else { self.last = nil; return .targetGone }
+            guard NSScreen.screens.contains(where: { $0.frame.intersects(rect) }) else { self.last = nil; return .targetGone(last) }
             isCapturing = true; run(settings, mode: .selection, region: rect, delay: 0, completion: completion)
-        case .screen:
-            isCapturing = true; run(settings, mode: .screen, region: nil, delay: 0, completion: completion)
+        case .screen(let id):
+            // The display's current frame, in case its resolution or arrangement changed.
+            guard let frame = NSScreen.screens.first(where: { $0.displayID == id })?.frame else { self.last = nil; return .targetGone(last) }
+            isCapturing = true; run(settings, mode: .screen, region: frame, delay: 0, completion: completion)
         }
         return .started
     }
@@ -1310,6 +1326,10 @@ final class ScreenCapturer {
     }
 }
 
+extension NSScreen {
+    var displayID: CGDirectDisplayID? { (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value }
+}
+
 // MARK: - Store
 
 final class CaptureStore: ObservableObject {
@@ -1318,6 +1338,7 @@ final class CaptureStore: ObservableObject {
     @Published var message: String
     @Published var captureShortcut: Shortcut
     @Published var windowShortcut: Shortcut
+    @Published var screenShortcut: Shortcut
     @Published var repeatShortcut: Shortcut
     @Published var autoImport = false
     @Published var highlightColor: RGB { didSet { settings.highlightColor = highlightColor } }
@@ -1373,6 +1394,7 @@ final class CaptureStore: ObservableObject {
         showRulers = settings.showRulers
         captureShortcut = settings.captureShortcut
         windowShortcut = settings.shortcut(for: .captureWindow)
+        screenShortcut = settings.shortcut(for: .captureScreen)
         repeatShortcut = settings.shortcut(for: .repeatCapture)
         let keys = settings.captureShortcut.display
         message = L("Press \(keys) or use the menu to take a screenshot.")
@@ -2180,11 +2202,14 @@ struct HelpView: View {
     private var topics: [Topic] {
         [
             Topic(id: L("Take Screenshot"), symbol: "viewfinder",
-                  text: L("Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing."),
+                  text: L("Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing."),
                   shortcut: store.captureShortcut),
-            Topic(id: L("Capture Window"), symbol: "macwindow", text: L("Click any window to capture it, whatever mode is selected."), shortcut: store.windowShortcut),
+            Topic(id: L("Capture Window"), symbol: "macwindow", text: L("Click any window to capture it."), shortcut: store.windowShortcut),
+            Topic(id: L("Capture Full Screen"), symbol: "display",
+                  text: L("Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want."),
+                  shortcut: store.screenShortcut),
             Topic(id: L("Repeat Last Capture"), symbol: "arrow.clockwise",
-                  text: L("Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts."),
+                  text: L("Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts."),
                   shortcut: store.repeatShortcut),
             Topic(id: L("Editor"), symbol: "pencil.tip.crop.circle",
                   text: L("Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original.")),
@@ -2802,7 +2827,7 @@ struct EditorView: View {
             BrandLogo(height: 84)
                 .padding(.bottom, 8)
             Text(L("No screenshots")).font(.system(size: 17, weight: .semibold))
-            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, again: store.repeatShortcut)
+            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, screen: store.screenShortcut, again: store.repeatShortcut)
                 .font(.system(size: 13))
             PillButton(title: L("Import from Clipboard"), symbol: "doc.on.clipboard") { store.importImage() }
                 .padding(.top, 6)
@@ -3021,7 +3046,7 @@ struct RecentPanelView: View {
     private var empty: some View {
         VStack(spacing: 10) {
             Text(L("No screenshots yet")).font(.system(size: 13, weight: .semibold))
-            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, again: store.repeatShortcut)
+            ShortcutHints(capture: store.captureShortcut, window: store.windowShortcut, screen: store.screenShortcut, again: store.repeatShortcut)
                 .font(.system(size: 12))
         }
         .frame(maxWidth: .infinity).frame(height: 132)
@@ -3157,6 +3182,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 switch hk.id {
                 case ShortcutAction.capture.hotKeyID: delegate.capture()
                 case ShortcutAction.captureWindow.hotKeyID: delegate.captureWindow()
+                case ShortcutAction.captureScreen.hotKeyID: delegate.captureScreen()
                 case ShortcutAction.repeatCapture.hotKeyID: delegate.repeatCapture()
                 case ShortcutAction.importClipboard.hotKeyID: delegate.importCapture()
                 default: break
@@ -3181,6 +3207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc func changeShortcut() { recordShortcut(for: .capture) }
     @objc func changeWindowShortcut() { recordShortcut(for: .captureWindow) }
+    @objc func changeScreenShortcut() { recordShortcut(for: .captureScreen) }
     @objc func changeImportShortcut() { recordShortcut(for: .importClipboard) }
     @objc func changeRepeatShortcut() { recordShortcut(for: .repeatCapture) }
 
@@ -3210,6 +3237,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         switch action {
         case .capture: store.captureShortcut = shortcut; store.message = L("Capture shortcut: \(keys)")
         case .captureWindow: store.windowShortcut = shortcut; store.message = L("Window shortcut: \(keys)")
+        case .captureScreen: store.screenShortcut = shortcut; store.message = L("Full screen shortcut: \(keys)")
         case .importClipboard: store.message = L("Import shortcut: \(keys)")
         case .repeatCapture: store.repeatShortcut = shortcut; store.message = L("Repeat shortcut: \(keys)")
         }
@@ -3218,9 +3246,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Capture flow
 
-    @objc func capture() { startCapture(mode: nil) }
-    /// Captures a whole window with the system picker, whatever mode is selected in the menu.
+    /// Drag over an area.
+    @objc func capture() { startCapture(mode: .selection) }
+    /// Captures a whole window with the system picker.
     @objc func captureWindow() { startCapture(mode: .window) }
+    /// Captures the whole display under the pointer.
+    @objc func captureScreen() { startCapture(mode: .screen) }
 
     /// Screen Recording permission and, when saving to a folder, a chosen folder. False when the capture can't start.
     private func readyToCapture() -> Bool {
@@ -3238,8 +3269,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return true
     }
 
-    /// Takes the last area, window or screen again. With nothing to repeat, or when that window has closed or that
-    /// area is off every display, it starts a normal capture instead (the window picker for a window).
+    /// Takes the last area, window or display again. With nothing to repeat it starts an area capture; when that window
+    /// has closed, or that area or display is gone, it starts a new capture of the same kind.
     @objc func repeatCapture() {
         guard readyToCapture() else { return }
         let result = capturer.repeatLast(settings) { [weak self] url in
@@ -3248,14 +3279,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         switch result {
         case .started: break
-        case .nothingToRepeat: startCapture(mode: nil)
-        case .targetGone: store.message = L("The window from the last capture is no longer open."); startCapture(mode: nil)
+        case .nothingToRepeat: startCapture(mode: .selection)
+        case .targetGone(.window):
+            store.message = L("The window from the last capture is no longer open."); startCapture(mode: .window)
+        case .targetGone(.screen):
+            store.message = L("The display from the last capture is no longer connected."); startCapture(mode: .screen)
+        case .targetGone(.region):
+            store.message = L("The area from the last capture is no longer on any display."); startCapture(mode: .selection)
         }
     }
 
-    func startCapture(mode: CaptureMode?) {
+    func startCapture(mode: CaptureMode) {
         guard readyToCapture() else { return }
-        capturer.capture(settings, mode: mode ?? settings.mode) { [weak self] url in
+        capturer.capture(settings, mode: mode) { [weak self] url in
             guard let self, let url else { return } // Esc or failure: nothing to do
             self.finishCapture(url)
         }
@@ -3358,12 +3394,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let windowShortcut = settings.shortcut(for: .captureWindow)
         let win = item(L("Capture Window"), #selector(captureWindow), key: windowShortcut.chars); win.keyEquivalentModifierMask = windowShortcut.menuFlags
         menu.addItem(win)
+        let screenShortcut = settings.shortcut(for: .captureScreen)
+        let full = item(L("Capture Full Screen"), #selector(captureScreen), key: screenShortcut.chars); full.keyEquivalentModifierMask = screenShortcut.menuFlags
+        menu.addItem(full)
         let repeatShortcut = settings.shortcut(for: .repeatCapture)
         let again = item(L("Repeat Last Capture"), #selector(repeatCapture), key: repeatShortcut.chars); again.keyEquivalentModifierMask = repeatShortcut.menuFlags
         menu.addItem(again)
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem.sectionHeader(title: L("Mode")))
-        for (n, m) in CaptureMode.allCases.enumerated() { menu.addItem(item(m.title, #selector(setMode(_:)), tag: n, on: settings.mode == m)) }
         menu.addItem(NSMenuItem.sectionHeader(title: L("Save To")))
         for (n, d) in Destination.allCases.enumerated() { menu.addItem(item(d.title, #selector(setDestination(_:)), tag: n, on: settings.destination == d)) }
         let folderTitle = settings.folder.map { L("Folder: \($0.lastPathComponent)…") } ?? L("Choose Folder…")
@@ -3381,6 +3418,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         options.addItem(.separator())
         options.addItem(item(L("Change Capture Shortcut…"), #selector(changeShortcut)))
         options.addItem(item(L("Change Window Shortcut…"), #selector(changeWindowShortcut)))
+        options.addItem(item(L("Change Full Screen Shortcut…"), #selector(changeScreenShortcut)))
         options.addItem(item(L("Change Repeat Shortcut…"), #selector(changeRepeatShortcut)))
         options.addItem(item(L("Change Import Shortcut…"), #selector(changeImportShortcut)))
         options.addItem(.separator())
@@ -3421,7 +3459,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(item(L("Quit"), #selector(quit)))
     }
 
-    @objc func setMode(_ sender: NSMenuItem) { settings.mode = CaptureMode.allCases[sender.tag] }
     @objc func setDestination(_ sender: NSMenuItem) {
         settings.destination = Destination.allCases[sender.tag]
         if settings.destination.usesFolder && settings.folder == nil { chooseFolder() }

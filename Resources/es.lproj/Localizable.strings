@@ -4,9 +4,6 @@
 "Arrow" = "Flecha";
 "Text" = "Texto";
 "Redact" = "Censurar";
-"Selection" = "Selección";
-"Window" = "Ventana";
-"Full Screen" = "Pantalla completa";
 "Clipboard" = "Portapapeles";
 "Folder" = "Carpeta";
 "Clipboard and Folder" = "Portapapeles y carpeta";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "No se ha podido copiar al portapapeles.";
 "Too large for the editor." = "Demasiado grande para el editor.";
 "Take Screenshot" = "Capturar";
-"Mode" = "Modo";
 "Save To" = "Guardar en";
 "Folder: %@…" = "Carpeta: %@…";
 "Choose Folder…" = "Elegir carpeta…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Buscar actualizaciones";
 "Check for Updates…" = "Buscar actualizaciones…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Haz clic en una captura reciente para abrirla. Recortar, flecha, texto, censurar y resaltar (⌘1 a ⌘5), con hasta cinco pasos para deshacer. «Guardar copia» crea un archivo nuevo y nunca cambia el original.";
-"Click any window to capture it, whatever mode is selected." = "Haz clic en cualquier ventana para capturarla, sea cual sea el modo elegido.";
+"Click any window to capture it." = "Haz clic en cualquier ventana para capturarla.";
 "Commit" = "Commit";
 "Copied" = "Copiado";
 "Copy Commands" = "Copiar comandos";
 "Copy Details" = "Copiar detalles";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Arrastra sobre la zona que quieras o elige Ventana o Pantalla completa en el menú. Antes de arrastrar, pulsa Espacio para elegir un temporizador; Esc cancela. Con Opciones › Ajustar área de captura puedes mover y redimensionar la zona antes de capturar.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Arrastra sobre la zona que quieras. Antes de arrastrar, pulsa Espacio para elegir un temporizador; Esc cancela. Con Opciones › Ajustar área de captura puedes mover y redimensionar la zona antes de capturar.";
 "Help" = "Ayuda";
 "Kapture SCR Help" = "Ayuda de Kapture SCR";
 "Network access" = "Acceso a la red";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Capturas privadas. Sin conexión. Sin acceso a la red.";
 "Signature" = "Firma";
 "Signed by" = "Firmada por";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Repite al instante la última captura, sin temporizador: la misma zona, la misma ventana aunque se haya movido o cambiado de tamaño, o la pantalla completa. Si esa ventana se ha cerrado, empieza una captura normal.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Repite al instante la última captura, sin temporizador: la misma zona, la misma ventana aunque se haya movido o cambiado de tamaño, o la misma pantalla. Si esa ventana se ha cerrado o esa pantalla se ha desconectado, empieza una captura nueva del mismo tipo.";
 "Team" = "Equipo";
 "Valid: unchanged since it was signed" = "Válida: sin cambios desde que se firmó";
 "Verify This Copy" = "Verifica esta copia";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Mostrar reglas";
 "Hide Rulers" = "Ocultar reglas";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "El editor muestra reglas en los píxeles reales de la captura. Siguen el zoom y marcan el puntero; abajo aparecen el tamaño de la imagen y la posición del puntero, y al arrastrar se ve el tamaño de la zona. Pulsa ⌘R para mostrarlas u ocultarlas.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Capturar pantalla completa";
+"Full Screen Shortcut" = "Atajo de pantalla completa";
+"Change Full Screen Shortcut…" = "Cambiar atajo de pantalla completa…";
+"Full screen shortcut: %@" = "Atajo de pantalla completa: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Captura la pantalla entera en la que está el puntero, después del temporizador si has elegido uno. Con varias pantallas, lleva el puntero a la que quieras.";
+"The area from the last capture is no longer on any display." = "La zona de la última captura ya no está en ninguna pantalla.";
+"The display from the last capture is no longer connected." = "La pantalla de la última captura ya no está conectada.";

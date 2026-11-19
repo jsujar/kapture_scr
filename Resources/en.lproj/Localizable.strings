@@ -4,9 +4,6 @@
 "Arrow" = "Arrow";
 "Text" = "Text";
 "Redact" = "Redact";
-"Selection" = "Selection";
-"Window" = "Window";
-"Full Screen" = "Full Screen";
 "Clipboard" = "Clipboard";
 "Folder" = "Folder";
 "Clipboard and Folder" = "Clipboard and Folder";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Couldn’t copy to the clipboard.";
 "Too large for the editor." = "Too large for the editor.";
 "Take Screenshot" = "Take Screenshot";
-"Mode" = "Mode";
 "Save To" = "Save To";
 "Folder: %@…" = "Folder: %@…";
 "Choose Folder…" = "Choose Folder…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Check for Updates";
 "Check for Updates…" = "Check for Updates…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original.";
-"Click any window to capture it, whatever mode is selected." = "Click any window to capture it, whatever mode is selected.";
+"Click any window to capture it." = "Click any window to capture it.";
 "Commit" = "Commit";
 "Copied" = "Copied";
 "Copy Commands" = "Copy Commands";
 "Copy Details" = "Copy Details";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing.";
 "Help" = "Help";
 "Kapture SCR Help" = "Kapture SCR Help";
 "Network access" = "Network access";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Private screenshots. Offline. No network access.";
 "Signature" = "Signature";
 "Signed by" = "Signed by";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts.";
 "Team" = "Team";
 "Valid: unchanged since it was signed" = "Valid: unchanged since it was signed";
 "Verify This Copy" = "Verify This Copy";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Show Rulers";
 "Hide Rulers" = "Hide Rulers";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Capture Full Screen";
+"Full Screen Shortcut" = "Full Screen Shortcut";
+"Change Full Screen Shortcut…" = "Change Full Screen Shortcut…";
+"Full screen shortcut: %@" = "Full screen shortcut: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want.";
+"The area from the last capture is no longer on any display." = "The area from the last capture is no longer on any display.";
+"The display from the last capture is no longer connected." = "The display from the last capture is no longer connected.";

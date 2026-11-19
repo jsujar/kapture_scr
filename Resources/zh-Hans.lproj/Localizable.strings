@@ -4,9 +4,6 @@
 "Arrow" = "箭头";
 "Text" = "文本";
 "Redact" = "遮盖";
-"Selection" = "所选区域";
-"Window" = "窗口";
-"Full Screen" = "全屏幕";
 "Clipboard" = "剪贴板";
 "Folder" = "文件夹";
 "Clipboard and Folder" = "剪贴板和文件夹";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "无法拷贝到剪贴板。";
 "Too large for the editor." = "太大，无法在编辑器中打开。";
 "Take Screenshot" = "截屏";
-"Mode" = "模式";
 "Save To" = "存储到";
 "Folder: %@…" = "文件夹：%@…";
 "Choose Folder…" = "选取文件夹…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "检查更新";
 "Check for Updates…" = "检查更新…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "点按最近的截屏即可打开。裁剪、箭头、文本、遮盖和高亮（⌘1 至 ⌘5），最多可撤销五步。“存储副本”会写入新文件，绝不更改原件。";
-"Click any window to capture it, whatever mode is selected." = "无论选择了哪种模式，点按任意窗口即可截取。";
+"Click any window to capture it." = "点按任意窗口即可截取。";
 "Commit" = "Commit";
 "Copied" = "已拷贝";
 "Copy Commands" = "拷贝命令";
 "Copy Details" = "拷贝详细信息";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "在所需区域上拖移，或在菜单中选取“窗口”或“全屏幕”。拖移前按空格键可选取定时器；按 Esc 键取消。使用“选项”›“调整截图区域”，可以在截屏前移动区域并调整其大小。";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "在所需区域上拖移。拖移前按空格键可选取定时器；按 Esc 键取消。使用“选项”›“调整截图区域”，可以在截屏前移动区域并调整其大小。";
 "Help" = "帮助";
 "Kapture SCR Help" = "Kapture SCR 帮助";
 "Network access" = "网络访问";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "私密截屏。离线。无网络访问。";
 "Signature" = "签名";
 "Signed by" = "签名者";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "立即重复上次截屏，不使用定时器：相同的区域、相同的窗口（即使已移动或调整大小）或全屏幕。如果该窗口已关闭，则开始普通截屏。";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "立即重复上次截屏，不使用定时器：相同的区域、相同的窗口（即使已移动或调整大小）或相同的显示器。如果该窗口已关闭或该显示器已断开连接，则开始同类型的新截屏。";
 "Team" = "团队";
 "Valid: unchanged since it was signed" = "有效：签名后未更改";
 "Verify This Copy" = "验证此副本";
@@ -240,3 +236,12 @@
 "Show Rulers" = "显示标尺";
 "Hide Rulers" = "隐藏标尺";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "编辑器以截图的实际像素显示标尺。标尺跟随缩放并标出指针位置；图像尺寸和指针坐标显示在底部，拖移时会显示区域大小。按下 ⌘R 可显示或隐藏标尺。";
+
+/* Full screen capture */
+"Capture Full Screen" = "截取全屏幕";
+"Full Screen Shortcut" = "全屏幕快捷键";
+"Change Full Screen Shortcut…" = "更改全屏幕快捷键…";
+"Full screen shortcut: %@" = "全屏幕快捷键：%@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "截取指针所在的整个显示器；如果选取了定时器，则在倒计时后截取。有多个显示器时，将指针移到所需的显示器上。";
+"The area from the last capture is no longer on any display." = "上次截屏的区域已不在任何显示器上。";
+"The display from the last capture is no longer connected." = "上次截屏的显示器已不再连接。";

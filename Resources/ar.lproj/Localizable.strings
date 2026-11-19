@@ -4,9 +4,6 @@
 "Arrow" = "سهم";
 "Text" = "نص";
 "Redact" = "حجب";
-"Selection" = "تحديد";
-"Window" = "نافذة";
-"Full Screen" = "ملء الشاشة";
 "Clipboard" = "الحافظة";
 "Folder" = "مجلد";
 "Clipboard and Folder" = "الحافظة والمجلد";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "تعذر النسخ إلى الحافظة.";
 "Too large for the editor." = "كبيرة جدًا على المحرر.";
 "Take Screenshot" = "التقاط الشاشة";
-"Mode" = "الوضع";
 "Save To" = "الحفظ في";
 "Folder: %@…" = "المجلد: %@…";
 "Choose Folder…" = "اختيار مجلد…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "التحقق من وجود تحديثات";
 "Check for Updates…" = "التحقق من وجود تحديثات…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "انقر على لقطة حديثة لفتحها. قص وسهم ونص وحجب وتمييز (⌘1 إلى ⌘5)، مع إمكانية التراجع حتى خمس خطوات. يكتب «حفظ نسخة» ملفًا جديدًا ولا يغيّر الأصل أبدًا.";
-"Click any window to capture it, whatever mode is selected." = "انقر على أي نافذة لالتقاطها، أيًّا كان الوضع المحدد.";
+"Click any window to capture it." = "انقر على أي نافذة لالتقاطها.";
 "Commit" = "Commit";
 "Copied" = "تم النسخ";
 "Copy Commands" = "نسخ الأوامر";
 "Copy Details" = "نسخ التفاصيل";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "اسحب فوق المنطقة التي تريدها، أو اختر نافذة أو ملء الشاشة من القائمة. قبل السحب، اضغط على مسافة لاختيار مؤقت؛ Esc للإلغاء. باستخدام خيارات › تعديل منطقة الالتقاط، يمكنك تحريك المنطقة وتغيير حجمها قبل الالتقاط.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "اسحب فوق المنطقة التي تريدها. قبل السحب، اضغط على مسافة لاختيار مؤقت؛ Esc للإلغاء. باستخدام خيارات › تعديل منطقة الالتقاط، يمكنك تحريك المنطقة وتغيير حجمها قبل الالتقاط.";
 "Help" = "مساعدة";
 "Kapture SCR Help" = "مساعدة Kapture SCR";
 "Network access" = "الوصول إلى الشبكة";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "لقطات شاشة خاصة. دون اتصال. بلا وصول إلى الشبكة.";
 "Signature" = "التوقيع";
 "Signed by" = "موقّع بواسطة";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "يعيد آخر التقاط فورًا دون مؤقت: المنطقة نفسها، أو النافذة نفسها حتى لو نُقلت أو تغيّر حجمها، أو ملء الشاشة. إذا أُغلقت تلك النافذة، يبدأ التقاط عادي.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "يعيد آخر التقاط فورًا دون مؤقت: المنطقة نفسها، أو النافذة نفسها حتى لو نُقلت أو تغيّر حجمها، أو الشاشة نفسها. إذا أُغلقت تلك النافذة أو فُصلت تلك الشاشة، يبدأ التقاط جديد من النوع نفسه.";
 "Team" = "الفريق";
 "Valid: unchanged since it was signed" = "صالح: لم يتغيّر منذ توقيعه";
 "Verify This Copy" = "التحقق من هذه النسخة";
@@ -240,3 +236,12 @@
 "Show Rulers" = "إظهار المساطر";
 "Hide Rulers" = "إخفاء المساطر";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "يعرض المحرر مساطر بوحدات البكسل الفعلية للقطة. تتبع المساطر التكبير وتحدد موضع المؤشر؛ ويظهر حجم الصورة وموضع المؤشر في الأسفل، وعند السحب يظهر حجم المنطقة. اضغط ⌘R لإظهارها أو إخفائها.";
+
+/* Full screen capture */
+"Capture Full Screen" = "التقاط ملء الشاشة";
+"Full Screen Shortcut" = "اختصار ملء الشاشة";
+"Change Full Screen Shortcut…" = "تغيير اختصار ملء الشاشة…";
+"Full screen shortcut: %@" = "اختصار ملء الشاشة: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "يلتقط الشاشة كاملة التي يوجد عليها المؤشر، بعد المؤقت إذا اخترت واحدًا. إذا كان لديك أكثر من شاشة، فحرّك المؤشر إلى الشاشة التي تريدها.";
+"The area from the last capture is no longer on any display." = "لم تعد منطقة آخر التقاط على أي شاشة.";
+"The display from the last capture is no longer connected." = "لم تعد شاشة آخر التقاط متصلة.";

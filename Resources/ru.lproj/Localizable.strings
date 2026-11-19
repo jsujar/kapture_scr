@@ -4,9 +4,6 @@
 "Arrow" = "Стрелка";
 "Text" = "Текст";
 "Redact" = "Закрасить";
-"Selection" = "Выделение";
-"Window" = "Окно";
-"Full Screen" = "Весь экран";
 "Clipboard" = "Буфер обмена";
 "Folder" = "Папка";
 "Clipboard and Folder" = "Буфер обмена и папка";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Не удалось скопировать в буфер обмена.";
 "Too large for the editor." = "Слишком большой для редактора.";
 "Take Screenshot" = "Сделать снимок";
-"Mode" = "Режим";
 "Save To" = "Сохранять в";
 "Folder: %@…" = "Папка: %@…";
 "Choose Folder…" = "Выбрать папку…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Проверить обновления";
 "Check for Updates…" = "Проверить обновления…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Нажмите на недавний снимок, чтобы открыть его. Обрезка, стрелка, текст, закрашивание и маркер (⌘1–⌘5), до пяти шагов отмены. «Сохранить копию» создает новый файл и никогда не изменяет оригинал.";
-"Click any window to capture it, whatever mode is selected." = "Нажмите на любое окно, чтобы сделать его снимок, независимо от выбранного режима.";
+"Click any window to capture it." = "Нажмите на любое окно, чтобы сделать его снимок.";
 "Commit" = "Commit";
 "Copied" = "Скопировано";
 "Copy Commands" = "Скопировать команды";
 "Copy Details" = "Скопировать сведения";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Выделите нужную область или выберите в меню «Окно» или «Весь экран». Перед выделением нажмите пробел, чтобы выбрать таймер; Esc отменяет. С параметром «Параметры» › «Изменять область снимка» можно переместить область и изменить ее размер перед снимком.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Выделите нужную область. Перед выделением нажмите пробел, чтобы выбрать таймер; Esc отменяет. С параметром «Параметры» › «Изменять область снимка» можно переместить область и изменить ее размер перед снимком.";
 "Help" = "Справка";
 "Kapture SCR Help" = "Справка Kapture SCR";
 "Network access" = "Доступ к сети";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Приватные снимки экрана. Офлайн. Без доступа к сети.";
 "Signature" = "Подпись";
 "Signed by" = "Подписано";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Сразу повторяет последний снимок без таймера: ту же область, то же окно, даже если его переместили или изменили его размер, или весь экран. Если это окно закрыто, начинается обычный снимок.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Сразу повторяет последний снимок без таймера: ту же область, то же окно, даже если его переместили или изменили его размер, или тот же экран. Если это окно закрыто или экран отключен, начинается новый снимок того же типа.";
 "Team" = "Команда";
 "Valid: unchanged since it was signed" = "Действительна: не изменялась после подписания";
 "Verify This Copy" = "Проверить эту копию";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Показать линейки";
 "Hide Rulers" = "Скрыть линейки";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Редактор показывает линейки в настоящих пикселях снимка. Они следуют за масштабом и отмечают указатель; внизу показаны размер изображения и положение указателя, а при перетаскивании — размер области. Нажмите ⌘R, чтобы показать или скрыть их.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Снимок всего экрана";
+"Full Screen Shortcut" = "Сочетание для снимка экрана";
+"Change Full Screen Shortcut…" = "Изменить сочетание для всего экрана…";
+"Full screen shortcut: %@" = "Сочетание для всего экрана: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Снимает весь экран, на котором находится указатель, после таймера, если он выбран. Если экранов несколько, наведите указатель на нужный.";
+"The area from the last capture is no longer on any display." = "Области из последнего снимка больше нет ни на одном экране.";
+"The display from the last capture is no longer connected." = "Экран из последнего снимка больше не подключен.";

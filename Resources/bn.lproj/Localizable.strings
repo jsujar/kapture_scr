@@ -4,9 +4,6 @@
 "Arrow" = "তীর";
 "Text" = "টেক্সট";
 "Redact" = "ঢেকে দিন";
-"Selection" = "নির্বাচন";
-"Window" = "উইন্ডো";
-"Full Screen" = "পূর্ণ স্ক্রিন";
 "Clipboard" = "ক্লিপবোর্ড";
 "Folder" = "ফোল্ডার";
 "Clipboard and Folder" = "ক্লিপবোর্ড ও ফোল্ডার";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "ক্লিপবোর্ডে কপি করা যায়নি।";
 "Too large for the editor." = "এডিটরের জন্য খুব বড়।";
 "Take Screenshot" = "স্ক্রিনশট নিন";
-"Mode" = "মোড";
 "Save To" = "যেখানে সংরক্ষণ";
 "Folder: %@…" = "ফোল্ডার: %@…";
 "Choose Folder…" = "ফোল্ডার বেছে নিন…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "আপডেট খুঁজুন";
 "Check for Updates…" = "আপডেট খুঁজুন…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "সাম্প্রতিক কোনো ক্যাপচার খুলতে সেটিতে ক্লিক করুন। ক্রপ, তীর, টেক্সট, ঢেকে দেওয়া ও হাইলাইটার (⌘1 থেকে ⌘5), পাঁচ ধাপ পর্যন্ত পূর্বাবস্থায় ফেরানোর সুবিধাসহ। “কপি সংরক্ষণ করুন” নতুন ফাইল তৈরি করে এবং মূলটি কখনো বদলায় না।";
-"Click any window to capture it, whatever mode is selected." = "যে মোডই বেছে নেওয়া থাকুক, কোনো উইন্ডো ক্যাপচার করতে সেটিতে ক্লিক করুন।";
+"Click any window to capture it." = "কোনো উইন্ডো ক্যাপচার করতে সেটিতে ক্লিক করুন।";
 "Commit" = "Commit";
 "Copied" = "কপি হয়েছে";
 "Copy Commands" = "কমান্ড কপি করুন";
 "Copy Details" = "বিবরণ কপি করুন";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "যে এলাকা চান তার ওপর টেনে নিন, অথবা মেনুতে উইন্ডো বা পূর্ণ স্ক্রিন বেছে নিন। টানার আগে টাইমার বেছে নিতে স্পেস চাপুন; Esc বাতিল করে। বিকল্প › ক্যাপচার এলাকা বদলান দিয়ে ক্যাপচারের আগে এলাকাটি সরাতে ও এর আকার বদলাতে পারবেন।";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "যে এলাকা চান তার ওপর টেনে নিন। টানার আগে টাইমার বেছে নিতে স্পেস চাপুন; Esc বাতিল করে। বিকল্প › ক্যাপচার এলাকা বদলান দিয়ে ক্যাপচারের আগে এলাকাটি সরাতে ও এর আকার বদলাতে পারবেন।";
 "Help" = "সহায়তা";
 "Kapture SCR Help" = "Kapture SCR সহায়তা";
 "Network access" = "নেটওয়ার্ক অ্যাক্সেস";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "ব্যক্তিগত স্ক্রিনশট। অফলাইন। কোনো নেটওয়ার্ক অ্যাক্সেস নেই।";
 "Signature" = "স্বাক্ষর";
 "Signed by" = "স্বাক্ষরকারী";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "টাইমার ছাড়াই শেষ ক্যাপচারটি সঙ্গে সঙ্গে আবার নেয়: একই এলাকা, একই উইন্ডো, সেটি সরানো বা আকার বদলানো হলেও, অথবা পূর্ণ স্ক্রিন। সেই উইন্ডো বন্ধ হয়ে গেলে একটি সাধারণ ক্যাপচার শুরু হয়।";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "টাইমার ছাড়াই শেষ ক্যাপচারটি সঙ্গে সঙ্গে আবার নেয়: একই এলাকা, একই উইন্ডো, সেটি সরানো বা আকার বদলানো হলেও, অথবা একই ডিসপ্লে। সেই উইন্ডো বন্ধ হয়ে গেলে বা সেই ডিসপ্লে বিচ্ছিন্ন হলে একই ধরনের নতুন ক্যাপচার শুরু হয়।";
 "Team" = "টিম";
 "Valid: unchanged since it was signed" = "বৈধ: স্বাক্ষরের পর থেকে অপরিবর্তিত";
 "Verify This Copy" = "এই কপি যাচাই করুন";
@@ -240,3 +236,12 @@
 "Show Rulers" = "রুলার দেখান";
 "Hide Rulers" = "রুলার লুকান";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "এডিটর ক্যাপচারের আসল পিক্সেলে রুলার দেখায়। এগুলো জুমের সাথে চলে এবং পয়েন্টার চিহ্নিত করে; ছবির আকার ও পয়েন্টারের অবস্থান নিচে দেখা যায়, আর টেনে নিলে জায়গার আকার দেখা যায়। দেখাতে বা লুকাতে ⌘R চাপুন।";
+
+/* Full screen capture */
+"Capture Full Screen" = "পূর্ণ স্ক্রিন ক্যাপচার করুন";
+"Full Screen Shortcut" = "পূর্ণ স্ক্রিন শর্টকাট";
+"Change Full Screen Shortcut…" = "পূর্ণ স্ক্রিন শর্টকাট বদলান…";
+"Full screen shortcut: %@" = "পূর্ণ স্ক্রিন শর্টকাট: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "পয়েন্টার যে ডিসপ্লেতে আছে তার পুরো স্ক্রিন ক্যাপচার করে, টাইমার বেছে নেওয়া থাকলে তার পরে। একাধিক ডিসপ্লে থাকলে পয়েন্টারটি পছন্দের ডিসপ্লেতে নিয়ে যান।";
+"The area from the last capture is no longer on any display." = "শেষ ক্যাপচারের এলাকাটি আর কোনো ডিসপ্লেতে নেই।";
+"The display from the last capture is no longer connected." = "শেষ ক্যাপচারের ডিসপ্লেটি আর সংযুক্ত নেই।";

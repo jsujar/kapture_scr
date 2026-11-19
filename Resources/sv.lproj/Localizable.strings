@@ -4,9 +4,6 @@
 "Arrow" = "Pil";
 "Text" = "Text";
 "Redact" = "Maskera";
-"Selection" = "Markering";
-"Window" = "Fönster";
-"Full Screen" = "Helskärm";
 "Clipboard" = "Urklipp";
 "Folder" = "Mapp";
 "Clipboard and Folder" = "Urklipp och mapp";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "Det gick inte att kopiera till urklipp.";
 "Too large for the editor." = "För stor för redigeraren.";
 "Take Screenshot" = "Ta skärmavbild";
-"Mode" = "Läge";
 "Save To" = "Spara i";
 "Folder: %@…" = "Mapp: %@…";
 "Choose Folder…" = "Välj mapp…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "Sök efter uppdateringar";
 "Check for Updates…" = "Sök efter uppdateringar…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "Klicka på en nyligen tagen bild för att öppna den. Beskär, pil, text, maskera och överstrykningspenna (⌘1 till ⌘5), med upp till fem steg att ångra. Spara kopia skriver en ny fil och ändrar aldrig originalet.";
-"Click any window to capture it, whatever mode is selected." = "Klicka på valfritt fönster för att ta en bild av det, oavsett vilket läge som är valt.";
+"Click any window to capture it." = "Klicka på valfritt fönster för att ta en bild av det.";
 "Commit" = "Commit";
 "Copied" = "Kopierat";
 "Copy Commands" = "Kopiera kommandon";
 "Copy Details" = "Kopiera detaljer";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Dra över området du vill ha, eller välj Fönster eller Helskärm i menyn. Innan du drar trycker du på mellanslag för att välja en timer; Esc avbryter. Med Alternativ › Justera bildområde kan du flytta området och ändra storlek på det innan bilden tas.";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "Dra över området du vill ha. Innan du drar trycker du på mellanslag för att välja en timer; Esc avbryter. Med Alternativ › Justera bildområde kan du flytta området och ändra storlek på det innan bilden tas.";
 "Help" = "Hjälp";
 "Kapture SCR Help" = "Hjälp för Kapture SCR";
 "Network access" = "Nätverksåtkomst";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "Privata skärmavbilder. Offline. Ingen nätverksåtkomst.";
 "Signature" = "Signatur";
 "Signed by" = "Signerad av";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "Tar den senaste bilden igen direkt, utan timer: samma område, samma fönster även om det har flyttats eller ändrat storlek, eller hela skärmen. Om fönstret har stängts startar en vanlig bildtagning.";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "Tar den senaste bilden igen direkt, utan timer: samma område, samma fönster även om det har flyttats eller ändrat storlek, eller samma skärm. Om fönstret har stängts eller skärmen kopplats från startar en ny bildtagning av samma typ.";
 "Team" = "Team";
 "Valid: unchanged since it was signed" = "Giltig: oförändrad sedan signeringen";
 "Verify This Copy" = "Verifiera den här kopian";
@@ -240,3 +236,12 @@
 "Show Rulers" = "Visa linjaler";
 "Hide Rulers" = "Göm linjaler";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "Redigeraren visar linjaler i bildens egna pixlar. De följer zoomen och markerar pekaren; bildens storlek och pekarens position visas längst ned, och när du drar ser du områdets storlek. Tryck på ⌘R för att visa eller gömma dem.";
+
+/* Full screen capture */
+"Capture Full Screen" = "Ta bild av hela skärmen";
+"Full Screen Shortcut" = "Kortkommando för hela skärmen";
+"Change Full Screen Shortcut…" = "Ändra kortkommando för hela skärmen…";
+"Full screen shortcut: %@" = "Kortkommando för hela skärmen: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "Tar en bild av hela skärmen som pekaren är på, efter timern om du har valt en. Med flera skärmar flyttar du pekaren till den du vill ha.";
+"The area from the last capture is no longer on any display." = "Området från den senaste bildtagningen finns inte längre på någon skärm.";
+"The display from the last capture is no longer connected." = "Skärmen från den senaste bildtagningen är inte längre ansluten.";

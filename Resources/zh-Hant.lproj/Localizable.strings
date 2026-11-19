@@ -4,9 +4,6 @@
 "Arrow" = "箭頭";
 "Text" = "文字";
 "Redact" = "遮蓋";
-"Selection" = "所選區域";
-"Window" = "視窗";
-"Full Screen" = "全螢幕";
 "Clipboard" = "剪貼簿";
 "Folder" = "資料夾";
 "Clipboard and Folder" = "剪貼簿和資料夾";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "無法拷貝到剪貼簿。";
 "Too large for the editor." = "太大，無法在編輯器中打開。";
 "Take Screenshot" = "截圖";
-"Mode" = "模式";
 "Save To" = "儲存到";
 "Folder: %@…" = "資料夾：%@…";
 "Choose Folder…" = "選取資料夾…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "檢查更新項目";
 "Check for Updates…" = "檢查更新項目…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "按一下最近的截圖即可打開。裁切、箭頭、文字、遮蓋和螢光筆（⌘1 至 ⌘5），最多可還原五個步驟。「儲存副本」會寫入新檔案，絕不更改原始檔案。";
-"Click any window to capture it, whatever mode is selected." = "無論選擇哪種模式，按一下任何視窗即可截取。";
+"Click any window to capture it." = "按一下任何視窗即可截取。";
 "Commit" = "Commit";
 "Copied" = "已拷貝";
 "Copy Commands" = "拷貝指令";
 "Copy Details" = "拷貝詳細資訊";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "在所需區域上拖移，或在選單中選擇「視窗」或「全螢幕」。拖移前按空白鍵可選擇計時器；按 Esc 鍵取消。使用「選項」›「調整截圖區域」，可以在截圖前移動區域並調整其大小。";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "在所需區域上拖移。拖移前按空白鍵可選擇計時器；按 Esc 鍵取消。使用「選項」›「調整截圖區域」，可以在截圖前移動區域並調整其大小。";
 "Help" = "說明";
 "Kapture SCR Help" = "Kapture SCR 說明";
 "Network access" = "網路存取";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "私密截圖。離線。無網路存取。";
 "Signature" = "簽名";
 "Signed by" = "簽署者";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "立即重複上次截圖，不使用計時器：相同的區域、相同的視窗（即使已移動或調整大小）或全螢幕。如果該視窗已關閉，則開始一般截圖。";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "立即重複上次截圖，不使用計時器：相同的區域、相同的視窗（即使已移動或調整大小）或相同的顯示器。如果該視窗已關閉或該顯示器已中斷連線，則開始同類型的新截圖。";
 "Team" = "團隊";
 "Valid: unchanged since it was signed" = "有效：簽名後未經更改";
 "Verify This Copy" = "驗證此副本";
@@ -240,3 +236,12 @@
 "Show Rulers" = "顯示尺標";
 "Hide Rulers" = "隱藏尺標";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "編輯器會以截圖的實際像素顯示尺標。尺標會跟隨縮放並標示指標位置；影像尺寸和指標座標會顯示在底部，拖移時會顯示區域大小。按下 ⌘R 可顯示或隱藏尺標。";
+
+/* Full screen capture */
+"Capture Full Screen" = "截取全螢幕";
+"Full Screen Shortcut" = "全螢幕快速鍵";
+"Change Full Screen Shortcut…" = "更改全螢幕快速鍵…";
+"Full screen shortcut: %@" = "全螢幕快速鍵：%@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "截取指標所在的整個顯示器；如果選擇了計時器，則在倒數後截取。有多部顯示器時，將指標移到所需的顯示器上。";
+"The area from the last capture is no longer on any display." = "上次截圖的區域已不在任何顯示器上。";
+"The display from the last capture is no longer connected." = "上次截圖的顯示器已不再連接。";

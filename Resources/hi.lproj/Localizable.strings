@@ -4,9 +4,6 @@
 "Arrow" = "तीर";
 "Text" = "टेक्स्ट";
 "Redact" = "छिपाएँ";
-"Selection" = "चयन";
-"Window" = "विंडो";
-"Full Screen" = "पूरी स्क्रीन";
 "Clipboard" = "क्लिपबोर्ड";
 "Folder" = "फ़ोल्डर";
 "Clipboard and Folder" = "क्लिपबोर्ड और फ़ोल्डर";
@@ -83,7 +80,6 @@
 "Couldn’t copy to the clipboard." = "क्लिपबोर्ड पर कॉपी नहीं हो सका।";
 "Too large for the editor." = "एडिटर के लिए बहुत बड़ी।";
 "Take Screenshot" = "स्क्रीनशॉट लें";
-"Mode" = "मोड";
 "Save To" = "यहाँ सहेजें";
 "Folder: %@…" = "फ़ोल्डर: %@…";
 "Choose Folder…" = "फ़ोल्डर चुनें…";
@@ -203,12 +199,12 @@
 "Check for Updates" = "अपडेट जाँचें";
 "Check for Updates…" = "अपडेट जाँचें…";
 "Click a recent capture to open it. Crop, arrow, text, redact and highlighter (⌘1 to ⌘5), with up to five undo steps. Save Copy writes a new file and never changes the original." = "किसी हाल के कैप्चर को खोलने के लिए उस पर क्लिक करें। क्रॉप, तीर, टेक्स्ट, छिपाएँ और हाइलाइटर (⌘1 से ⌘5), पाँच चरण तक पूर्ववत करने की सुविधा के साथ। “कॉपी सहेजें” नई फ़ाइल बनाता है और मूल को कभी नहीं बदलता।";
-"Click any window to capture it, whatever mode is selected." = "कोई भी मोड चुना हो, किसी भी विंडो को कैप्चर करने के लिए उस पर क्लिक करें।";
+"Click any window to capture it." = "किसी भी विंडो को कैप्चर करने के लिए उस पर क्लिक करें।";
 "Commit" = "Commit";
 "Copied" = "कॉपी किया गया";
 "Copy Commands" = "कमांड कॉपी करें";
 "Copy Details" = "विवरण कॉपी करें";
-"Drag over the area you want, or choose Window or Full Screen in the menu. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "जिस क्षेत्र को चाहें उस पर ड्रैग करें, या मेन्यू में विंडो या पूरी स्क्रीन चुनें। ड्रैग करने से पहले टाइमर चुनने के लिए स्पेस दबाएँ; Esc रद्द करता है। विकल्प › कैप्चर क्षेत्र बदलें से आप कैप्चर करने से पहले क्षेत्र को खिसका सकते हैं और उसका आकार बदल सकते हैं।";
+"Drag over the area you want. Before dragging, press Space to pick a timer; Esc cancels. With Options › Adjust Capture Area, you can move and resize the area before capturing." = "जिस क्षेत्र को चाहें उस पर ड्रैग करें। ड्रैग करने से पहले टाइमर चुनने के लिए स्पेस दबाएँ; Esc रद्द करता है। विकल्प › कैप्चर क्षेत्र बदलें से आप कैप्चर करने से पहले क्षेत्र को खिसका सकते हैं और उसका आकार बदल सकते हैं।";
 "Help" = "सहायता";
 "Kapture SCR Help" = "Kapture SCR सहायता";
 "Network access" = "नेटवर्क एक्सेस";
@@ -223,7 +219,7 @@
 "Private screenshots. Offline. No network access." = "निजी स्क्रीनशॉट। ऑफ़लाइन। कोई नेटवर्क एक्सेस नहीं।";
 "Signature" = "हस्ताक्षर";
 "Signed by" = "हस्ताक्षरकर्ता";
-"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the full screen. If that window has closed, a normal capture starts." = "बिना टाइमर के पिछला कैप्चर तुरंत दोबारा लेता है: वही क्षेत्र, वही विंडो भले ही वह खिसक गई हो या उसका आकार बदल गया हो, या पूरी स्क्रीन। अगर वह विंडो बंद हो गई है, तो सामान्य कैप्चर शुरू होता है।";
+"Takes the last capture again at once, with no timer: the same area, the same window even if it has moved or been resized, or the same display. If that window has closed or that display is disconnected, a new capture of the same kind starts." = "बिना टाइमर के पिछला कैप्चर तुरंत दोबारा लेता है: वही क्षेत्र, वही विंडो भले ही वह खिसक गई हो या उसका आकार बदल गया हो, या वही डिस्प्ले। अगर वह विंडो बंद हो गई है या वह डिस्प्ले डिस्कनेक्ट हो गया है, तो उसी तरह का नया कैप्चर शुरू होता है।";
 "Team" = "टीम";
 "Valid: unchanged since it was signed" = "मान्य: हस्ताक्षर के बाद से कोई बदलाव नहीं";
 "Verify This Copy" = "इस कॉपी को सत्यापित करें";
@@ -240,3 +236,12 @@
 "Show Rulers" = "रूलर दिखाएँ";
 "Hide Rulers" = "रूलर छिपाएँ";
 "The editor shows rulers in the capture’s own pixels. They follow the zoom and mark the pointer, the image size and the pointer position appear at the bottom, and dragging shows the size of the area. Press ⌘R to show or hide them." = "एडिटर कैप्चर के असली पिक्सल में रूलर दिखाता है। ये ज़ूम के साथ चलते हैं और पॉइंटर को चिह्नित करते हैं; इमेज का आकार और पॉइंटर की स्थिति नीचे दिखती है, और ड्रैग करने पर क्षेत्र का आकार दिखता है। इन्हें दिखाने या छिपाने के लिए ⌘R दबाएँ।";
+
+/* Full screen capture */
+"Capture Full Screen" = "पूरी स्क्रीन कैप्चर करें";
+"Full Screen Shortcut" = "पूरी स्क्रीन शॉर्टकट";
+"Change Full Screen Shortcut…" = "पूरी स्क्रीन शॉर्टकट बदलें…";
+"Full screen shortcut: %@" = "पूरी स्क्रीन शॉर्टकट: %@";
+"Captures the whole display the pointer is on, after the timer if one is chosen. With several displays, move the pointer to the one you want." = "जिस डिस्प्ले पर पॉइंटर है उसकी पूरी स्क्रीन कैप्चर करता है, टाइमर चुना हो तो उसके बाद। कई डिस्प्ले हों तो पॉइंटर को अपनी पसंद वाले पर ले जाएँ।";
+"The area from the last capture is no longer on any display." = "पिछले कैप्चर वाला क्षेत्र अब किसी भी डिस्प्ले पर नहीं है।";
+"The display from the last capture is no longer connected." = "पिछले कैप्चर वाला डिस्प्ले अब कनेक्ट नहीं है।";

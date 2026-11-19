@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.0] – 2026-11-19
+
+One shortcut for each kind of capture, including the full screen.
+
+### Added
+- **Capture Full Screen** with its own shortcut, ⌘⇧8, in the menu and the shortcut hints. It captures the whole display the pointer is on, not always the main one, and *Options › Change Full Screen Shortcut…* changes it.
+
+### Changed
+- **One shortcut for each kind of capture:** ⌘⇧6 an area, ⌘⇧7 a window, ⌘⇧8 the full screen and ⌘⇧9 repeats the last capture (it was ⌘⇧8). The *Mode* section of the menu is gone, since every kind now has its own shortcut. A shortcut you changed yourself is kept.
+- **Repeat Last Capture** takes the same display again after a full screen capture. If the window or display is gone, it starts a new capture of the same kind and says why.
+
 ## [1.1.0] – 2026-11-18
 
 Pixel rulers in the editor and a cleaner recent captures panel.

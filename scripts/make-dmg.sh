@@ -63,7 +63,7 @@ if [[ "${1:-}" == "--finish" ]]; then
     [[ "$IDENTITY_KIND" == developer-id ]] || { echo "--finish needs the Developer ID certificate"; exit 1; }
     wait_notary "$2" || exit $?
     # The executable's checksum, read from inside the image.
-    MOUNT=$(hdiutil attach "$DMG" -readonly -nobrowse -noverify -noautoopen | awk -F'\t' '/\/Volumes\// {print $NF; exit}')
+    MOUNT=$(hdiutil attach "$DMG" -readonly -nobrowse -noverify -noautoopen | awk -F'\t' '/\/Volumes\// && !n {print $NF; n=1}')
     EXEC_SHA=$(shasum -a 256 "$MOUNT/$NAME.app/Contents/MacOS/Kapture" | cut -d" " -f1)
     hdiutil detach "$MOUNT" -quiet
     finish "$EXEC_SHA"
@@ -96,7 +96,7 @@ ln -s /Applications "$STAGE/Applications"
 # Writable image first, so Finder can store the window layout in it.
 RW="$WORK/rw.dmg"
 hdiutil create -quiet -srcfolder "$STAGE" -volname "$NAME" -fs HFS+ -format UDRW -size 64m "$RW"
-MOUNT=$(hdiutil attach "$RW" -readwrite -noverify -noautoopen | awk -F'\t' '/\/Volumes\// {print $NF; exit}')
+MOUNT=$(hdiutil attach "$RW" -readwrite -noverify -noautoopen | awk -F'\t' '/\/Volumes\// && !n {print $NF; n=1}')
 
 # Window layout (needs permission for Terminal to control Finder; skipped with a warning if denied).
 if ! osascript <<EOF
@@ -138,7 +138,7 @@ TIMESTAMP=--timestamp=none
 /usr/bin/codesign --force --sign "$IDENTITY" $TIMESTAMP "$DMG"
 if [[ "$IDENTITY_KIND" == developer-id ]]; then
     echo "Notarizing (usually a few minutes)…"
-    SUBMISSION=$(xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --no-wait | tee /dev/stderr | awk '/^  id: / {print $2; exit}')
+    SUBMISSION=$(xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --no-wait | tee /dev/stderr | awk '/^  id: / && !n {print $2; n=1}')
     [[ -n "$SUBMISSION" ]] || { echo "Could not submit to the notary service"; exit 1; }
     wait_notary "$SUBMISSION" || exit $?
 fi

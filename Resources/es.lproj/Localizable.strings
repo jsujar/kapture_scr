@@ -191,6 +191,7 @@
 "A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains." = "Una copia manipulada también podría falsear esta ventana. Para asegurarte, compara el SHA-256 con el de la página de la versión o comprueba la app en Terminal como se explica en la Ayuda.";
 "About Kapture SCR" = "Acerca de Kapture SCR";
 "About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page." = "«Acerca de Kapture SCR» muestra la versión, la firma de código y el SHA-256 de la app. Para comprobarlo sin fiarte de la app, ejecuta estos comandos en Terminal: la firma debe ser válida, los permisos deben incluir el App Sandbox y ningún acceso a la red, y el SHA-256 debe coincidir con el de la página de la versión.";
+"The last command checks Apple’s notarization: a downloaded copy must show “accepted” and “source=Notarized Developer ID”. A copy you build yourself is not notarized." = "El último comando comprueba la notarización de Apple: una copia descargada debe mostrar «accepted» y «source=Notarized Developer ID». Una copia que compiles tú no está notarizada.";
 "Ad hoc (no certificate)" = "Ad hoc (sin certificado)";
 "Allowed" = "Permitido";
 "App Sandbox" = "App Sandbox";

@@ -28,7 +28,7 @@ This is a small, independent project. Reports are read and acknowledged as soon 
 - Escaping the App Sandbox, or reading or writing files outside the folder you chose and the app's own container.
 - Captures, edits or clipboard contents ending up somewhere you didn't send them (other apps, logs, temporary files that are not deleted).
 - Redaction that can be undone in an exported image (exports should contain only the final pixels).
-- Problems with the code signature or the published checksums of a release.
+- Problems with the code signature, the notarization or the published checksums of a release. Official releases are signed with Developer ID, team `UBX6M2XYLU`; a copy signed by anyone else is not an official build.
 
 ## Out of scope
 

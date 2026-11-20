@@ -2138,6 +2138,7 @@ func verificationCommands(appPath: String) -> String {
     codesign --verify --deep --strict --verbose=2 \(app)
     codesign -d --entitlements - \(app)
     shasum -a 256 \(app.dropLast())/Contents/MacOS/Kapture"
+    spctl --assess --type execute --verbose=2 \(app)
     """
 }
 
@@ -2230,6 +2231,12 @@ struct HelpView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .center) {
+                    BrandLogo(height: 44)
+                    Spacer()
+                    Text(EditorView.versionText).font(.system(size: 12)).monospacedDigit().foregroundStyle(.secondary)
+                }
+                Divider()
                 ForEach(topics) { topic in
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: topic.symbol).font(.system(size: 18)).foregroundStyle(Color.accentColor).frame(width: 28)
@@ -2265,6 +2272,8 @@ struct HelpView: View {
                     .padding(10).frame(maxWidth: .infinity, alignment: .leading)
                     .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.primary.opacity(0.06)))
                     .environment(\.layoutDirection, .leftToRight)
+                Text(L("The last command checks Apple’s notarization: a downloaded copy must show “accepted” and “source=Notarized Developer ID”. A copy you build yourself is not notarized."))
+                    .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 HStack {
                     Button(copied ? L("Copied") : L("Copy Commands")) {
                         NSPasteboard.general.clearContents()
@@ -2833,6 +2842,23 @@ struct EditorView: View {
                 .padding(.top, 6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottomTrailing) { versionLabel }
+    }
+
+    /// The app's version, in the corner of the empty window; it opens About Kapture SCR.
+    private var versionLabel: some View {
+        Button {
+            NSApp.sendAction(#selector(AppDelegate.showAbout), to: nil, from: nil)
+        } label: {
+            Text(Self.versionText).font(.system(size: 11)).monospacedDigit().foregroundStyle(.tertiary)
+        }
+        .buttonStyle(.plain)
+        .help(L("About Kapture SCR"))
+        .padding(.trailing, 16).padding(.bottom, 12)
+    }
+
+    static var versionText: String {
+        "\(L("Version")) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?")"
     }
 
     // MARK: Bottom

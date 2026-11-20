@@ -191,6 +191,7 @@
 "A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains." = "কারসাজি করা কপি এই উইন্ডোটিও নকল করতে পারে। নিশ্চিত হতে, SHA-256 রিলিজ পেজেরটির সাথে মিলিয়ে দেখুন, অথবা সহায়তায় যেভাবে বলা আছে সেভাবে টার্মিনালে অ্যাপটি যাচাই করুন।";
 "About Kapture SCR" = "Kapture SCR সম্পর্কে";
 "About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page." = "“Kapture SCR সম্পর্কে” অ্যাপের সংস্করণ, কোড স্বাক্ষর ও SHA-256 দেখায়। অ্যাপের ওপর ভরসা না করে যাচাই করতে, টার্মিনালে এই কমান্ডগুলো চালান: স্বাক্ষর বৈধ হতে হবে, এনটাইটেলমেন্টে App Sandbox থাকতে হবে এবং কোনো নেটওয়ার্ক অ্যাক্সেস থাকবে না, আর SHA-256 রিলিজ পেজেরটির সাথে মিলতে হবে।";
+"The last command checks Apple’s notarization: a downloaded copy must show “accepted” and “source=Notarized Developer ID”. A copy you build yourself is not notarized." = "শেষ কমান্ডটি Apple-এর নোটারাইজেশন যাচাই করে: ডাউনলোড করা কপিতে “accepted” এবং “source=Notarized Developer ID” দেখাতে হবে। আপনার নিজে বানানো কপি নোটারাইজড নয়।";
 "Ad hoc (no certificate)" = "Ad hoc (কোনো সার্টিফিকেট নেই)";
 "Allowed" = "অনুমোদিত";
 "App Sandbox" = "App Sandbox";

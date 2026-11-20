@@ -191,6 +191,7 @@
 "A tampered copy could also fake this window. To be sure, compare the SHA-256 with the one on the release page, or check the app in Terminal as Help explains." = "被篡改的副本也可能伪造此窗口。为确保无误，请将 SHA-256 与发布页面上的值进行比较，或按照帮助中的说明在“终端”中检查 App。";
 "About Kapture SCR" = "关于 Kapture SCR";
 "About Kapture SCR shows the version, the code signature and the SHA-256 of the app. To check without trusting the app, run these commands in Terminal: the signature must be valid, the entitlements must include the App Sandbox and no network access, and the SHA-256 must match the one on the release page." = "“关于 Kapture SCR”会显示 App 的版本、代码签名和 SHA-256。若要在不信任 App 的情况下进行检查，请在“终端”中运行这些命令：签名必须有效，权限必须包含 App Sandbox 且不含网络访问权限，SHA-256 必须与发布页面上的值一致。";
+"The last command checks Apple’s notarization: a downloaded copy must show “accepted” and “source=Notarized Developer ID”. A copy you build yourself is not notarized." = "最后一条命令检查 Apple 公证：下载的副本必须显示“accepted”和“source=Notarized Developer ID”。你自己构建的副本未经公证。";
 "Ad hoc (no certificate)" = "Ad hoc（无证书）";
 "Allowed" = "允许";
 "App Sandbox" = "App Sandbox";

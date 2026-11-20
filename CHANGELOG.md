@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [1.3.1] – 2026-11-20
+
+The version number in sight, and a way to check the notarization from Help. First published release with Developer ID signing (1.3.0 was tagged but never released).
+
+### Added
+- **Version number in sight:** in the corner of the empty window (click it for *About Kapture SCR*) and at the top of *Kapture SCR Help*.
+- *Kapture SCR Help › Verify This Copy* adds the `spctl` command that confirms Apple's notarization.
+
 ## [1.3.0] – 2026-11-19
 
 Signed with Developer ID and notarized by Apple: it opens without warnings.

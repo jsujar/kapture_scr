@@ -57,6 +57,7 @@ final class AboutTests: XCTestCase {
             #"codesign --verify --deep --strict --verbose=2 "/Applications/Kapture SCR.app""#,
             #"codesign -d --entitlements - "/Applications/Kapture SCR.app""#,
             #"shasum -a 256 "/Applications/Kapture SCR.app/Contents/MacOS/Kapture""#,
+            #"spctl --assess --type execute --verbose=2 "/Applications/Kapture SCR.app""#,
         ])
     }
 }

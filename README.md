@@ -204,9 +204,9 @@ shasum -a 256 "/Applications/Kapture SCR.app/Contents/MacOS/Kapture"
 spctl --assess --type execute --verbose=2 "/Applications/Kapture SCR.app"
 ```
 
-- The first must report `valid on disk` and `satisfies its Designated Requirement`.
+- The first must report `valid on disk` and `satisfies its Designated Requirement`. Official releases are signed by **Developer ID Application: Javier Sújar Rodríguez (UBX6M2XYLU)**; `codesign -dvv` shows it as the first `Authority`, and *About Kapture SCR* as *Signed by* and *Team*.
 - The second must list only `app-sandbox`, `files.user-selected.read-write` and `files.bookmarks.app-scope`, with no `network` entitlement.
-- The fourth must say `accepted` and `source=Notarized Developer ID`.
+- The fourth must say `accepted` and `source=Notarized Developer ID`: Apple notarized that copy. A copy you build yourself is not notarized.
 - The SHA-256 must match the one published with the release, next to the disk image's own checksum. `scripts/make-dmg.sh` prints both and writes them to `dist/Kapture SCR <version>.sha256.txt`.
 
 You can also read the source and [build it yourself](#build-from-source).
